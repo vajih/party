@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Party App (MVP)</title>
+
+  <!-- CSS (relative path so it works locally AND on GitHub Pages) -->
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>🎉 Party App</h1>
+  </header>
+
+  <main class="container">
+    <!-- Auth strip -->
+    <section class="card" id="authSection">
+      <div id="authMsg">Sign in to continue</div>
+      <form id="authForm" class="row" autocomplete="on" style="margin-top:8px">
+        <input type="email" id="authEmail" placeholder="you@example.com" required />
+        <button type="submit">Send magic link</button>
+      </form>
+      <button id="signOutBtn" class="link" style="margin-top:8px" hidden>Sign out</button>
+    </section>
+
+    <!-- Host Dashboard (shown only when signed in) -->
+    <section class="card" id="hostCard" hidden>
+      <h2>Host Dashboard</h2>
+
+      <h3 style="margin-top:12px">Create a new party</h3>
+      <form id="createPartyForm" class="stack" style="margin-top:8px">
+        <div class="row">
+          <label for="partyTitle">Title</label>
+          <input id="partyTitle" required placeholder="e.g., FriendsGiving 2025" />
+        </div>
+        <div class="row">
+          <label for="partyDate">Date & Time</label>
+          <input id="partyDate" type="datetime-local" />
+        </div>
+        <div class="row">
+          <label for="partyVenue">Venue</label>
+          <input id="partyVenue" placeholder="Optional" />
+        </div>
+        <div class="row">
+          <label for="partyDesc">Description</label>
+          <textarea id="partyDesc" rows="2" placeholder="Optional"></textarea>
+        </div>
+        <div class="row">
+          <label for="partySlug">Custom Slug</label>
+          <input id="partySlug" placeholder="friendsgiving-2025 (optional)" />
+        </div>
+        <button type="submit">Create Party</button>
+      </form>
+
+      <hr style="margin:16px 0" />
+
+      <h3>Your parties</h3>
+      <div id="hostPartiesList" class="list" style="margin-top:8px"></div>
+
+      <hr style="margin:16px 0" />
+
+      <h3>Add a game to a party</h3>
+      <form id="newGameForm" class="stack" style="margin-top:8px">
+        <div class="row">
+          <label for="hostPartySelect">Party</label>
+          <select id="hostPartySelect" required></select>
+        </div>
+        <div class="row">
+          <label for="gameType">Game Type</label>
+          <select id="gameType" required>
+            <option value="two_facts">Custom Prompts (Two+ facts)</option>
+            <option value="favorite_song">Favorite Song</option>
+            <option value="baby_photo">Baby Photo Contest</option>
+            <option value="teen_photo">Teenage Photo Contest</option>
+            <option value="wedding_photo">Wedding Photo Contest</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="gameTitle">Title</label>
+          <input id="gameTitle" placeholder="Optional (auto if empty)" />
+        </div>
+        <button type="submit">Add Game</button>
+      </form>
+    </section>
+
+    <!-- Party Page (shows when ?party=slug is present) -->
+    <section class="card" id="partyCard" hidden>
+      <!-- Host controls for the Party page -->
+      <div class="row" style="justify-content:space-between; margin-bottom:8px;">
+        <button id="backToDashBtn" class="link">← Back to dashboard</button>
+        <div id="hostTools" hidden>
+          <button id="editPartyToggle" class="link">Edit party</button>
+          <button id="addGameToggle" class="link">Add game</button>
+        </div>
+      </div>
+
+      <!-- Inline edit form (hidden by default) -->
+      <form id="editPartyForm" class="stack" hidden style="margin-bottom:10px;">
+        <div class="row">
+          <label for="editTitle">Title</label>
+          <input id="editTitle" required />
+        </div>
+        <div class="row">
+          <label for="editDate">Date & Time</label>
+          <input id="editDate" type="datetime-local" />
+        </div>
+        <div class="row">
+          <label for="editVenue">Venue</label>
+          <input id="editVenue" />
+        </div>
+        <div class="row">
+          <label for="editDesc">Description</label>
+          <textarea id="editDesc" rows="2"></textarea>
+        </div>
+        <button type="submit">Save changes</button>
+      </form>
+
+      <!-- Inline add-game form (hidden by default) -->
+      <form id="addGameHereForm" class="stack" hidden style="margin-bottom:10px;">
+        <div class="row">
+          <label for="addGameType">Game Type</label>
+          <select id="addGameType" required>
+            <option value="two_facts">Custom Prompts (Two+ facts)</option>
+            <option value="favorite_song">Favorite Song</option>
+            <option value="baby_photo">Baby Photo Contest</option>
+            <option value="teen_photo">Teenage Photo Contest</option>
+            <option value="wedding_photo">Wedding Photo Contest</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="addGameTitle">Title</label>
+          <input id="addGameTitle" placeholder="Optional (auto if empty)" />
+        </div>
+        <button type="submit">Add Game</button>
+      </form>
+
+      <div id="partyHeader"></div>
+      <div id="partyShare" style="margin:8px 0 12px 0"></div>
+      <div id="partyGames" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">Static MVP • HTML + JS</footer>
+
+  <!-- JS (ES module so we can grow cleanly later) -->
+  <script type="module" src="./js/app.js"></script>
+  <noscript>This site needs JavaScript enabled.</noscript>
+</body>
+</html>
