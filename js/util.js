@@ -1,19 +1,36 @@
 export const byId = (id) => document.getElementById(id);
 
-export function slugify(text) {
-  return (text || '')
-    .toString().trim().toLowerCase()
+export function slugify(str = '') {
+  return String(str)
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, ' and ')
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)+/g, '')
-    .slice(0, 60);
+    .replace(/^-+|-+$/g, '');
 }
 
-export function fmtDate(dt) {
-  if (!dt) return '';
-  const d = new Date(dt);
-  return d.toLocaleString();
+export function fmtDate(iso) {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    }).format(d);
+  } catch {
+    return '';
+  }
 }
 
-export function copyToClipboard(text) {
-  navigator.clipboard?.writeText(text).catch(() => {});
+export async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+  }
 }

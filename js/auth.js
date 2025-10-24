@@ -5,7 +5,11 @@ export const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_K
 
 export const auth = {
   getSession: () => supabase.auth.getSession(),
-  onChange: (cb) => supabase.auth.onAuthStateChange((_event, session) => cb(session)),
+  onChange: (cb) => {
+    const { data: { subscription } } =
+      supabase.auth.onAuthStateChange((_event, session) => cb(session));
+    return () => subscription?.unsubscribe();
+  },
   signInWithEmail: (email, redirectTo) =>
     supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo } }),
   signOut: () => supabase.auth.signOut(),

@@ -1,23 +1,45 @@
-:root { --ink:#1f2937; --bg:#fafafa; --card:#ffffff; --accent:#22c55e; }
+/* Base */
 * { box-sizing: border-box; }
-body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:var(--bg); color:var(--ink); }
-.site-header, .site-footer { padding:12px 16px; background:#ffffff; border-bottom:1px solid #e5e7eb; }
-.site-footer { border-top:1px solid #e5e7eb; border-bottom:none; margin-top:24px; }
-.container { max-width: 900px; margin: 16px auto; padding: 0 12px; }
-.badge-ok { display:inline-block; padding:6px 10px; border-radius:999px; background:var(--accent); color:white; font-weight:600; }
-.card { background:var(--card); border:1px solid #e5e7eb; border-radius:12px; padding:16px; box-shadow:0 6px 16px rgba(0,0,0,.06); }
+html, body { margin:0; padding:0; }
+body {
+  font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  color:#111827; background:#f7f7fb;
+}
+a { color:#2563eb; text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+.site-header, .site-footer { background:#fff; border-bottom:1px solid #eee; }
+.site-footer { border-top:1px solid #eee; border-bottom:none; }
+.site-header h1 { margin:0; padding:16px 20px; }
+.site-footer { padding:12px 20px; color:#6b7280; }
+
+.container { max-width: 820px; margin: 16px auto 48px; padding: 0 16px; }
+
+.card {
+  background:#fff; border:1px solid #e5e7eb; border-radius:12px;
+  padding:12px; box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+}
+
+/* Ensure anything with [hidden] truly disappears */
+[hidden] { display:none !important; }
+
+/* Layout helpers */
 .row { display:flex; gap:10px; align-items:center; }
 .row label { width: 140px; font-size: 14px; color: #6b7280; }
 .stack { display:grid; gap:10px; }
+.grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
 
+/* Controls */
 input, textarea, select, button {
   padding:10px 12px; border-radius:10px; border:1px solid #e5e7eb;
   background:#fff; color:#111827; font: inherit;
 }
+textarea { resize: vertical; }
 button { background:#22c55e; color:#052; font-weight:600; border:none; cursor:pointer; }
-button.link { background:transparent; border:1px solid #d1d5db; }
+button.link { background:transparent; border:1px solid #d1d5db; color:#111827; }
 button:disabled { opacity:0.6; cursor:not-allowed; }
 
+/* Lists & badges */
 .list .item {
   background:#fff; border:1px solid #e5e7eb; border-radius:10px;
   padding:12px; margin-bottom:10px;
@@ -26,6 +48,25 @@ button:disabled { opacity:0.6; cursor:not-allowed; }
   border:1px solid #d1d5db; border-radius:999px; font-size:12px; color:#6b7280;
 }
 .muted { color:#6b7280; font-size:12px; }
-.grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.small { font-size:12px; color:#6b7280; }
+
+/* Games */
 .game-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:12px; }
 .game-card h4 { margin: 0 0 6px 0; }
+
+/* Submissions */
+.pill { display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid #e5e7eb; font-size:12px; color:#6b7280; }
+.pill.pending { background:#fff8e1; border-color:#f59e0b; color:#92400e; }
+.pill.approved { background:#ecfdf5; border-color:#10b981; color:#065f46; }
+.pill.rejected { background:#fef2f2; border-color:#ef4444; color:#991b1b; }
+
+.submission { background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:10px; margin-top:8px; }
+.submission img { width:100%; height:auto; border-radius:8px; border:1px solid #e5e7eb; }
+
+/* Welcome helpers */
+.notice {
+  background:#ecfdf5; border:1px solid #10b981; color:#065f46;
+  padding:10px; border-radius:10px;
+}
+#welcomeCard h2 { margin:0; }
+#welcomeCard .row input { flex:1; }
