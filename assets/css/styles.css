@@ -39,6 +39,10 @@ button { background:#22c55e; color:#052; font-weight:600; border:none; cursor:po
 button.link { background:transparent; border:1px solid #d1d5db; color:#111827; }
 button:disabled { opacity:0.6; cursor:not-allowed; }
 
+/* Danger button for destructive actions */
+button.danger { border-color:#ef4444; color:#991b1b; background:transparent; }
+button.danger:hover { background:#fef2f2; }
+
 /* Lists & badges */
 .list .item {
   background:#fff; border:1px solid #e5e7eb; border-radius:10px;

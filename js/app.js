@@ -1,7 +1,11 @@
 import { auth, supabase } from './auth.js';
 import { byId, slugify, fmtDate, copyToClipboard } from './util.js';
 
-/* ---------- Elements ---------- */
+/* ------------ Config for uploads ------------ */
+const STORAGE_BUCKET = 'party-media';
+const MAX_IMAGE_MB = 8;
+
+/* ------------ Elements ------------ */
 const authSection = byId('authSection');
 const authMsg     = byId('authMsg');
 const authForm    = byId('authForm');
@@ -57,26 +61,28 @@ const cohostEmail       = byId('cohostEmail');
 const cohostRole        = byId('cohostRole');
 const hostsList         = byId('hostsList');
 
+/* Moderation list (dashboard) */
 const refreshMod = byId('refreshMod');
 const modList    = byId('modList');
 
-/* ---------- State ---------- */
+/* ------------ State ------------ */
 let session = null;
 let user    = null;
 let currentParty = null;
+let isHostForCurrentParty = false;
 
-/* ---------- Helpers to truly hide/show ---------- */
+/* ------------ Helpers ------------ */
 function hideEl(el){ if(!el) return; el.hidden = true; el.style.display = 'none'; }
 function showEl(el, display=''){ if(!el) return; el.hidden = false; el.style.display = display; }
+const qs = (sel, root=document) => root.querySelector(sel);
 
-/* ---------- Boot ---------- */
+/* ------------ Boot ------------ */
 document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('popstate', route);
 
 backToDashBtn?.addEventListener('click', (e) => {
   e.preventDefault();
-  const base = `${location.origin}${location.pathname}`;
-  history.pushState({}, '', base);
+  history.pushState({}, '', `${location.origin}${location.pathname}`);
   route();
 });
 
@@ -104,12 +110,12 @@ async function init() {
   route();
 }
 
-/* ---------- Auth UI ---------- */
+/* ------------ Auth UI ------------ */
 function renderAuth() {
   const signedIn = !!user;
 
   if (signedIn) {
-    authMsg.innerHTML = `Signed in as <strong>${user.email}</strong>`;
+    authMsg.innerHTML = `Signed in as <strong>${escapeHtml(user.email)}</strong>`;
     hideEl(authForm);
     showEl(signOutBtn);
   } else {
@@ -142,7 +148,7 @@ async function onAuthSubmit(e) {
   if (!error) authEmail.value = '';
 }
 
-/* ---------- Router ---------- */
+/* ------------ Router ------------ */
 function route() {
   const params = new URLSearchParams(location.search);
   const slug = params.get('party');
@@ -159,7 +165,7 @@ function route() {
   }
 }
 
-/* ---------- Parties: create & list ---------- */
+/* ------------ Parties: create & list ------------ */
 async function onCreateParty(e) {
   e.preventDefault();
   if (!user) return alert('Please sign in first.');
@@ -217,9 +223,9 @@ async function renderHostParties() {
       <div class="item">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
           <div>
-            <div><strong>${p.title}</strong></div>
-            <div class="muted">${fmtDate(p.date)} • ${p.venue || ''}</div>
-            <div class="muted">Slug: <code>${p.slug}</code></div>
+            <div><strong>${escapeHtml(p.title)}</strong></div>
+            <div class="muted">${fmtDate(p.date)} • ${escapeHtml(p.venue || '')}</div>
+            <div class="muted">Slug: <code>${escapeHtml(p.slug)}</code></div>
           </div>
           <div style="display:flex; gap:8px;">
             <button class="link copyBtn" data-url="${url}">Copy link</button>
@@ -231,7 +237,7 @@ async function renderHostParties() {
   }).join('');
 
   hostPartySelect.innerHTML = parties.map(p =>
-    `<option value="${p.id}">${p.title} (${p.slug})</option>`
+    `<option value="${p.id}">${escapeHtml(p.title)} (${escapeHtml(p.slug)})</option>`
   ).join('');
 
   hostPartiesList.querySelectorAll('.copyBtn').forEach(btn => {
@@ -245,7 +251,7 @@ async function renderHostParties() {
   hostPartiesList.dataset.partyIds = parties.map(p => p.id).join(',');
 }
 
-/* ---------- Add Game (dashboard) ---------- */
+/* ------------ Add Game (dashboard) ------------ */
 async function onAddGame(e) {
   e.preventDefault();
   if (!user) return alert('Please sign in first.');
@@ -273,7 +279,7 @@ function defaultGameTitle(type) {
   }
 }
 
-/* ---------- Party page ---------- */
+/* ------------ Party page ------------ */
 async function loadParty(slug) {
   if (partyHeader) { partyHeader.hidden = false; partyHeader.innerHTML = 'Loading…'; }
   if (partyShare)  { partyShare.hidden  = false; partyShare.innerHTML  = ''; }
@@ -285,7 +291,7 @@ async function loadParty(slug) {
 
   if (error) { partyHeader.innerHTML = `<p>Error: ${error.message}</p>`; return; }
   currentParty = parties?.[0] ?? null;
-  if (!currentParty) { partyHeader.innerHTML = `<h2>Party not found: ${slug}</h2>`; return; }
+  if (!currentParty) { partyHeader.innerHTML = `<h2>Party not found: ${escapeHtml(slug)}</h2>`; return; }
 
   if (welcomeTitle)   welcomeTitle.textContent    = currentParty.title || 'Welcome';
   if (welcomeSubtitle)welcomeSubtitle.textContent = `${fmtDate(currentParty.date)} • ${currentParty.venue || ''}`;
@@ -299,10 +305,7 @@ async function loadParty(slug) {
     hideEl(welcomeCard);
   }
 
-  /* Determine host status:
-     - Owner (parties.host_id)
-     - OR in party_hosts by user_id or invite_email
-  */
+  // Determine host (owner or in party_hosts)
   let isHost = false;
   if (user) {
     if (currentParty.host_id === user.id) {
@@ -317,6 +320,7 @@ async function loadParty(slug) {
       isHost = !!(mem && mem.length);
     }
   }
+  isHostForCurrentParty = isHost;
 
   // Host tools
   editPartyForm.hidden = true;
@@ -330,7 +334,6 @@ async function loadParty(slug) {
     showEl(hostTools);
     showEl(backToDashBtn);
 
-    // Prefill edit form
     editTitle.value = currentParty.title || '';
     editVenue.value = currentParty.venue || '';
     editDesc.value  = currentParty.description || '';
@@ -345,7 +348,6 @@ async function loadParty(slug) {
       if (!addGameHereForm.hidden) { editPartyForm.hidden = true; manageHostsForm.hidden = true; }
     };
 
-    /* Manage hosts toggle & handlers */
     manageHostsToggle.onclick = async () => {
       manageHostsForm.hidden = !manageHostsForm.hidden;
       if (!manageHostsForm.hidden) {
@@ -441,9 +443,9 @@ async function loadParty(slug) {
 
   // Header + share
   partyHeader.innerHTML = `
-    <h2>${currentParty.title}</h2>
-    <p class="muted">${fmtDate(currentParty.date)} • ${currentParty.venue || ''}</p>
-    <p>${currentParty.description || ''}</p>
+    <h2>${escapeHtml(currentParty.title)}</h2>
+    <p class="muted">${fmtDate(currentParty.date)} • ${escapeHtml(currentParty.venue || '')}</p>
+    <p>${escapeHtml(currentParty.description || '')}</p>
   `;
   const url = `${location.origin}${location.pathname}?party=${encodeURIComponent(slug)}`;
   partyShare.innerHTML = `Share link: <code>${url}</code> <button class="link" id="copyPartyLink">Copy</button>`;
@@ -460,14 +462,33 @@ async function loadParty(slug) {
   if (!games || games.length === 0) { partyGames.innerHTML = '<p class="small">No games yet.</p>'; return; }
 
   partyGames.innerHTML = games.map(renderGameCardSkeleton).join('');
+
+  // attach delete handlers
+  if (isHostForCurrentParty) {
+    partyGames.querySelectorAll('.delGameBtn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        if (!confirm('Delete this game? This will also remove its submissions.')) return;
+        const { error: delErr } = await supabase.from('games').delete().eq('id', id);
+        if (delErr) return alert(delErr.message);
+        await loadParty(slug);
+      });
+    });
+  }
+
   for (const g of games) await hydrateGameCard(g);
 }
 
 function renderGameCardSkeleton(g) {
   return `
     <div class="game-card" id="game-${g.id}">
-      <h4>${g.title || defaultGameTitle(g.type)}</h4>
-      <div class="muted">Type: ${g.type}</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <div>
+          <h4 style="margin:0">${escapeHtml(g.title || defaultGameTitle(g.type))}</h4>
+          <div class="muted">Type: ${escapeHtml(g.type)}</div>
+        </div>
+        ${isHostForCurrentParty ? `<button class="link danger delGameBtn" data-id="${g.id}">Delete</button>` : ``}
+      </div>
       <div class="game-submit" id="submit-${g.id}" style="margin-top:8px;"></div>
       <div class="game-list" id="list-${g.id}" style="margin-top:8px;"></div>
     </div>
@@ -508,8 +529,40 @@ async function hydrateGameCard(game) {
     const form = submitWrap.querySelector('form');
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const payload = readSubmissionForm(game, form);
-      if (!payload) return;
+
+      let payload = null;
+
+      // Photo games → upload first
+      if (['baby_photo','teen_photo','wedding_photo'].includes(game.type)) {
+        const fd = new FormData(form);
+        const display_name = (fd.get('display_name') || '').toString().trim();
+        const file = fd.get('image_file');
+
+        if (!display_name) return alert('Please enter a display name.');
+        if (!(file instanceof File)) return alert('Please choose a photo.');
+
+        const mb = file.size / (1024 * 1024);
+        if (mb > MAX_IMAGE_MB) return alert(`Please upload a smaller photo (under ${MAX_IMAGE_MB} MB).`);
+        if (!file.type.startsWith('image/')) return alert('Please upload an image file.');
+
+        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+        const path = `party/${currentParty.id}/game/${game.id}/user/${user.id}/${Date.now()}.${ext}`;
+
+        const { error: upErr } = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .upload(path, file, { cacheControl: '3600', upsert: false });
+
+        if (upErr) return alert(`Upload failed: ${upErr.message}`);
+
+        const { data: pub } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+        const image_url = pub?.publicUrl;
+
+        payload = { display_name, content: { image_url, storage_path: path } };
+      } else {
+        payload = readSubmissionForm(game, form);
+        if (!payload) return;
+      }
+
       const { error } = await supabase.from('submissions').insert({
         party_id: currentParty.id,
         game_id: game.id,
@@ -518,6 +571,7 @@ async function hydrateGameCard(game) {
         content: payload.content,
         moderation_status: 'pending'
       });
+
       if (error) return alert(error.message);
       await hydrateGameCard(game);
       alert('Submitted! Awaiting host approval.');
@@ -536,7 +590,7 @@ async function hydrateGameCard(game) {
   }
 }
 
-/* ----- Submission forms (MVP) ----- */
+/* ----- Submission forms & renderers ----- */
 function renderSubmissionForm(game) {
   switch (game.type) {
     case 'two_facts':
@@ -566,9 +620,9 @@ function renderSubmissionForm(game) {
       return `
         <form class="stack">
           <input name="display_name" placeholder="Display name" required />
-          <input name="image_url" type="url" placeholder="Public image URL (.jpg/.png)" required />
-          <button type="submit">Submit</button>
-          <p class="small">Photos are reviewed by host before posting.</p>
+          <input name="image_file" type="file" accept="image/*" required />
+          <button type="submit">Upload photo</button>
+          <p class="small">JPG/PNG recommended. Max ~${MAX_IMAGE_MB} MB. Host will approve before posting.</p>
         </form>
       `;
     default:
@@ -595,13 +649,6 @@ function readSubmissionForm(game, form) {
       if (!title || !artist) { alert('Please enter song title and artist.'); return null; }
       return { display_name, content: { title, artist, link } };
     }
-    case 'baby_photo':
-    case 'teen_photo':
-    case 'wedding_photo': {
-      const image_url = (fd.get('image_url') || '').toString().trim();
-      try { new URL(image_url); } catch { alert('Please paste a valid public image URL.'); return null; }
-      return { display_name, content: { image_url } };
-    }
     default:
       return null;
   }
@@ -626,7 +673,7 @@ function renderSubmissionContent(type, content) {
   }
 }
 
-/* ---------- Welcome flow ---------- */
+/* ------------ Welcome flow ------------ */
 async function onWelcomeSubmit(e) {
   e.preventDefault();
   const email = (welcomeEmail.value || '').trim();
@@ -661,7 +708,7 @@ async function onWelcomeSubmit(e) {
   };
 }
 
-/* ---------- Moderation ---------- */
+/* ------------ Moderation (dashboard) ------------ */
 async function renderModQueue() {
   if (!user || !modList) return;
 
@@ -726,7 +773,7 @@ async function renderModQueue() {
   });
 }
 
-/* ---------- Local util ---------- */
+/* ------------ Utility ------------ */
 function escapeHtml(str) {
   return String(str ?? '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')

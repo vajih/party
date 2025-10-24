@@ -12,7 +12,7 @@
   </header>
 
   <main class="container">
-    <!-- Auth strip (shown on Dashboard; hidden on Party page) -->
+    <!-- Auth strip (Dashboard only; hidden on Party page) -->
     <section class="card" id="authSection">
       <div id="authMsg">Sign in to continue</div>
       <form id="authForm" class="row" autocomplete="on" style="margin-top:8px">
@@ -95,11 +95,10 @@
       <div class="row" style="justify-content:space-between; margin-bottom:8px;">
         <button id="backToDashBtn" class="link">← Back to dashboard</button>
         <div id="hostTools" hidden>
-            <button id="editPartyToggle" class="link">Edit party</button>
-            <button id="addGameToggle" class="link">Add game</button>
-            <button id="manageHostsToggle" class="link">Manage hosts</button> <!-- NEW -->
+          <button id="editPartyToggle" class="link">Edit party</button>
+          <button id="addGameToggle" class="link">Add game</button>
+          <button id="manageHostsToggle" class="link">Manage hosts</button>
         </div>
-
       </div>
 
       <!-- Host inline forms -->
@@ -123,25 +122,6 @@
         <button type="submit">Save changes</button>
       </form>
 
-      <!-- Manage hosts (owner/co-host only) -->
-<form id="manageHostsForm" class="stack" hidden style="margin-bottom:10px;">
-  <div class="row">
-    <label for="cohostEmail">Invite co-host (email)</label>
-    <input id="cohostEmail" type="email" placeholder="friend@example.com" />
-  </div>
-  <div class="row">
-    <label for="cohostRole">Role</label>
-    <select id="cohostRole">
-      <option value="cohost">Co-host (full control)</option>
-      <option value="moderator">Moderator (approve only)</option>
-    </select>
-  </div>
-  <button type="submit">Invite</button>
-  <p class="small">Invitee should open the same party link and sign in with this email.</p>
-  <div id="hostsList" class="list" style="margin-top:8px;"></div>
-</form>
-
-
       <form id="addGameHereForm" class="stack" hidden style="margin-bottom:10px;">
         <div class="row">
           <label for="addGameType">Game Type</label>
@@ -160,7 +140,25 @@
         <button type="submit">Add Game</button>
       </form>
 
-      <!-- Welcome (guest-first) -->
+      <!-- Manage hosts -->
+      <form id="manageHostsForm" class="stack" hidden style="margin-bottom:10px;">
+        <div class="row">
+          <label for="cohostEmail">Invite co-host (email)</label>
+          <input id="cohostEmail" type="email" placeholder="friend@example.com" />
+        </div>
+        <div class="row">
+          <label for="cohostRole">Role</label>
+          <select id="cohostRole">
+            <option value="cohost">Co-host (full control)</option>
+            <option value="moderator">Moderator (approve only)</option>
+          </select>
+        </div>
+        <button type="submit">Invite</button>
+        <p class="small">Invitee should open this party link and sign in with the same email.</p>
+        <div id="hostsList" class="list" style="margin-top:8px;"></div>
+      </form>
+
+      <!-- Guest Welcome -->
       <section class="card" id="welcomeCard" hidden>
         <h2 id="welcomeTitle">Welcome to the Party 🎉</h2>
         <p id="welcomeSubtitle" class="muted" style="margin-top:4px;"></p>
