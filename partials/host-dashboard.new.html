@@ -1,0 +1,184 @@
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="brand">
+      <i class="fas fa-calendar"></i>
+      Party Dashboard
+    </div>
+    
+    <nav>
+      <a href="#overview" class="nav-item active">
+        <i class="fas fa-home"></i>
+        Overview
+      </a>
+      <a href="#parties" class="nav-item">
+        <i class="fas fa-calendar"></i>
+        Parties
+      </a>
+      <a href="#games" class="nav-item">
+        <i class="fas fa-gamepad"></i>
+        Games
+      </a>
+      <a href="#cohosts" class="nav-item">
+        <i class="fas fa-users"></i>
+        Co-Hosts
+      </a>
+      <a href="#moderation" class="nav-item">
+        <i class="fas fa-shield"></i>
+        Moderation
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Header -->
+  <header class="admin-header">
+    <div class="select-party">
+      <select id="hostPartySelect"></select>
+    </div>
+    <div class="actions">
+      <button id="createPartyBtn" class="primary">
+        <i class="fas fa-plus"></i>
+        New Party
+      </button>
+      <div id="roleBadge" class="mode-badge" data-role="host">Host</div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <!-- Overview Section -->
+    <section id="overview" class="section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">Total Parties</div>
+          <div class="value" id="totalParties">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Active Games</div>
+          <div class="value" id="activeGames">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Total Guests</div>
+          <div class="value" id="totalGuests">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Pending Mods</div>
+          <div class="value" id="pendingMods">-</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card">
+        <h3>Quick Actions</h3>
+        <div class="button-group">
+          <button id="newGameBtn">Add Game</button>
+          <button id="inviteCohostBtn">Invite Co-host</button>
+          <button id="checkModQueueBtn">Check Mod Queue</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Parties Section -->
+    <section id="parties" class="section" hidden>
+      <div class="card">
+        <h3>Create a new party</h3>
+        <form id="createPartyForm" class="stack">
+          <div class="row"><label>Title</label><input id="partyTitle" required placeholder="FriendsGiving 2025" /></div>
+          <div class="row"><label>Date & Time</label><input id="partyDate" type="datetime-local" /></div>
+          <div class="row"><label>Venue</label><input id="partyVenue" placeholder="Optional" /></div>
+          <div class="row"><label>Description</label><textarea id="partyDesc" rows="2"></textarea></div>
+          <div class="row"><label>Expected guests</label><input id="partyExpected" type="number" min="0" placeholder="e.g. 30" /></div>
+          <div class="row"><label>Custom slug</label><input id="partySlug" placeholder="friendsgiving-2025 (optional)" /></div>
+          <button type="submit">Create Party</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Your parties</h3>
+        <div id="hostPartiesList" class="list"></div>
+      </div>
+
+      <!-- Edit Party Form -->
+      <div id="partyEditForm" class="card" hidden>
+        <h3>Edit Party</h3>
+        <form id="editPartyForm" class="stack">
+          <div class="row"><label>Title</label><input id="editPartyTitle" required /></div>
+          <div class="row"><label>Date & Time</label><input id="editPartyDate" type="datetime-local" /></div>
+          <div class="row"><label>Venue</label><input id="editPartyVenue" placeholder="Optional" /></div>
+          <div class="row"><label>Description</label><textarea id="editPartyDesc" rows="2"></textarea></div>
+          <div class="row"><label>Expected guests</label><input id="editPartyExpected" type="number" min="0" /></div>
+          <div class="row">
+            <button type="submit">Save Changes</button>
+            <button type="button" class="link" id="cancelEditParty">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Games Section -->
+    <section id="games" class="section" hidden>
+      <div class="card">
+        <h3>Add a game</h3>
+        <form id="newGameForm" class="stack">
+          <div class="row"><label>Party</label><select id="gamePartySelect"></select></div>
+          <div class="row">
+            <label>Game Type</label>
+            <select id="gameType">
+              <option value="two_facts">Custom Prompts</option>
+              <option value="favorite_song">Favorite Song</option>
+              <option value="baby_photo">Baby Photo</option>
+              <option value="teen_photo">Teen Photo</option>
+              <option value="wedding_photo">Wedding Photo</option>
+            </select>
+          </div>
+          <div class="row"><label>Title</label><input id="gameTitle" placeholder="Optional (auto if empty)"/></div>
+          <button type="submit">Add Game</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Games List</h3>
+        <div id="hostGamesList" class="list"></div>
+      </div>
+    </section>
+
+    <!-- Co-Hosts Section -->
+    <section id="cohosts" class="section" hidden>
+      <div class="card">
+        <h3>Co-Host Management</h3>
+        <div class="row">
+          <label>Select Party</label>
+          <select id="cohostPartySelect"></select>
+        </div>
+        <div id="cohostSection" hidden>
+          <form id="addCohostForm" class="stack">
+            <div class="row">
+              <label>Email</label>
+              <input type="email" id="cohostEmail" required placeholder="co-host@example.com" />
+            </div>
+            <div class="row">
+              <label>Role</label>
+              <select id="cohostRole">
+                <option value="cohost">Co-Host (Full access)</option>
+                <option value="moderator">Moderator (Games only)</option>
+              </select>
+            </div>
+            <button type="submit">Add Co-Host</button>
+          </form>
+          <div id="cohostList" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Moderation Section -->
+    <section id="moderation" class="section" hidden>
+      <div class="card">
+        <h3>Moderation Queue</h3>
+        <div class="actions">
+          <button id="refreshMod" class="link">Refresh</button>
+        </div>
+        <div id="modList" class="list"></div>
+      </div>
+    </section>
+  </main>
+</div>

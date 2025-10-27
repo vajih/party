@@ -1,0 +1,255 @@
+/* Modern Tooltip & Help System */
+.help-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--brand-light);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: help;
+  border: 1px solid var(--brand);
+  transition: var(--transition);
+  margin-left: 6px;
+  position: relative;
+}
+
+.help-icon:hover {
+  background: var(--brand);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: var(--glow);
+}
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltip-text {
+  visibility: hidden;
+  width: 280px;
+  background: var(--card);
+  color: var(--text);
+  text-align: left;
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  position: absolute;
+  z-index: 1000;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -140px;
+  opacity: 0;
+  transition: var(--transition);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: normal;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.tooltip .tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -8px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: var(--card) transparent transparent transparent;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Info Banner */
+.info-banner {
+  background: var(--brand-light);
+  border: 1px solid var(--brand);
+  border-left: 4px solid var(--brand);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.info-banner .icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.info-banner .content {
+  flex: 1;
+}
+
+.info-banner .title {
+  font-weight: 700;
+  color: var(--brand);
+  margin-bottom: 4px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-banner .description {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.info-banner.success {
+  background: var(--success-light);
+  border-color: var(--success-color);
+}
+
+.info-banner.success .title {
+  color: var(--success-color);
+}
+
+/* Step Guide */
+.step-guide {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.step-guide .title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--brand);
+}
+
+.step-guide .steps {
+  display: grid;
+  gap: 16px;
+}
+
+.step-guide .step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 12px;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+}
+
+.step-guide .step:hover {
+  border-color: var(--brand);
+  transform: translateX(4px);
+}
+
+.step-guide .step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  box-shadow: var(--glow);
+}
+
+.step-guide .step-content {
+  flex: 1;
+}
+
+.step-guide .step-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.step-guide .step-description {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Quick Tip */
+.quick-tip {
+  background: var(--warning-light);
+  border: 1px solid var(--warning-color);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.quick-tip::before {
+  content: "💡";
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* Dismissible Banner */
+.dismissible-banner {
+  position: relative;
+  padding-right: 40px;
+}
+
+.dismissible-banner .close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.dismissible-banner .close-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--text);
+  transform: none;
+}

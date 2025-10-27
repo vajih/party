@@ -1,0 +1,41 @@
+.host-mode .mode-badge{background:#dcfce7;color:#065f46}
+
+.cohost-section {
+  max-width: 600px;
+  margin: 1rem 0;
+}
+
+#cohostList {
+  margin-top: 1rem;
+}
+
+#cohostList .item {
+  background: var(--surface-2);
+  border-radius: var(--radius-2);
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+#cohostList .small {
+  color: var(--text-2);
+  font-size: 0.875rem;
+}
+
+#addCohostForm {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+#addCohostForm .inputs {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0.5rem;
+}
+
+.link.danger {
+  color: var(--danger);
+}
+.link.danger:hover {
+  color: var(--danger-dark);
+}

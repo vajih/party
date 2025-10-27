@@ -1,0 +1,21 @@
+<header class="site-header">
+  <h1 class="brand">
+    <img src="/assets/img/logo.svg" alt="" style="height:20px;vertical-align:-4px;margin-right:6px;">
+    Party App
+    <span data-mode-badge class="badge" style="margin-left:8px;"></span>
+  </h1>
+
+  <!-- Role badge: shows Host or Guest and is clickable for a quick hint -->
+  <div style="margin-left:12px;">
+    <button id="roleBadge" class="role-badge" aria-pressed="false" title="Your role">Guest</button>
+  </div>
+
+  <!-- Hidden on party pages -->
+  <div id="headerAuth" data-hide-on-party>
+    <form id="authFormHeader" class="row" autocomplete="on">
+      <input type="email" id="authEmailHeader" placeholder="you@example.com" required />
+      <button type="submit">Send magic link</button>
+    </form>
+    <div id="authMsgHeader" class="small">Sign in to continue</div>
+  </div>
+</header>

@@ -1,0 +1,229 @@
+.progress{height:10px;background:#eef2ff;border-radius:999px;overflow:hidden}
+.progress>div{height:100%;background:#22c55e}
+
+/* Progress Tracker for Guest Onboarding */
+.progress-tracker {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 32px;
+  position: sticky;
+  top: 80px;
+  z-index: 50;
+  box-shadow: var(--shadow-lg);
+}
+
+.progress-tracker .title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--brand);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.progress-steps {
+  display: grid;
+  gap: 12px;
+}
+
+.progress-step {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+}
+
+.progress-step::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: var(--gradient-brand);
+  opacity: 0;
+  transition: var(--transition);
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.progress-step:hover {
+  border-color: var(--border);
+  transform: translateX(4px);
+}
+
+.progress-step.active {
+  background: var(--brand-light);
+  border-color: var(--brand);
+}
+
+.progress-step.active::before {
+  opacity: 1;
+}
+
+.progress-step.completed {
+  background: var(--success-light);
+  border-color: var(--success-color);
+  opacity: 0.8;
+}
+
+.progress-step.completed .step-status {
+  background: var(--success-color);
+  color: white;
+}
+
+.progress-step.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.progress-step .step-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+.progress-step.active .step-status {
+  background: var(--gradient-brand);
+  color: white;
+  box-shadow: var(--glow);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: var(--glow);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+  }
+}
+
+.progress-step .step-info {
+  flex: 1;
+}
+
+.progress-step .step-title {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.progress-step .step-description {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.progress-step .step-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--badge);
+  color: var(--badge-text);
+}
+
+.progress-step.active .step-badge {
+  background: var(--brand);
+  color: white;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.progress-step.completed .step-badge {
+  background: var(--success-color);
+  color: white;
+}
+
+/* Current Task Highlight */
+.current-task-banner {
+  background: var(--gradient-brand);
+  color: white;
+  padding: 20px 24px;
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--glow);
+  animation: slideDown 0.4s ease-out;
+}
+
+.current-task-banner .icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.current-task-banner .content {
+  flex: 1;
+}
+
+.current-task-banner .title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.current-task-banner .description {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .progress-tracker {
+    position: relative;
+    top: 0;
+  }
+  
+  .progress-step {
+    padding: 10px 12px;
+  }
+  
+  .progress-step .step-status {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+  
+  .current-task-banner {
+    padding: 16px;
+  }
+  
+  .current-task-banner .icon {
+    font-size: 24px;
+  }
+}

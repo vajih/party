@@ -1,0 +1,76 @@
+<div class="game-panel" data-game-type="favorite_song">
+  <div class="panel-header">
+    <h3>Favorite Song 🎵</h3>
+    <div class="description">Share your favorite song with the group!</div>
+  </div>
+
+  <!-- Help Banner -->
+  <div class="info-banner" style="margin: 16px 0;">
+    <div class="icon">🎶</div>
+    <div class="content">
+      <div class="title">How to Share Your Favorite Song</div>
+      <div class="description">
+        <strong>1.</strong> Enter the song title (required)<br>
+        <strong>2.</strong> Add the artist name (optional)<br>
+        <strong>3.</strong> Paste a YouTube/Spotify link so others can listen (optional)<br>
+        <strong>4.</strong> Vote for up to 5 songs you like!
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    <form class="game-form">
+      <div class="field">
+        <label for="song_title">
+          Song title *
+          <span class="tooltip">
+            <span class="help-icon">?</span>
+            <span class="tooltip-text">Enter the name of your favorite song. This field is required.</span>
+          </span>
+        </label>
+        <input type="text" name="title" id="song_title" placeholder="Enter song title" required>
+      </div>
+
+      <div class="field">
+        <label for="song_artist">
+          Artist 
+          <span class="small muted">(optional)</span>
+          <span class="tooltip">
+            <span class="help-icon">?</span>
+            <span class="tooltip-text">Who sings or performs this song? This helps others find it!</span>
+          </span>
+        </label>
+        <input type="text" name="artist" id="song_artist" placeholder="Artist name (optional)">
+      </div>
+
+      <div class="field">
+        <label for="song_link">
+          YouTube or Spotify link 
+          <span class="small muted">(optional)</span>
+          <span class="tooltip">
+            <span class="help-icon">?</span>
+            <span class="tooltip-text">Copy and paste a link from YouTube or Spotify so others can listen to your song!</span>
+          </span>
+        </label>
+        <input type="url" name="link" id="song_link" placeholder="https://... (optional)">
+        <div class="quick-tip">Open YouTube or Spotify, find your song, and copy the web address (URL) from the top of your browser</div>
+      </div>
+
+      <button type="submit" class="primary">Submit Song</button>
+    </form>
+
+    <div class="songs-list" id="favoriteSongsList" style="margin-top:24px;">
+      <h4>Submitted Songs</h4>
+      <div class="info-banner" style="margin: 12px 0; padding: 12px 16px;">
+        <div class="icon">👍</div>
+        <div class="content">
+          <div class="description" style="font-size: 13px;">
+            <strong>Voting:</strong> Click "Vote" on your favorite songs (max 5 votes). Click again to remove your vote.
+          </div>
+        </div>
+      </div>
+      <ul id="favoriteSongsItems" class="list" style="margin-top:6px;"></ul>
+      <div id="favoriteSongsEmpty" class="small muted" style="margin-top:6px;">No songs yet. Be the first!</div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+:root{
+  /* Modern color palette - Dark mode inspired */
+  --bg: #0a0a0f;
+  --bg-secondary: #13131a;
+  --card: #1a1a24;
+  --card-hover: #232330;
+  --border: #2a2a3a;
+  --text: #e8e8f0;
+  --text-secondary: #a0a0b8;
+  --muted: #6b6b88;
+  
+  /* Brand colors - Vibrant accents */
+  --brand: #8b5cf6;
+  --brand-hover: #7c3aed;
+  --brand-light: rgba(139, 92, 246, 0.1);
+  --accent: #06b6d4;
+  --accent-hover: #0891b2;
+  
+  /* Link colors */
+  --link: #60a5fa;
+  --link-hover: #3b82f6;
+  
+  /* Badge/pill colors */
+  --badge: rgba(139, 92, 246, 0.15);
+  --badge-text: #c4b5fd;
+  
+  /* Status colors */
+  --success-color: #10b981;
+  --success-light: rgba(16, 185, 129, 0.15);
+  --error-color: #ef4444;
+  --error-light: rgba(239, 68, 68, 0.15);
+  --warning-color: #f59e0b;
+  --warning-light: rgba(245, 158, 11, 0.15);
+  
+  /* Effects */
+  --radius: 16px;
+  --radius-sm: 12px;
+  --radius-lg: 20px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  --glow: 0 0 20px rgba(139, 92, 246, 0.3);
+  
+  /* Transitions */
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(26, 26, 36, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+  --gradient-accent: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+}

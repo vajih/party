@@ -3,212 +3,38 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Party App (MVP)</title>
-  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <title>Party App</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./styles/tokens.css">
+  <link rel="stylesheet" href="./styles/base.css">
+  <link rel="stylesheet" href="./styles/layout.css">
+  <link rel="stylesheet" href="./styles/components/tabs.css">
+  <link rel="stylesheet" href="./styles/components/progress.css">
+  <link rel="stylesheet" href="./styles/components/tooltip.css">
+  <link rel="stylesheet" href="./styles/features/host.css">
+  <link rel="stylesheet" href="./styles/features/guest.css">
+  <link rel="stylesheet" href="./styles/features/games.css">
+
+  <link rel="icon" href="./public/favicon.ico" type="image/x-icon">
+  <link rel="manifest" href="./public/manifest.webmanifest">
+
+  <!-- Optional libs (you can remove if not used yet) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js" defer></script>
+
+  <!-- Config globals (env.local.js overrides example) -->
+  <script src="./config/env.example.js"></script>
+  <script src="./config/env.local.js"></script>
 </head>
 <body>
-  <header class="site-header">
-    <h1>🎉 Party App</h1>
-  </header>
-
-  <main class="container">
-    <!-- Auth strip (Dashboard only; hidden on Party page) -->
-    <section class="card" id="authSection">
-      <div id="authMsg">Sign in to continue</div>
-      <form id="authForm" class="row" autocomplete="on" style="margin-top:8px">
-        <input type="email" id="authEmail" placeholder="you@example.com" required />
-        <button type="submit">Send magic link</button>
-      </form>
-      <button id="signOutBtn" class="link" style="margin-top:8px" hidden>Sign out</button>
-    </section>
-
-    <!-- Host Dashboard -->
-    <section class="card" id="hostCard" hidden>
-      <h2>Host Dashboard</h2>
-
-      <h3 style="margin-top:12px">Create a new party</h3>
-      <form id="createPartyForm" class="stack" style="margin-top:8px">
-        <div class="row">
-          <label for="partyTitle">Title</label>
-          <input id="partyTitle" required placeholder="e.g., FriendsGiving 2025" />
-        </div>
-        <div class="row">
-          <label for="partyDate">Date & Time</label>
-          <input id="partyDate" type="datetime-local" />
-        </div>
-        <div class="row">
-          <label for="partyVenue">Venue</label>
-          <input id="partyVenue" placeholder="Optional" />
-        </div>
-        <div class="row">
-          <label for="partyDesc">Description</label>
-          <textarea id="partyDesc" rows="2" placeholder="Optional"></textarea>
-        </div>
-        <div class="row">
-          <label for="partySlug">Custom Slug</label>
-          <input id="partySlug" placeholder="friendsgiving-2025 (optional)" />
-        </div>
-        <button type="submit">Create Party</button>
-      </form>
-
-      <hr style="margin:16px 0" />
-
-      <h3>Your parties</h3>
-      <div id="hostPartiesList" class="list" style="margin-top:8px"></div>
-
-      <hr style="margin:16px 0" />
-
-      <h3>Add a game to a party</h3>
-      <form id="newGameForm" class="stack" style="margin-top:8px">
-        <div class="row">
-          <label for="hostPartySelect">Party</label>
-          <select id="hostPartySelect" required></select>
-        </div>
-        <div class="row">
-          <label for="gameType">Game Type</label>
-          <select id="gameType" required>
-            <option value="two_facts">Custom Prompts (Two+ facts)</option>
-            <option value="favorite_song">Favorite Song</option>
-            <option value="baby_photo">Baby Photo Contest</option>
-            <option value="teen_photo">Teenage Photo Contest</option>
-            <option value="wedding_photo">Wedding Photo Contest</option>
-          </select>
-        </div>
-        <div class="row">
-          <label for="gameTitle">Title</label>
-          <input id="gameTitle" placeholder="Optional (auto if empty)" />
-        </div>
-        <button type="submit">Add Game</button>
-      </form>
-
-      <hr style="margin:16px 0" />
-      <h3>Moderation queue</h3>
-      <p class="small">Pending submissions across your parties.</p>
-      <div style="display:flex; gap:8px; align-items:center; margin:6px 0;">
-        <button id="refreshMod" class="link">Refresh</button>
-      </div>
-      <div id="modList" class="list"></div>
-    </section>
-
-    <!-- Party Page (/?party=slug) -->
-    <section class="card" id="partyCard" hidden>
-      <div class="row" style="justify-content:space-between; margin-bottom:8px;">
-        <button id="backToDashBtn" class="link">← Back to dashboard</button>
-        <div id="hostTools" hidden>
-          <button id="editPartyToggle" class="link">Edit party</button>
-          <button id="addGameToggle" class="link">Add game</button>
-          <button id="manageHostsToggle" class="link">Manage hosts</button>
-        </div>
-      </div>
-
-      <!-- Host inline forms -->
-      <form id="editPartyForm" class="stack" hidden style="margin-bottom:10px;">
-        <div class="row">
-          <label for="editTitle">Title</label>
-          <input id="editTitle" required />
-        </div>
-        <div class="row">
-          <label for="editDate">Date & Time</label>
-          <input id="editDate" type="datetime-local" />
-        </div>
-        <div class="row">
-          <label for="editVenue">Venue</label>
-          <input id="editVenue" />
-        </div>
-        <div class="row">
-          <label for="editDesc">Description</label>
-          <textarea id="editDesc" rows="2"></textarea>
-        </div>
-        <button type="submit">Save changes</button>
-      </form>
-
-      <form id="addGameHereForm" class="stack" hidden style="margin-bottom:10px;">
-        <div class="row">
-          <label for="addGameType">Game Type</label>
-          <select id="addGameType" required>
-            <option value="two_facts">Custom Prompts (Two+ facts)</option>
-            <option value="favorite_song">Favorite Song</option>
-            <option value="baby_photo">Baby Photo Contest</option>
-            <option value="teen_photo">Teenage Photo Contest</option>
-            <option value="wedding_photo">Wedding Photo Contest</option>
-          </select>
-        </div>
-        <div class="row">
-          <label for="addGameTitle">Title</label>
-          <input id="addGameTitle" placeholder="Optional (auto if empty)" />
-        </div>
-        <button type="submit">Add Game</button>
-      </form>
-
-      <!-- Manage hosts -->
-      <form id="manageHostsForm" class="stack" hidden style="margin-bottom:10px;">
-        <div class="row">
-          <label for="cohostEmail">Invite co-host (email)</label>
-          <input id="cohostEmail" type="email" placeholder="friend@example.com" />
-        </div>
-        <div class="row">
-          <label for="cohostRole">Role</label>
-          <select id="cohostRole">
-            <option value="cohost">Co-host (full control)</option>
-            <option value="moderator">Moderator (approve only)</option>
-          </select>
-        </div>
-        <button type="submit">Invite</button>
-        <p class="small">Invitee should open this party link and sign in with the same email.</p>
-        <div id="hostsList" class="list" style="margin-top:8px;"></div>
-      </form>
-
-      <!-- Guest Welcome -->
-      <section class="card" id="welcomeCard" hidden>
-        <h2 id="welcomeTitle">Welcome to the Party 🎉</h2>
-        <p id="welcomeSubtitle" class="muted" style="margin-top:4px;"></p>
-
-        <div id="welcomeStepEnter" class="stack" style="margin-top:10px;">
-          <ol class="small" style="margin:0 0 8px 18px;">
-            <li>Type your real email address below.</li>
-            <li>We’ll email you a one-time sign-in link.</li>
-            <li>Open that email and tap the link to enter the party.</li>
-          </ol>
-
-          <form id="welcomeForm" class="row" autocomplete="on">
-            <input type="email" id="welcomeEmail" placeholder="you@example.com" required />
-            <button type="submit">Email me a magic link</button>
-          </form>
-
-          <p class="small" style="margin-top:6px;">
-            Tips: Keep this tab open • Check Spam/Promotions • On phone, open the email in the
-            <em>same browser</em> you used here if possible.
-          </p>
-        </div>
-
-        <div id="welcomeStepSent" class="stack" hidden style="margin-top:12px;">
-          <div class="notice">
-            ✅ We’ve sent a sign-in link to <strong id="sentEmailText"></strong>.
-          </div>
-          <ol class="small" style="margin:6px 0 0 18px;">
-            <li>Open your email and find our message.</li>
-            <li>Tap the link inside — it will bring you back here, signed in.</li>
-            <li>If you don’t see it, check Spam/Promotions and wait ~30 seconds.</li>
-          </ol>
-          <div class="row" style="margin-top:8px;">
-            <button id="resendLinkBtn" class="link" disabled>Resend link in 30s</button>
-            <a class="link" href="https://mail.google.com" target="_blank" rel="noopener">Open Gmail</a>
-            <a class="link" href="https://outlook.live.com/mail/" target="_blank" rel="noopener">Open Outlook</a>
-            <a class="link" href="https://mail.yahoo.com/" target="_blank" rel="noopener">Open Yahoo</a>
-          </div>
-        </div>
-      </section>
-
-      <!-- Party content -->
-      <div id="partyHeader"></div>
-      <div id="partyShare" style="margin:8px 0 12px 0"></div>
-      <div id="partyGames" class="grid"></div>
-    </section>
-  </main>
-
-  <footer class="site-footer">Static MVP • HTML + JS</footer>
-
-  <script type="module" src="./js/app.js"></script>
+  <div id="app">
+    <header id="site-header"></header>
+    <main class="container" id="main"></main>
+    <footer id="site-footer"></footer>
+  </div>
+  <script type="module" src="./src/main.js"></script>
   <noscript>This site needs JavaScript enabled.</noscript>
 </body>
 </html>

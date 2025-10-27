@@ -1,0 +1,36 @@
+<![CDATA[<div class="game-panel">
+  <h3>Song Vote 🎵</h3>
+  <p class="instructions">Share your favorite song and vote for others!</p>
+
+  <form class="game-form">
+    <div class="form-group">
+      <label for="songDisplayName">Display Name</label>
+      <input type="text" id="songDisplayName" name="display_name" required placeholder="How you want to be known">
+    </div>
+    
+    <div class="form-group">
+      <label for="songTitle">Song Title</label>
+      <input type="text" id="songTitle" name="title" required placeholder="Enter song title">
+    </div>
+
+    <div class="form-group">
+      <label for="songArtist">Artist</label>
+      <input type="text" id="songArtist" name="artist" required placeholder="Enter artist name">
+    </div>
+
+    <div class="form-group">
+      <label for="songLink">Link (Optional)</label>
+      <input type="url" id="songLink" name="link" placeholder="Spotify or YouTube link">
+    </div>
+
+    <button type="submit" class="submit-btn">Submit Song</button>
+  </form>
+
+  <div class="songs-list">
+    <h4>Submissions</h4>
+    <div id="songVotesList">
+      <!-- Songs will be listed here -->
+      <p class="placeholder">No songs submitted yet. Be the first!</p>
+    </div>
+  </div>
+</div>]]>

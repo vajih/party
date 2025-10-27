@@ -1,0 +1,58 @@
+<div class="game-panel">
+  <h3>Baby Photo Contest 👶</h3>
+  <p class="instructions">Share your cutest baby photo! The host will review submissions before they appear in the gallery.</p>
+
+  <!-- Help Banner -->
+  <div class="info-banner" data-help="baby-photo-guide">
+    <div class="icon">📸</div>
+    <div class="content">
+      <div class="title">How to Submit Your Baby Photo</div>
+      <div class="description">
+        <strong>Step 1:</strong> Click "Choose Photo" below and select a photo from your device.<br>
+        <strong>Step 2:</strong> (Optional) Add details about the photo.<br>
+        <strong>Step 3:</strong> Click "Submit Photo" and wait for confirmation!
+      </div>
+    </div>
+  </div>
+
+  <form class="game-form">
+    <div class="form-group">
+      <label for="photoInfo">
+        Photo Info 
+        <span class="small muted">(optional)</span>
+        <span class="tooltip">
+          <span class="help-icon">?</span>
+          <span class="tooltip-text">Add context like "Age 6 months" or "Summer 1995" to help identify your photo. This is optional!</span>
+        </span>
+      </label>
+      <input type="text" id="photoInfo" name="photo_info" placeholder="e.g., Age 6 months, Summer 1995">
+    </div>
+    
+    <div class="form-group">
+      <label for="photoUpload">
+        Choose Photo
+        <span class="tooltip">
+          <span class="help-icon">?</span>
+          <span class="tooltip-text">Click here to select a baby photo from your phone, tablet, or computer. Most image formats (JPG, PNG, etc.) are supported.</span>
+        </span>
+      </label>
+      <input type="file" id="photoUpload" name="photo" accept="image/*" required>
+      <div class="quick-tip">Tap the button above to find a photo on your device</div>
+    </div>
+
+    <div class="preview-container" hidden>
+      <img id="photoPreview" alt="Preview">
+      <button type="button" class="link" id="clearPreview">Clear</button>
+    </div>
+
+    <button type="submit" class="submit-btn">Submit Photo</button>
+  </form>
+
+  <div class="submissions-gallery">
+    <h4>Gallery</h4>
+    <div class="gallery-grid" id="babyPhotoGallery">
+      <!-- Photos will be inserted here -->
+      <p class="placeholder">No approved photos yet. Be the first to share!</p>
+    </div>
+  </div>
+</div>

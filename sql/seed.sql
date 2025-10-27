@@ -1,0 +1,2 @@
+-- Optional seed (dev only)
+-- insert into public.parties (host_id, title, slug) values ('00000000-0000-0000-0000-000000000000','Demo Party','demo-party-1234');

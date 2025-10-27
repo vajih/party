@@ -1,0 +1,38 @@
+<div class="game-panel" data-game-type="about_you">
+  <div class="panel-header">
+    <h3 data-slot="title">About You</h3>
+    <div class="description" data-slot="description">Answer a few fun questions to help everyone get to know you better!</div>
+  </div>
+
+  <!-- Help Banner -->
+  <div class="info-banner" style="margin: 16px 0;">
+    <div class="icon">✨</div>
+    <div class="content">
+      <div class="title">Tell Us About Yourself</div>
+      <div class="description">
+        Answer the fun questions below! The host created these to help everyone at the party get to know each other. Your answers will be reviewed before sharing.
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    <div data-slot="hint"></div>
+    <form class="game-form" data-slot="form">
+      <div class="field">
+        <label for="display_name">
+          Display name
+          <span class="tooltip">
+            <span class="help-icon">?</span>
+            <span class="tooltip-text">How would you like to be known? This will appear next to your answers.</span>
+          </span>
+        </label>
+        <input type="text" name="display_name" id="display_name" placeholder="Your name" required>
+      </div>
+      <!-- Question fields will be dynamically inserted here -->
+    </form>
+  </div>
+  <div class="panel-footer" data-slot="footer">
+    <button type="submit" class="primary">Submit</button>
+    <div class="quick-tip" style="margin-top: 12px;">Your submission will be reviewed by the host before it appears publicly</div>
+  </div>
+</div>
