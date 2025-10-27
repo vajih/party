@@ -315,3 +315,79 @@
   background: var(--card);
   border-color: var(--brand);
 }
+
+/* Birth Map Component */
+.birth-map-container {
+  margin-top: 32px;
+  padding: 24px;
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.birth-map-locked,
+.birth-map-empty {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.birth-map-locked .lock-icon,
+.birth-map-empty .icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.birth-map-locked h3 {
+  font-size: 24px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.birth-map-locked p,
+.birth-map-empty p {
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  font-size: 16px;
+}
+
+.birth-map-header {
+  margin-bottom: 20px;
+}
+
+.birth-map-header h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.birth-map-header .muted {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Leaflet map popup customization */
+.leaflet-popup-content-wrapper {
+  background: var(--card);
+  color: var(--text);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+}
+
+.leaflet-popup-content {
+  margin: 12px;
+  font-size: 14px;
+}
+
+.map-popup strong {
+  color: var(--text);
+  font-size: 16px;
+}
+
+.map-popup .muted {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.leaflet-popup-tip {
+  background: var(--card);
+}

@@ -28,6 +28,25 @@
         </label>
         <input type="text" name="display_name" id="display_name" placeholder="Your name" required>
       </div>
+      
+      <div class="field">
+        <label for="birth_city">
+          City where you were born
+          <span class="tooltip">
+            <span class="help-icon">?</span>
+            <span class="tooltip-text">This helps create a cool map showing where all guests are from! Unlock the map by submitting.</span>
+          </span>
+        </label>
+        <input 
+          type="text" 
+          name="birth_city" 
+          id="birth_city" 
+          placeholder="e.g., New York, Tokyo, London" 
+          autocomplete="off"
+          required>
+        <div class="city-suggestions" id="citySuggestions" style="display: none;"></div>
+      </div>
+      
       <!-- Question fields will be dynamically inserted here -->
       
       <div class="panel-footer" data-slot="footer" style="padding: 0; margin-top: 24px;">

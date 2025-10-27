@@ -1,13 +1,13 @@
 <header class="site-header">
   <h1 class="brand">
     <img src="/assets/img/logo.svg" alt="" style="height:20px;vertical-align:-4px;margin-right:6px;">
-    Party App
+    <span id="headerPartyInfo" class="header-party-info"></span>
     <span data-mode-badge class="badge" style="margin-left:8px;"></span>
   </h1>
 
-  <!-- Role badge: shows Host or Guest and is clickable for a quick hint -->
-  <div style="margin-left:12px;">
-    <button id="roleBadge" class="role-badge" aria-pressed="false" title="Your role">Guest</button>
+  <!-- Role badge: shows Host or Guest and is clickable for a quick hint (centered) -->
+  <div class="header-center">
+    <button id="roleBadge" class="role-badge" aria-pressed="false" title="Guest">G</button>
   </div>
 
   <!-- Hidden on party pages -->

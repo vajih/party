@@ -70,6 +70,11 @@ async function route(userFromEvent) {
   const strip = document.querySelector('[data-hide-on-party]');
   if (slug) strip?.setAttribute('hidden',''); else strip?.removeAttribute('hidden');
 
+  // Clear party info from header if not on a party page
+  if (!slug) {
+    clearHeaderPartyInfo();
+  }
+
   await updateHeaderAuthState(user);
 
   if (!slug) {
@@ -124,9 +129,12 @@ async function route(userFromEvent) {
     return;
   }
 
-  const titleHtml = `<h2>${escapeHtml(party.title)}</h2><p class="muted">${fmtDate(party.date)} • ${escapeHtml(party.venue || '')}</p>`;
+  // Build party header with countdown (removed - now in global header)
+  // Update global header with party info
+  updateHeaderPartyInfo(party);
+  
   if (!games || games.length === 0) {
-    qs('#main').innerHTML = `<section class="card">${titleHtml}<div class="card" style="margin-top:12px;"><p class="small">No games configured for this party yet.</p></div></section>`;
+    qs('#main').innerHTML = `<section class="card"><div class="card" style="margin-top:12px;"><p class="small">No games configured for this party yet.</p></div></section>`;
     return;
   }
 
@@ -141,10 +149,16 @@ async function route(userFromEvent) {
 
   qs('#main').innerHTML = `
     <section class="card">
-      ${titleHtml}
       ${progressHtml}
       <div id="game-content" style="margin-top:24px;"></div>
+      <div id="birthMap" class="birth-map-container" style="margin-top:32px;"></div>
     </section>`;
+  
+  // Initialize countdown timer in header
+  initHeaderCountdown(party.date);
+  
+  // Initialize birth map
+  initBirthMapComponent(party.id, user.id);
 
   // Wire up progress tracker clicks to load content directly
   document.querySelectorAll('.progress-step').forEach(step => {
@@ -336,9 +350,15 @@ async function route(userFromEvent) {
             
             const formData = new FormData(form);
             const displayName = formData.get('display_name');
+            const birthCity = (formData.get('birth_city') || '').trim();
             
             if (!displayName) {
               alert('Please enter a display name.');
+              return;
+            }
+            
+            if (!birthCity) {
+              alert('Please enter your birth city.');
               return;
             }
             
@@ -372,6 +392,23 @@ async function route(userFromEvent) {
             
             console.log('[about_you] Submitting to database...');
             
+            // Geocode birth city
+            let birthLat = null;
+            let birthLng = null;
+            if (birthCity) {
+              try {
+                const geoResult = await geocodeCity(birthCity);
+                if (geoResult) {
+                  birthLat = geoResult.lat;
+                  birthLng = geoResult.lng;
+                  console.log('[about_you] Geocoded city:', birthCity, '→', geoResult);
+                }
+              } catch (geoError) {
+                console.warn('[about_you] Geocoding failed:', geoError);
+                // Continue anyway - city name is still saved
+              }
+            }
+            
             // Submit to database
             const { error } = await supabase.from('submissions').insert({
               game_id: game.id,
@@ -381,6 +418,32 @@ async function route(userFromEvent) {
               display_name: displayName,
               moderation_status: 'pending'
             });
+            
+            // Save to party_profiles (upsert birth city data)
+            if (!error) {
+              const profileData = {
+                party_id: game.party_id,
+                user_id: sessionData.session.user.id,
+                display_name: displayName,
+                birth_city: birthCity,
+                birth_lat: birthLat,
+                birth_lng: birthLng
+              };
+              
+              const { error: profileError } = await supabase
+                .from('party_profiles')
+                .upsert(profileData, {
+                  onConflict: 'party_id,user_id'
+                });
+              
+              if (profileError) {
+                console.warn('[about_you] Failed to save party profile:', profileError);
+              } else {
+                console.log('[about_you] Party profile saved successfully');
+                // Trigger map update event
+                window.dispatchEvent(new CustomEvent('birth-map-updated'));
+              }
+            }
             
             // Restore button state
             if (submitBtn) {
@@ -934,6 +997,136 @@ function wireHeaderAuth() {
   }
 }
 
+/* -------- Party Header Info (in global header) -------- */
+function updateHeaderPartyInfo(party) {
+  const headerInfo = document.getElementById('headerPartyInfo');
+  if (!headerInfo) {
+    console.log('[updateHeaderPartyInfo] headerInfo element not found');
+    return;
+  }
+  
+  console.log('[updateHeaderPartyInfo] party:', party);
+  console.log('[updateHeaderPartyInfo] party.date:', party.date);
+  console.log('[updateHeaderPartyInfo] fmtDate result:', fmtDate(party.date));
+  
+  const hasDetails = party.description || party.venue;
+  
+  headerInfo.innerHTML = `
+    <div class="party-header-line1">
+      <span class="party-name">${escapeHtml(party.title)}</span>
+      <span class="party-separator">•</span>
+      <span class="party-date-inline">${fmtDate(party.date)}</span>
+      ${hasDetails ? `
+        <button class="party-info-btn" title="View party details" aria-label="View party details">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="currentColor"/>
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M8 2C4.5 2 1.7 4.7 1 8c.7 3.3 3.5 6 7 6s6.3-2.7 7-6c-.7-3.3-3.5-6-7-6zm0 10a4 4 0 110-8 4 4 0 010 8z" fill="currentColor"/>
+          </svg>
+        </button>
+      ` : ''}
+    </div>
+    <div class="party-countdown-inline" data-date="${party.date}">
+      <span class="countdown-loading-inline">...</span>
+    </div>
+  `;
+  
+  console.log('[updateHeaderPartyInfo] HTML set, headerInfo.innerHTML:', headerInfo.innerHTML);
+  
+  // Wire up info button to show modal with details
+  if (hasDetails) {
+    const infoBtn = headerInfo.querySelector('.party-info-btn');
+    if (infoBtn) {
+      infoBtn.addEventListener('click', () => {
+        showPartyDetailsModal(party);
+      });
+    }
+  }
+}
+
+function showPartyDetailsModal(party) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal party-details-modal">
+      <div class="modal-header">
+        <h3>${escapeHtml(party.title)}</h3>
+        <button class="modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        ${party.description ? `<p class="party-description">${escapeHtml(party.description)}</p>` : ''}
+        ${party.venue ? `<p class="party-venue"><strong>Location:</strong> ${escapeHtml(party.venue)}</p>` : ''}
+        <p class="party-date-full"><strong>Date:</strong> ${fmtDate(party.date)}</p>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Close handlers
+  const closeBtn = modal.querySelector('.modal-close');
+  closeBtn?.addEventListener('click', () => modal.remove());
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+  
+  // ESC key
+  const escHandler = (e) => {
+    if (e.key === 'Escape') {
+      modal.remove();
+      document.removeEventListener('keydown', escHandler);
+    }
+  };
+  document.addEventListener('keydown', escHandler);
+}
+
+function initHeaderCountdown(eventDate) {
+  if (!eventDate) return;
+  
+  const countdownEl = document.querySelector('.party-countdown-inline');
+  if (!countdownEl) return;
+  
+  const targetDate = new Date(eventDate).getTime();
+  
+  function updateCountdown() {
+    const now = new Date().getTime();
+    const distance = targetDate - now;
+    
+    if (distance < 0) {
+      countdownEl.innerHTML = `<span class="countdown-complete-inline">🎉 Now!</span>`;
+      return;
+    }
+    
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    
+    let text = '';
+    if (days > 0) {
+      text = `${days}d ${hours}h`;
+    } else if (hours > 0) {
+      text = `${hours}h ${minutes}m`;
+    } else {
+      text = `${minutes}m`;
+    }
+    
+    countdownEl.innerHTML = `<span class="countdown-value-inline">${text}</span>`;
+  }
+  
+  // Update immediately and then every minute (no need for seconds in header)
+  updateCountdown();
+  const intervalId = setInterval(updateCountdown, 60000);
+  
+  // Store interval ID
+  countdownEl.dataset.intervalId = intervalId;
+}
+
+function clearHeaderPartyInfo() {
+  const headerInfo = document.getElementById('headerPartyInfo');
+  if (headerInfo) {
+    headerInfo.innerHTML = 'Party App';
+  }
+}
+
 async function fetchRole(user){
   if (!user) return { role: 'guest', source: null };
 
@@ -963,11 +1156,12 @@ function setRoleBadge(role, source=null){
   const btn = document.getElementById('roleBadge');
   if (!btn) return;
   const r = role === 'host' ? 'host' : 'guest';
-  btn.textContent = r === 'host' ? 'Host' : 'Guest';
+  btn.textContent = r === 'host' ? 'H' : 'G';
   btn.dataset.role = r;
   if (source) btn.dataset.source = source;
   btn.setAttribute('data-role', r);
   btn.setAttribute('aria-pressed', r === 'host' ? 'true' : 'false');
+  btn.setAttribute('title', r === 'host' ? 'Host' : 'Guest');
 }
 
 async function updateHeaderAuthState(user){
@@ -1425,4 +1619,281 @@ function createConfetti() {
     // Remove after animation
     setTimeout(() => confetti.remove(), 5000);
   }
+}
+
+/* -------- Geocoding & Map Utilities -------- */
+
+/**
+ * Geocode a city name to lat/lng using Nominatim (OpenStreetMap)
+ * Free, no API key required
+ */
+async function geocodeCity(cityName) {
+  if (!cityName || !cityName.trim()) return null;
+  
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?` + new URLSearchParams({
+      q: cityName,
+      format: 'json',
+      limit: '1'
+    });
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'PartyApp/1.0' // Required by Nominatim
+      }
+    });
+    
+    if (!response.ok) {
+      console.error('[geocodeCity] HTTP error:', response.status);
+      return null;
+    }
+    
+    const data = await response.json();
+    if (data && data.length > 0) {
+      return {
+        lat: parseFloat(data[0].lat),
+        lng: parseFloat(data[0].lon),
+        displayName: data[0].display_name
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('[geocodeCity] Error:', error);
+    return null;
+  }
+}
+
+/**
+ * Load birth points map data for a party
+ */
+async function fetchBirthPoints(partyId) {
+  try {
+    console.log('[fetchBirthPoints] Fetching for party:', partyId);
+    const { data, error } = await supabase
+      .rpc('party_birth_points', { p_party_id: partyId });
+    
+    if (error) {
+      console.error('[fetchBirthPoints] Error:', error);
+      return [];
+    }
+    
+    console.log('[fetchBirthPoints] Received data:', data);
+    console.log('[fetchBirthPoints] Data length:', data?.length);
+    
+    return data || [];
+  } catch (error) {
+    console.error('[fetchBirthPoints] Error:', error);
+    return [];
+  }
+}
+
+/**
+ * Check if current user has submitted their birth city
+ */
+async function hasUserSubmittedBirthCity(partyId, userId) {
+  try {
+    const { data, error} = await supabase
+      .from('party_profiles')
+      .select('birth_city')
+      .eq('party_id', partyId)
+      .eq('user_id', userId)
+      .maybeSingle();
+    
+    if (error) {
+      console.error('[hasUserSubmittedBirthCity] Error:', error);
+      return false;
+    }
+    
+    return !!(data && data.birth_city);
+  } catch (error) {
+    console.error('[hasUserSubmittedBirthCity] Error:', error);
+    return false;
+  }
+}
+
+/**
+ * Initialize the birth map component
+ */
+async function initBirthMapComponent(partyId, userId) {
+  console.log('[initBirthMapComponent] Starting - partyId:', partyId, 'userId:', userId);
+  
+  const container = document.getElementById('birthMap');
+  if (!container) {
+    console.error('[birthMap] Container not found');
+    return;
+  }
+
+  // Check if user has submitted their birth city
+  const hasSubmitted = await hasUserSubmittedBirthCity(partyId, userId);
+  console.log('[initBirthMapComponent] User has submitted birth city:', hasSubmitted);
+  
+  if (!hasSubmitted) {
+    // Show locked state
+    container.innerHTML = `
+      <div class="birth-map-locked">
+        <div class="lock-icon">🔒</div>
+        <h3>Where is Everyone From?</h3>
+        <p>Unlock this interactive map by completing the "About You" activity and sharing your birth city!</p>
+        <button class="link primary" onclick="
+          const aboutYouStep = Array.from(document.querySelectorAll('.progress-step')).find(step => {
+            const game = step.textContent.toLowerCase();
+            return game.includes('about') || game.includes('you');
+          });
+          if (aboutYouStep) aboutYouStep.click();
+        ">
+          Complete About You to Unlock →
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  // Fetch birth points data
+  console.log('[initBirthMapComponent] Fetching birth points...');
+  const birthPoints = await fetchBirthPoints(partyId);
+  console.log('[initBirthMapComponent] Fetched birth points:', birthPoints);
+  
+  if (!birthPoints || birthPoints.length === 0) {
+    console.log('[initBirthMapComponent] No birth points found');
+    container.innerHTML = `
+      <div class="birth-map-empty">
+        <div class="icon">🌍</div>
+        <p>No birth cities submitted yet. You're the first!</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Render the map
+  console.log('[initBirthMapComponent] Rendering map with', birthPoints.length, 'points');
+  renderBirthMap(container, birthPoints);
+  
+  // Listen for updates
+  window.addEventListener('birth-map-updated', async () => {
+    console.log('[birthMap] Received update event, refreshing...');
+    const updatedPoints = await fetchBirthPoints(partyId);
+    if (updatedPoints && updatedPoints.length > 0) {
+      renderBirthMap(container, updatedPoints);
+    }
+  });
+}
+
+/**
+ * Render the Leaflet map with birth city markers
+ */
+function renderBirthMap(container, birthPoints) {
+  console.log('[renderBirthMap] Rendering map with points:', birthPoints);
+  console.log('[renderBirthMap] Number of points:', birthPoints.length);
+  
+  // Clear container and set up structure
+  container.innerHTML = `
+    <div class="birth-map-header">
+      <h3>🌍 Where We're All From</h3>
+      <p class="muted">${birthPoints.length} ${birthPoints.length === 1 ? 'city' : 'cities'} represented • ${birthPoints.reduce((sum, p) => sum + (p.count || 0), 0)} guests</p>
+    </div>
+    <div id="leafletMap" style="height: 400px; border-radius: 12px; overflow: hidden;"></div>
+  `;
+
+  // Wait for Leaflet to be available
+  if (typeof L === 'undefined') {
+    console.error('[birthMap] Leaflet not loaded');
+    container.innerHTML = '<p class="error">Map library not loaded. Please refresh the page.</p>';
+    return;
+  }
+
+  // Wait for DOM to be ready, then initialize map
+  setTimeout(() => {
+    const mapContainer = document.getElementById('leafletMap');
+    if (!mapContainer) {
+      console.error('[renderBirthMap] Map container element not found in DOM');
+      return;
+    }
+    
+    try {
+      // Remove existing map instance if it exists
+      if (mapContainer._leaflet_id) {
+        console.log('[renderBirthMap] Removing existing map instance');
+        mapContainer._leaflet_id = undefined;
+        mapContainer.innerHTML = '';
+      }
+      
+      // Initialize Leaflet map
+      const map = L.map('leafletMap').setView([20, 0], 2);
+
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 18
+      }).addTo(map);
+
+      // Calculate max count for scaling
+      const maxCount = Math.max(...birthPoints.map(p => parseInt(p.count) || 1));
+      console.log('[renderBirthMap] Max count:', maxCount);
+      
+      // Add markers with scaled circles
+      birthPoints.forEach((point, index) => {
+        const { birth_city, birth_lat, birth_lng, count } = point;
+        
+        console.log(`[renderBirthMap] Processing point ${index + 1}:`, {
+          city: birth_city,
+          lat: birth_lat,
+          lng: birth_lng,
+          count: count
+        });
+        
+        if (!birth_lat || !birth_lng) {
+          console.warn(`[renderBirthMap] Skipping point ${index + 1} - missing coordinates`);
+          return;
+        }
+        
+        // Scale radius based on count
+        // Minimum 8px, maximum 30px
+        const baseRadius = 8;
+        const maxRadius = 30;
+        const countInt = parseInt(count) || 1;
+        const radius = maxCount > 1 
+          ? baseRadius + ((countInt / maxCount) * (maxRadius - baseRadius))
+          : baseRadius;
+        
+        console.log(`[renderBirthMap] Circle for ${birth_city}: radius=${radius.toFixed(1)}px (count=${countInt}/${maxCount})`);
+        
+        // Circle marker
+        const circle = L.circleMarker([birth_lat, birth_lng], {
+          radius: radius,
+          fillColor: '#8b5cf6',
+          color: '#fff',
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.7
+        }).addTo(map);
+        
+        // Popup
+        const plural = countInt === 1 ? 'guest' : 'guests';
+        circle.bindPopup(`
+          <div class="map-popup">
+            <strong>${escapeHtml(birth_city || 'Unknown')}</strong><br>
+            <span class="muted">${countInt} ${plural}</span>
+          </div>
+        `);
+      });
+
+      // Fit map to show all markers
+      if (birthPoints.length > 0) {
+        const bounds = birthPoints
+          .filter(p => p.birth_lat && p.birth_lng)
+          .map(p => [p.birth_lat, p.birth_lng]);
+        
+        if (bounds.length > 0) {
+          console.log('[renderBirthMap] Fitting map to bounds:', bounds.length, 'points');
+          map.fitBounds(bounds, { padding: [50, 50] });
+        }
+      }
+      
+      console.log('[renderBirthMap] Map rendered successfully');
+    } catch (error) {
+      console.error('[renderBirthMap] Error rendering map:', error);
+      container.innerHTML = '<p class="error">Failed to render map. Please refresh the page.</p>';
+    }
+  }, 200); // Increased timeout to ensure DOM is ready
 }

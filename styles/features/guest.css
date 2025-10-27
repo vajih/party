@@ -1,1 +1,142 @@
 .guest-mode .mode-badge{background:#ede9fe;color:#4f46e5}
+
+/* Party Header Info (inline in global header) */
+.header-party-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.party-header-line1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.party-name {
+  font-weight: 500;
+}
+
+.party-separator {
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+.party-countdown-inline {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  text-align: center;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.party-date-inline {
+  font-size: 0.8125rem;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.countdown-loading-inline {
+  font-style: italic;
+  opacity: 0.6;
+}
+
+.countdown-value-inline {
+  font-family: var(--font-mono, 'Monaco', 'Courier New', monospace);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--primary);
+}
+
+.countdown-complete-inline {
+  font-weight: 600;
+  color: var(--success);
+}
+
+.party-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  margin-left: -2px;
+}
+
+.party-info-btn:hover {
+  color: var(--text);
+  background: var(--bg-secondary);
+}
+
+.party-info-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Party Details Modal */
+.party-details-modal {
+  max-width: 500px;
+}
+
+.party-details-modal .modal-body {
+  padding: 20px;
+}
+
+.party-details-modal .party-description {
+  margin: 0 0 16px 0;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.party-details-modal .party-venue,
+.party-details-modal .party-date-full {
+  margin: 8px 0;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+}
+
+.party-details-modal strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .header-party-info {
+    font-size: 0.8125rem;
+    gap: 6px;
+  }
+  
+  .party-name {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .party-countdown-inline,
+  .party-date-inline {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-party-info {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .party-date-inline {
+    display: none; /* Hide date on very small screens to save space */
+  }
+}
+
