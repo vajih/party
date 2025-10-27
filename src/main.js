@@ -139,33 +139,32 @@ async function route(userFromEvent) {
   // Build progress tracker HTML
   const progressHtml = buildProgressTracker(progressSteps);
 
-  const tabsHtml = games.map(g => `<button class="game-tab" data-game-id="${g.id}" data-game-type="${escapeHtml(g.type)}">${escapeHtml(g.title || g.type)}</button>`).join('');
   qs('#main').innerHTML = `
     <section class="card">
       ${titleHtml}
       ${progressHtml}
-      <div style="margin-top:12px;">
-        <nav class="game-tabs" style="display:flex;gap:8px;flex-wrap:wrap;">${tabsHtml}</nav>
-        <div id="game-content" style="margin-top:12px;"></div>
-      </div>
+      <div id="game-content" style="margin-top:24px;"></div>
     </section>`;
 
-  // Wire up progress tracker clicks
+  // Wire up progress tracker clicks to load content directly
   document.querySelectorAll('.progress-step').forEach(step => {
-    step.addEventListener('click', () => {
+    step.addEventListener('click', async () => {
       if (step.classList.contains('locked')) return;
+      
       const gameId = step.dataset.gameId;
-      const tab = document.querySelector(`.game-tab[data-game-id="${gameId}"]`);
-      if (tab) {
-        tab.click();
-        // Scroll to game content after a short delay to ensure content is loaded
-        setTimeout(() => {
-          const gameContent = document.getElementById('game-content');
-          if (gameContent) {
-            gameContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 100);
-      }
+      const game = games.find(g => g.id === gameId);
+      if (!game) return;
+      
+      // Load the game content directly
+      await loadGameContent(game, games, party, user);
+      
+      // Scroll to game content after a short delay
+      setTimeout(() => {
+        const gameContent = document.getElementById('game-content');
+        if (gameContent) {
+          gameContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
     });
   });
 
@@ -186,19 +185,18 @@ async function route(userFromEvent) {
         currentTracker.outerHTML = updatedProgressHtml;
         // Re-wire click handlers
         document.querySelectorAll('.progress-step').forEach(step => {
-          step.addEventListener('click', () => {
+          step.addEventListener('click', async () => {
             if (step.classList.contains('locked')) return;
             const gameId = step.dataset.gameId;
-            const tab = document.querySelector(`.game-tab[data-game-id="${gameId}"]`);
-            if (tab) {
-              tab.click();
-              setTimeout(() => {
-                const gameContent = document.getElementById('game-content');
-                if (gameContent) {
-                  gameContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-              }, 100);
-            }
+            const game = games.find(g => g.id === gameId);
+            if (!game) return;
+            await loadGameContent(game, games, party, user);
+            setTimeout(() => {
+              const gameContent = document.getElementById('game-content');
+              if (gameContent) {
+                gameContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }, 100);
           });
         });
       }
@@ -217,38 +215,36 @@ async function route(userFromEvent) {
     }
   };
 
-  // Click handler to load partial into #game-content
-  qs('#main').addEventListener('click', async (e) => {
-    const btn = e.target.closest('.game-tab');
-    if (!btn) return;
-    const gameId = btn.dataset.gameId;
-    const type = btn.dataset.gameType;
+  // Helper function to load game content
+  async function loadGameContent(game, allGames, party, user) {
+    const type = game.type;
+    const gameId = game.id;
     const p = partialForType(type);
+    
     if (!p) {
       const content = document.getElementById('game-content');
       if (content) content.innerHTML = `<div class="card"><p class="small">No partial available for game type: ${escapeHtml(type)}</p></div>`;
       return;
     }
+    
     await loadFragment('#game-content', p);
     
     // For about_you games, dynamically inject question fields from config
     if (type === 'about_you') {
-      const game = games.find(g => g.id === gameId);
-      if (game) {
-        const form = qs('#game-content .game-form');
-        if (form) {
-          // Check if questions are already rendered (prevent duplicates)
-          if (form.dataset.questionsRendered === 'true') {
-            console.debug('[about_you guest] Questions already rendered, skipping');
-            return;
-          }
-          
-          // Parse config
-          let config = game.config;
-          if (typeof config === 'string') {
-            try { config = JSON.parse(config); } catch (e) { config = {}; }
-          }
-          config = config || {};
+      const form = qs('#game-content .game-form');
+      if (form && game) {
+        // Check if questions are already rendered (prevent duplicates)
+        if (form.dataset.questionsRendered === 'true') {
+          console.debug('[about_you guest] Questions already rendered, skipping');
+          return;
+        }
+        
+        // Parse config
+        let config = game.config;
+        if (typeof config === 'string') {
+          try { config = JSON.parse(config); } catch (e) { config = {}; }
+        }
+        config = config || {};
           
           const questions = config.questions || [
             { label: 'What is a fun fact about you?' },
@@ -319,7 +315,6 @@ async function route(userFromEvent) {
               form.prepend(fieldDiv);
             }
           });
-        }
         
         // Add form submission handler
         if (form && !form.dataset.boundSubmit) {
@@ -491,7 +486,6 @@ async function route(userFromEvent) {
     
     // For favorite_song games, add form submission handler
     if (type === 'favorite_song') {
-      const game = games.find(g => g.id === gameId);
       if (game) {
         const form = qs('#game-content .game-form');
         const listWrap = qs('#favoriteSongsList');
@@ -670,7 +664,6 @@ async function route(userFromEvent) {
 
     // For baby_photo games, add file upload handler
     if (type === 'baby_photo') {
-      const game = games.find(g => g.id === gameId);
       if (game) {
         // Check if user already submitted a photo
         const { data: sessionData } = await supabase.auth.getSession();
@@ -887,13 +880,18 @@ async function route(userFromEvent) {
           });
         }
       }
-    }
-  });
+    } // End of if (type === 'baby_photo')
+  } // End of loadGameContent function
 
-  // Auto-load first game
-  const first = document.querySelector('.game-tab');
-  if (first) first.click();
-}
+  // Auto-load first incomplete game
+  const firstIncompleteStep = document.querySelector('.progress-step:not(.completed)');
+  if (firstIncompleteStep) {
+    const firstGame = games.find(g => g.id === firstIncompleteStep.dataset.gameId);
+    if (firstGame) {
+      await loadGameContent(firstGame, games, party, user);
+    }
+  }
+} // End of route function
 
 /* -------- Header auth -------- */
 function devRedirectOrigin() {
