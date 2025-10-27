@@ -25,10 +25,13 @@
   --badge-text: #c4b5fd;
   
   /* Status colors */
+  --success: #10b981;
   --success-color: #10b981;
   --success-light: rgba(16, 185, 129, 0.15);
+  --danger: #ef4444;
   --error-color: #ef4444;
   --error-light: rgba(239, 68, 68, 0.15);
+  --warning: #f59e0b;
   --warning-color: #f59e0b;
   --warning-light: rgba(245, 158, 11, 0.15);
   

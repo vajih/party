@@ -246,6 +246,27 @@ export async function renderHostParties(user) {
     qsa(sel).forEach(el => { el.innerHTML = opts; });
   });
 
+  // Wire up copy link buttons
+  hostPartiesList.querySelectorAll('.copyBtn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const url = btn.dataset.url;
+      try {
+        await navigator.clipboard.writeText(url);
+        const originalText = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => {
+          btn.textContent = originalText;
+        }, 1500);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+        btn.textContent = 'Failed to copy';
+        setTimeout(() => {
+          btn.textContent = 'Copy link';
+        }, 1500);
+      }
+    });
+  });
+
   // Wire up edit buttons
   hostPartiesList.querySelectorAll('.editPartyBtn').forEach(btn => {
     btn.addEventListener('click', () => {

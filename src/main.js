@@ -133,10 +133,12 @@ async function route(userFromEvent) {
   // Check completion status for progress tracker
   const progressSteps = await getGuestProgressSteps(games, party.id, user.id);
 
-  // Build progress tracker
+  // Show welcome modal FIRST for first-time guests (before rendering content)
+  await showWelcomeModalIfNeeded(party, user);
+
+  // Build progress tracker HTML
   const progressHtml = buildProgressTracker(progressSteps);
 
-  // Build basic tabs UI
   const tabsHtml = games.map(g => `<button class="game-tab" data-game-id="${g.id}" data-game-type="${escapeHtml(g.type)}">${escapeHtml(g.title || g.type)}</button>`).join('');
   qs('#main').innerHTML = `
     <section class="card">
@@ -154,8 +156,53 @@ async function route(userFromEvent) {
       if (step.classList.contains('locked')) return;
       const gameId = step.dataset.gameId;
       const tab = document.querySelector(`.game-tab[data-game-id="${gameId}"]`);
-      if (tab) tab.click();
+      if (tab) {
+        tab.click();
+        // Scroll to game content after a short delay to ensure content is loaded
+        setTimeout(() => {
+          const gameContent = document.getElementById('game-content');
+          if (gameContent) {
+            gameContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      }
     });
+  });
+
+  // Listen for submission updates to refresh progress tracker
+  window.addEventListener('submission-updated', async () => {
+    console.log('[Progress Tracker] Refreshing after submission');
+    const updatedSteps = await getGuestProgressSteps(games, party.id, user.id);
+    const updatedProgressHtml = buildProgressTracker(updatedSteps);
+    const trackerContainer = document.querySelector('.progress-tracker')?.parentElement;
+    if (trackerContainer) {
+      // Find and replace the entire progress section (banner + tracker)
+      const currentBanner = document.querySelector('.current-task-banner');
+      if (currentBanner) {
+        currentBanner.remove();
+      }
+      const currentTracker = document.querySelector('.progress-tracker');
+      if (currentTracker) {
+        currentTracker.outerHTML = updatedProgressHtml;
+        // Re-wire click handlers
+        document.querySelectorAll('.progress-step').forEach(step => {
+          step.addEventListener('click', () => {
+            if (step.classList.contains('locked')) return;
+            const gameId = step.dataset.gameId;
+            const tab = document.querySelector(`.game-tab[data-game-id="${gameId}"]`);
+            if (tab) {
+              tab.click();
+              setTimeout(() => {
+                const gameContent = document.getElementById('game-content');
+                if (gameContent) {
+                  gameContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }, 100);
+            }
+          });
+        });
+      }
+    }
   });
 
   // Helper to map game.type to partial path
@@ -204,6 +251,9 @@ async function route(userFromEvent) {
           ];
           
           console.debug('[about_you guest] Rendering questions:', questions);
+          
+          // Store questions count in form for later use
+          form.dataset.questionsCount = questions.length;
           
           // Find the display_name field
           const displayNameField = form.querySelector('[name="display_name"]');
@@ -265,8 +315,11 @@ async function route(userFromEvent) {
         // Add form submission handler
         if (form && !form.dataset.boundSubmit) {
           form.dataset.boundSubmit = '1';
+          console.log('[about_you] Binding submit handler to form');
+          
           form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log('[about_you] Form submitted');
             
             // Check if user is signed in
             const { data: sessionData } = await supabase.auth.getSession();
@@ -274,6 +327,8 @@ async function route(userFromEvent) {
               alert('Please sign in to submit.');
               return;
             }
+            
+            console.log('[about_you] User authenticated:', sessionData.session.user.id);
             
             const formData = new FormData(form);
             const displayName = formData.get('display_name');
@@ -283,13 +338,18 @@ async function route(userFromEvent) {
               return;
             }
             
+            // Get questions count from form dataset
+            const questionsCount = parseInt(form.dataset.questionsCount) || 0;
+            
             // Collect answers
             const answers = {};
-            for (let i = 0; i < questions.length; i++) {
+            for (let i = 0; i < questionsCount; i++) {
               const key = `q_${i}`;
               const value = (formData.get(key) || '').toString().trim();
               answers[key] = value;
             }
+            
+            console.log('[about_you] Collected answers:', answers);
             
             // Require at least one answer
             const hasAnyAnswer = Object.values(answers).some(v => v && v.length);
@@ -297,6 +357,16 @@ async function route(userFromEvent) {
               alert('Please answer at least one question.');
               return;
             }
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn ? submitBtn.textContent : '';
+            if (submitBtn) {
+              submitBtn.disabled = true;
+              submitBtn.textContent = 'Submitting...';
+            }
+            
+            console.log('[about_you] Submitting to database...');
             
             // Submit to database
             const { error } = await supabase.from('submissions').insert({
@@ -308,14 +378,104 @@ async function route(userFromEvent) {
               moderation_status: 'pending'
             });
             
+            // Restore button state
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = originalBtnText;
+            }
+            
             if (error) {
               console.error('[about_you] Submission error:', error);
-              alert(`Error: ${error.message}`);
+              
+              // Show error state
+              const errorMsg = document.createElement('div');
+              errorMsg.className = 'submission-status error';
+              errorMsg.innerHTML = `
+                <div class="status-icon">❌</div>
+                <div class="status-content">
+                  <div class="status-title">Submission Failed</div>
+                  <div class="status-message">${escapeHtml(error.message)}</div>
+                  <button class="link" onclick="this.parentElement.parentElement.remove()">Try Again</button>
+                </div>
+              `;
+              form.insertAdjacentElement('beforebegin', errorMsg);
+              
+              // Scroll to error
+              errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
-              alert('Thank you! Your submission has been sent for review.');
-              form.reset();
+              console.log('[about_you] Submission successful');
+              
+              // Store submitted data for potential edit
+              const submittedData = {
+                display_name: displayName,
+                answers: answers
+              };
+              form.dataset.submittedData = JSON.stringify(submittedData);
+              
+              // Show success state
+              const successMsg = document.createElement('div');
+              successMsg.className = 'submission-status success';
+              successMsg.innerHTML = `
+                <div class="status-icon">✓</div>
+                <div class="status-content">
+                  <div class="status-title">Submitted Successfully! 🎉</div>
+                  <div class="status-message">
+                    Thank you, <strong>${escapeHtml(displayName)}</strong>! Your answers have been sent to the host for review.
+                    You'll receive a notification once they're approved.
+                  </div>
+                  <div class="status-actions">
+                    <button class="link primary" onclick="
+                      const nextStep = document.querySelector('.progress-step:not(.completed):not(.locked)');
+                      if (nextStep) {
+                        nextStep.click();
+                      } else {
+                        const gameContent = document.getElementById('game-content');
+                        if (gameContent) gameContent.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    ">
+                      Continue to Next Activity →
+                    </button>
+                    <button class="link" onclick="
+                      const form = document.querySelector('.game-form');
+                      const data = JSON.parse(form.dataset.submittedData || '{}');
+                      
+                      // Re-populate form
+                      if (data.display_name) {
+                        form.querySelector('[name=display_name]').value = data.display_name;
+                      }
+                      Object.entries(data.answers || {}).forEach(([key, val]) => {
+                        const input = form.querySelector('[name=' + key + ']');
+                        if (input) input.value = val;
+                      });
+                      
+                      // Show form, hide success
+                      this.closest('.submission-status').remove();
+                      form.style.display = 'block';
+                      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    ">
+                      ✏️ Edit My Answers
+                    </button>
+                  </div>
+                </div>
+              `;
+              
+              // Hide form and show success
+              form.style.display = 'none';
+              form.insertAdjacentElement('beforebegin', successMsg);
+              
+              // Scroll to success message
+              setTimeout(() => {
+                successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }, 100);
+              
+              // Trigger progress update
+              window.dispatchEvent(new CustomEvent('submission-updated'));
             }
           });
+        } else if (form) {
+          console.log('[about_you] Form already has submit handler bound');
+        } else {
+          console.error('[about_you] Form not found!');
         }
       }
     }
@@ -971,4 +1131,235 @@ function buildProgressTracker(steps) {
       </div>
     </div>
   `;
+}
+
+/* -------- Welcome Modal for First-Time Guests -------- */
+async function showWelcomeModalIfNeeded(party, user) {
+  // Check if user has seen welcome modal for this party
+  const storageKey = `welcome-seen-${party.id}-${user.id}`;
+  if (localStorage.getItem(storageKey)) {
+    return; // Already seen
+  }
+
+  // Check if modal already exists (prevent duplicates)
+  if (document.getElementById('welcomeModal')) {
+    console.log('[Welcome Modal] Modal already exists, skipping');
+    return;
+  }
+
+  console.log('[Welcome Modal] Creating modal for first-time user');
+
+  // Create and show welcome modal
+  const modalHtml = `
+    <div class="modal-overlay" id="welcomeModal">
+      <div class="modal modal-welcome">
+        <button class="modal-close" aria-label="Close" id="closeWelcome">×</button>
+        
+        <div class="modal-header">
+          <div class="emoji-burst">🎉</div>
+          <h2>Welcome to ${escapeHtml(party.title)}!</h2>
+          <p class="subtitle">We're so excited you're here!</p>
+        </div>
+        
+        <div class="modal-body">
+          <div class="modal-welcome-message">
+            <p class="intro">
+              This party is all about <strong>getting to know each other</strong> and having fun together!
+            </p>
+            <div class="purpose">
+              💝 We've prepared some fun activities to help everyone share a bit about themselves, 
+              their favorite music, and memories. Your participation helps make this gathering special 
+              and meaningful for everyone!
+            </div>
+          </div>
+          
+          <div class="modal-features">
+            <div class="modal-feature">
+              <div class="icon">✨</div>
+              <div class="content">
+                <div class="title">Share About You</div>
+                <div class="description">
+                  Answer fun questions so everyone can get to know you better!
+                </div>
+              </div>
+            </div>
+            
+            <div class="modal-feature">
+              <div class="icon">🎵</div>
+              <div class="content">
+                <div class="title">Favorite Songs</div>
+                <div class="description">
+                  Share songs you love and vote for others' picks!
+                </div>
+              </div>
+            </div>
+            
+            <div class="modal-feature">
+              <div class="icon">👶</div>
+              <div class="content">
+                <div class="title">Baby Photos</div>
+                <div class="description">
+                  Share a baby photo of yourself!
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button class="cta-button" id="startJourney">Let's Get Started! 🚀</button>
+          <a class="skip-link" id="skipWelcome">Skip and explore on my own</a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Insert modal into DOM
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  
+  // Prevent body scroll and preserve scroll position
+  const scrollY = window.scrollY;
+  document.documentElement.classList.add('modal-open');
+  document.body.classList.add('modal-open');
+  document.body.style.top = `-${scrollY}px`;
+
+  console.log('[Welcome Modal] Modal inserted into DOM, scroll position:', scrollY);
+
+  // Wire up close handlers - Use setTimeout to ensure DOM is ready
+  setTimeout(() => {
+    console.log('[Welcome Modal] Setting up event listeners...');
+    
+    const modal = document.getElementById('welcomeModal');
+    const closeBtn = document.getElementById('closeWelcome');
+    const startBtn = document.getElementById('startJourney');
+    const skipLink = document.getElementById('skipWelcome');
+
+    console.log('[Welcome Modal] Elements:', {
+      modal: modal,
+      closeBtn: closeBtn,
+      startBtn: startBtn,
+      skipLink: skipLink
+    });
+
+    if (!modal || !closeBtn || !startBtn || !skipLink) {
+      console.error('[Welcome Modal] Failed to find modal elements', {
+        modal: !!modal,
+        closeBtn: !!closeBtn,
+        startBtn: !!startBtn,
+        skipLink: !!skipLink
+      });
+      return;
+    }
+
+    console.log('[Welcome Modal] All elements found, wiring up handlers');
+
+    function closeModal() {
+      console.log('[Welcome Modal] Closing modal...');
+      modal.classList.add('closing');
+      setTimeout(() => {
+        modal.remove();
+        
+        // Restore body scroll and position
+        document.documentElement.classList.remove('modal-open');
+        document.body.classList.remove('modal-open');
+        const scrollY = document.body.style.top;
+        document.body.style.top = '';
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+        
+        console.log('[Welcome Modal] Modal closed, scroll restored');
+      }, 300);
+      localStorage.setItem(storageKey, 'true');
+    }
+
+    function startJourney() {
+      console.log('[Welcome Modal] Starting journey...');
+      closeModal();
+      // Auto-click the first game tab
+      setTimeout(() => {
+        const firstTab = document.querySelector('.game-tab');
+        console.log('[Welcome Modal] First tab:', firstTab);
+        if (firstTab) {
+          firstTab.click();
+          // Scroll to game content
+          setTimeout(() => {
+            const gameContent = document.getElementById('game-content');
+            if (gameContent) {
+              gameContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 100);
+        }
+      }, 400);
+    }
+
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('[Welcome Modal] Close button clicked');
+      closeModal();
+    });
+    
+    skipLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('[Welcome Modal] Skip link clicked');
+      closeModal();
+    });
+    
+    startBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('[Welcome Modal] Start button clicked');
+      startJourney();
+    });
+
+    // Also add onclick as a backup
+    startBtn.onclick = (e) => {
+      e.preventDefault();
+      console.log('[Welcome Modal] Start button onclick fired');
+      startJourney();
+    };
+    
+    // Close on overlay click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        console.log('[Welcome Modal] Overlay clicked');
+        closeModal();
+      }
+    });
+    
+    // Close on Escape key
+    const escapeHandler = (e) => {
+      if (e.key === 'Escape') {
+        console.log('[Welcome Modal] Escape key pressed');
+        closeModal();
+        document.removeEventListener('keydown', escapeHandler);
+      }
+    };
+    document.addEventListener('keydown', escapeHandler);
+
+    // Add confetti effect after handlers are set up
+    try {
+      createConfetti();
+    } catch (err) {
+      console.error('[Welcome Modal] Confetti error:', err);
+    }
+  }, 100);
+}
+
+function createConfetti() {
+  const colors = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'];
+  const modal = document.querySelector('.modal-header');
+  
+  for (let i = 0; i < 50; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = Math.random() * 100 + '%';
+    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.animationDelay = Math.random() * 3 + 's';
+    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+    modal.appendChild(confetti);
+    
+    // Remove after animation
+    setTimeout(() => confetti.remove(), 5000);
+  }
 }
