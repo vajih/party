@@ -237,6 +237,12 @@ async function route(userFromEvent) {
       if (game) {
         const form = qs('#game-content .game-form');
         if (form) {
+          // Check if questions are already rendered (prevent duplicates)
+          if (form.dataset.questionsRendered === 'true') {
+            console.debug('[about_you guest] Questions already rendered, skipping');
+            return;
+          }
+          
           // Parse config
           let config = game.config;
           if (typeof config === 'string') {
@@ -254,6 +260,9 @@ async function route(userFromEvent) {
           
           // Store questions count in form for later use
           form.dataset.questionsCount = questions.length;
+          
+          // Mark as rendered to prevent duplicates
+          form.dataset.questionsRendered = 'true';
           
           // Find the display_name field
           const displayNameField = form.querySelector('[name="display_name"]');
@@ -663,6 +672,61 @@ async function route(userFromEvent) {
     if (type === 'baby_photo') {
       const game = games.find(g => g.id === gameId);
       if (game) {
+        // Check if user already submitted a photo
+        const { data: sessionData } = await supabase.auth.getSession();
+        const userId = sessionData?.session?.user?.id;
+        
+        if (userId) {
+          const { data: existingSubmissions, error: checkError } = await supabase
+            .from('submissions')
+            .select('id, content, moderation_status, created_at')
+            .eq('game_id', game.id)
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(1);
+          
+          if (!checkError && existingSubmissions && existingSubmissions.length > 0) {
+            const submission = existingSubmissions[0];
+            const status = submission.moderation_status;
+            const statusText = status === 'approved' ? 'approved and is visible in the gallery' :
+                             status === 'rejected' ? 'was reviewed but not approved' :
+                             'is pending review by the host';
+            const statusColor = status === 'approved' ? 'var(--success)' :
+                              status === 'rejected' ? 'var(--danger)' :
+                              'var(--warning)';
+            
+            // Show already submitted message
+            const gameContent = qs('#game-content');
+            if (gameContent) {
+              gameContent.innerHTML = `
+                <div class="submission-status success" style="border-color: ${statusColor};">
+                  <div class="status-icon" style="color: ${statusColor};">${status === 'approved' ? '✓' : status === 'rejected' ? '✕' : '⏳'}</div>
+                  <div class="status-content">
+                    <div class="status-title">You've Already Submitted a Photo!</div>
+                    <div class="status-message">
+                      Your baby photo ${statusText}. You can only submit one photo per party.
+                      ${status === 'pending' ? ' The host will review it soon!' : ''}
+                    </div>
+                    <div class="status-actions">
+                      <button class="link primary" onclick="
+                        const gallery = document.querySelector('.submissions-gallery');
+                        if (gallery) {
+                          gallery.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        } else {
+                          window.location.reload();
+                        }
+                      ">
+                        View Gallery
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+            return; // Exit early, don't set up form handlers
+          }
+        }
+        
         const form = qs('#game-content .game-form');
         const fileInput = qs('#photoUpload');
         const preview = qs('#photoPreview');
@@ -772,42 +836,43 @@ async function route(userFromEvent) {
               const gameContent = qs('#game-content');
               if (gameContent) {
                 gameContent.innerHTML = `
-                  <div class="card" style="text-align:center;padding:32px;">
-                    <div style="font-size:48px;margin-bottom:16px;">✓</div>
-                    <h3 style="color:var(--success-color, #22c55e);margin-bottom:8px;">Photo Uploaded Successfully!</h3>
-                    <p class="muted" style="margin-bottom:24px;">Your baby photo has been submitted for review. The host will approve it before it appears in the gallery.</p>
-                    <div style="display:flex;flex-direction:column;gap:8px;max-width:280px;margin:0 auto;">
-                      <button class="primary" id="submitAnother">Submit Another Photo</button>
-                      <button class="link" id="viewGallery">View Gallery</button>
+                  <div class="submission-status success">
+                    <div class="status-icon">✓</div>
+                    <div class="status-content">
+                      <div class="status-title">Photo Submitted Successfully! 🎉</div>
+                      <div class="status-message">
+                        Your baby photo has been sent to the host for review. 
+                        You'll see it in the gallery once it's approved!
+                        <br><br>
+                        <strong>Note:</strong> You can only submit one photo per party.
+                      </div>
+                      <div class="status-actions">
+                        <button class="link primary" onclick="
+                          const nextStep = document.querySelector('.progress-step:not(.completed):not(.locked)');
+                          if (nextStep) {
+                            nextStep.click();
+                          } else {
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        ">
+                          Continue to Next Activity →
+                        </button>
+                        <button class="link" onclick="
+                          const gallery = document.querySelector('.submissions-gallery');
+                          if (gallery) {
+                            gallery.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                        ">
+                          View Gallery
+                        </button>
+                      </div>
                     </div>
                   </div>
                 `;
-
-                // Wire up buttons
-                const submitAnotherBtn = qs('#submitAnother');
-                const viewGalleryBtn = qs('#viewGallery');
-
-                if (submitAnotherBtn) {
-                  submitAnotherBtn.addEventListener('click', () => {
-                    // Reload the game tab
-                    const gameTab = document.querySelector(`.game-tab[data-game-id="${game.id}"]`);
-                    if (gameTab) gameTab.click();
-                  });
-                }
-
-                if (viewGalleryBtn) {
-                  viewGalleryBtn.addEventListener('click', () => {
-                    // Scroll to gallery if it exists, or reload to show it
-                    const gallery = document.querySelector('.submissions-gallery');
-                    if (gallery) {
-                      gallery.scrollIntoView({ behavior: 'smooth' });
-                    } else {
-                      const gameTab = document.querySelector(`.game-tab[data-game-id="${game.id}"]`);
-                      if (gameTab) gameTab.click();
-                    }
-                  });
-                }
               }
+              
+              // Trigger progress update
+              window.dispatchEvent(new CustomEvent('submission-updated'));
 
             } catch (err) {
               console.error('[baby_photo] Unexpected error:', err);
