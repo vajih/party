@@ -778,9 +778,19 @@ async function renderAboutYouReport(user) {
 
           let displayAnswer = '';
           if (question.kind === 'either_or') {
-            displayAnswer = answer.selected || 'No answer';
-            if (answer.modifiers && answer.modifiers.length > 0) {
-              displayAnswer += ` <span class="detailed-answer-tag">${answer.modifiers.join(', ')}</span>`;
+            // Resolve A/B to actual label text
+            let selectedId = (typeof answer === 'object') ? answer.selected : answer;
+            let modifiers = (typeof answer === 'object') ? (answer.modifiers || []) : [];
+            
+            if (selectedId && question.options) {
+              const option = question.options.find(opt => opt.id === selectedId);
+              displayAnswer = option ? option.label : selectedId;
+            } else {
+              displayAnswer = 'No answer';
+            }
+            
+            if (modifiers.length > 0) {
+              displayAnswer += ` <span class="detailed-answer-tag">${modifiers.join(', ')}</span>`;
             }
           } else if (question.kind === 'single_choice') {
             displayAnswer = answer || 'No answer';
@@ -791,7 +801,7 @@ async function renderAboutYouReport(user) {
           return `
             <div class="detailed-answer-item">
               <div class="detailed-answer-question">${escapeHtml(question.prompt)}</div>
-              <div class="detailed-answer-response">${escapeHtml(displayAnswer)}</div>
+              <div class="detailed-answer-response">${displayAnswer}</div>
             </div>
           `;
         }).join('');
@@ -889,18 +899,27 @@ async function renderAboutYouReport(user) {
           else if (q.kind === 'either_or') {
             const counts = {};
             answers.forEach(a => {
-              const selected = a.selected || 'No answer';
-              counts[selected] = (counts[selected] || 0) + 1;
+              // Get the selected ID (A or B)
+              const selectedId = (typeof a === 'object') ? a.selected : a;
+              
+              // Resolve ID to label text
+              let displayLabel = selectedId;
+              if (selectedId && q.options) {
+                const option = q.options.find(opt => opt.id === selectedId);
+                displayLabel = option ? option.label : selectedId;
+              }
+              
+              counts[displayLabel] = (counts[displayLabel] || 0) + 1;
             });
 
             const total = answers.length;
             resultsHtml = Object.entries(counts)
               .sort(([, a], [, b]) => b - a)
-              .map(([option, count]) => {
+              .map(([optionLabel, count]) => {
                 const percentage = Math.round((count / total) * 100);
                 return `
                   <li class="aggregate-result-item">
-                    <span class="aggregate-result-label">${escapeHtml(option)}</span>
+                    <span class="aggregate-result-label">${escapeHtml(optionLabel)}</span>
                     <div class="aggregate-result-bar">
                       <div class="aggregate-result-fill" style="width: ${percentage}%">${percentage}%</div>
                     </div>
@@ -997,15 +1016,27 @@ async function renderAboutYouReport(user) {
         let displayAnswer = '';
         if (question.kind === 'either_or') {
           // Check if answer is an object with 'selected' property or just a string
+          let selectedId = null;
+          let modifiers = [];
+          
           if (typeof answer === 'object' && answer.selected) {
-            displayAnswer = answer.selected;
-            if (answer.modifiers && answer.modifiers.length > 0) {
-              displayAnswer += ` (${answer.modifiers.join(', ')})`;
-            }
+            selectedId = answer.selected;
+            modifiers = answer.modifiers || [];
           } else if (typeof answer === 'string') {
-            displayAnswer = answer;
+            selectedId = answer;
+          }
+          
+          // Resolve the ID (A/B) to the actual label text
+          if (selectedId && question.options) {
+            const option = question.options.find(opt => opt.id === selectedId);
+            displayAnswer = option ? option.label : selectedId;
           } else {
             displayAnswer = 'No answer';
+          }
+          
+          // Add modifiers like "Both" or "Neither"
+          if (modifiers.length > 0) {
+            displayAnswer += ` <span class="detailed-answer-tag">${modifiers.join(', ')}</span>`;
           }
         } else {
           displayAnswer = answer || 'No answer';
@@ -1018,7 +1049,7 @@ async function renderAboutYouReport(user) {
             <div style="font-weight: 600; font-size: 0.9375rem; color: #6b7280; margin-bottom: 8px; line-height: 1.4;">
               ${escapeHtml(question.prompt)}
             </div>
-            <div style="font-size: 1.0625rem; color: #111827; font-weight: 500;">${escapeHtml(displayAnswer)}</div>
+            <div style="font-size: 1.0625rem; color: #111827; font-weight: 500;">${displayAnswer}</div>
           </div>
         `;
       }).join('');
@@ -1097,8 +1128,19 @@ async function renderAboutYouReport(user) {
           let cell = '';
           
           if (question.kind === 'either_or' && answer) {
-            cell = answer.selected || '';
-            if (answer.modifiers && answer.modifiers.length > 0) {
+            // Get the selected ID
+            const selectedId = (typeof answer === 'object') ? answer.selected : answer;
+            
+            // Resolve ID to label text
+            if (selectedId && question.options) {
+              const option = question.options.find(opt => opt.id === selectedId);
+              cell = option ? option.label : selectedId;
+            } else {
+              cell = selectedId || '';
+            }
+            
+            // Add modifiers if present
+            if (typeof answer === 'object' && answer.modifiers && answer.modifiers.length > 0) {
               cell += ` (${answer.modifiers.join(', ')})`;
             }
           } else {
