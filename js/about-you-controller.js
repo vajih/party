@@ -415,7 +415,16 @@ async function handleBatchSubmit(e) {
   
   console.log('[AboutYouExtended] Batch saved successfully');
   
-  alert(`✓ ${getBatch(currentState.currentBatch).title} complete!`);
+  // Get next batch for guidance
+  const currentBatchIndex = QUESTION_BATCHES.findIndex(b => b.id === currentState.currentBatch);
+  const nextBatch = QUESTION_BATCHES[currentBatchIndex + 1];
+  
+  let completionMessage = `✓ ${getBatch(currentState.currentBatch).title} complete!`;
+  if (nextBatch) {
+    completionMessage += ` Now let's do ${nextBatch.title}.`;
+  }
+  
+  alert(completionMessage);
   
   // Reload profile and show batch selector
   await loadProfileData();

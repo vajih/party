@@ -51,9 +51,6 @@
 
   <!-- Header -->
   <header class="admin-header">
-    <div class="select-party">
-      <select id="hostPartySelect"></select>
-    </div>
     <div class="actions">
       <button id="headerCreatePartyBtn" class="primary">
         <i class="fas fa-plus"></i>
@@ -176,11 +173,11 @@
         <div id="partyEditForm" class="card" style="margin-top:12px;" hidden>
           <h4>Edit Party</h4>
           <form id="editPartyForm" class="stack">
-            <div class="row"><label>Title</label><input id="editPartyTitle" required /></div>
-            <div class="row"><label>Date & Time</label><input id="editPartyDate" type="datetime-local" /></div>
-            <div class="row"><label>Venue</label><input id="editPartyVenue" placeholder="Optional" /></div>
-            <div class="row"><label>Description</label><textarea id="editPartyDesc" rows="2"></textarea></div>
-            <div class="row"><label>Expected guests</label><input id="editPartyExpected" type="number" min="0" /></div>
+            <div class="row"><label>Title</label><input id="editPartyTitle" name="title" required /></div>
+            <div class="row"><label>Date & Time</label><input id="editPartyDate" name="date" type="datetime-local" /></div>
+            <div class="row"><label>Venue</label><input id="editPartyVenue" name="venue" placeholder="Optional" /></div>
+            <div class="row"><label>Description</label><textarea id="editPartyDesc" name="description" rows="2"></textarea></div>
+            <div class="row"><label>Expected guests</label><input id="editPartyExpected" name="expected_guests" type="number" min="0" /></div>
             <div class="row">
               <button type="submit">Save Changes</button>
               <button type="button" class="link" id="cancelEditParty">Cancel</button>

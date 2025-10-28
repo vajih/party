@@ -52,13 +52,23 @@ async function boot() {
   await consumeAuthRedirect();   // handle magic-link hash
   wireHeaderAuth();              // header sign-in form
 
-  // re-route on any auth state change
+  // Get initial session
+  const { data } = await supabase.auth.getSession();
+  const initialUser = data?.session?.user ?? null;
+  
+  // Do initial route
+  await route(initialUser);
+  
+  // re-route on any FUTURE auth state changes (skip the initial SIGNED_IN event)
+  let isInitialAuth = true;
   supabase.auth.onAuthStateChange((_event, session) => {
+    // Skip the first auth state change event which fires immediately
+    if (isInitialAuth) {
+      isInitialAuth = false;
+      return;
+    }
     route(session?.user ?? null);
   });
-
-  const { data } = await supabase.auth.getSession();
-  await route(data?.session?.user ?? null);
 }
 
 async function route(userFromEvent) {
@@ -986,8 +996,21 @@ function wireHeaderAuth() {
       email,
       options: { emailRedirectTo: redirectTo }
     });
-    msg.textContent = error ? `Error: ${error.message}` : `Check your email: ${email}`;
-    if (!error) input.value = '';
+    
+    if (error) {
+      msg.textContent = `Error: ${error.message}`;
+    } else {
+      // Hide the form and show clear success message
+      form.style.display = 'none';
+      msg.innerHTML = `
+        <div style="text-align: center; padding: 16px; background: var(--mint-tint); border: 1px solid var(--mint); border-radius: 12px;">
+          <div style="font-size: 24px; margin-bottom: 8px;">📧</div>
+          <div style="font-weight: 600; margin-bottom: 8px;">Party link sent to your email!</div>
+          <div style="color: var(--text-secondary); font-size: 14px;">Check your inbox at <strong>${email}</strong> and click the link to join the party.</div>
+        </div>
+      `;
+      input.value = '';
+    }
   });
 
   // role badge quick action (after header fragment is loaded)
@@ -1256,8 +1279,25 @@ function renderPartyWelcome(party) {
       email: addr,
       options: { emailRedirectTo: redirectTo }
     });
-    status.textContent = error ? `Error: ${error.message}` : `Check your email: ${addr}`;
-    if (!error) email.value = '';
+    
+    if (error) {
+      status.textContent = `Error: ${error.message}`;
+    } else {
+      // Hide the form and show clear success message
+      form.style.display = 'none';
+      status.innerHTML = `
+        <div style="text-align: center; padding: 20px; background: var(--mint-tint); border: 1px solid var(--mint); border-radius: 12px; margin-top: 16px;">
+          <div style="font-size: 32px; margin-bottom: 12px;">📧</div>
+          <div style="font-size: 18px; font-weight: 600; margin-bottom: 12px; color: var(--ink);">Party link sent!</div>
+          <div style="color: var(--text-secondary); line-height: 1.6;">
+            <p style="margin-bottom: 8px;">We sent a magic link to:</p>
+            <p style="font-weight: 600; color: var(--ink); margin-bottom: 12px;">${addr}</p>
+            <p style="margin-bottom: 0;">Open your email and click the link to join the party.</p>
+          </div>
+        </div>
+      `;
+      email.value = '';
+    }
   });
 }
 
@@ -1424,66 +1464,66 @@ async function showWelcomeModalIfNeeded(party, user) {
 
   console.log('[Welcome Modal] Creating modal for first-time user');
 
+  // Format party date
+  let formattedDate = 'To be announced';
+  let formattedTime = 'To be announced';
+  if (party.date) {
+    const partyDate = new Date(party.date);
+    // Format: "Saturday, November 23rd, 2025"
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    formattedDate = partyDate.toLocaleDateString('en-US', options);
+    
+    // Format time: "6:00 PM"
+    const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+    formattedTime = partyDate.toLocaleTimeString('en-US', timeOptions);
+  }
+  
+  const venue = party.venue || 'Venue to be announced';
+
   // Create and show welcome modal
   const modalHtml = `
     <div class="modal-overlay" id="welcomeModal">
-      <div class="modal modal-welcome">
+      <div class="modal modal-welcome modal-invitation">
         <button class="modal-close" aria-label="Close" id="closeWelcome">×</button>
         
-        <div class="modal-header">
-          <div class="emoji-burst">🎉</div>
-          <h2>Welcome to ${escapeHtml(party.title)}!</h2>
-          <p class="subtitle">We're so excited you're here!</p>
-        </div>
-        
-        <div class="modal-body">
-          <div class="modal-welcome-message">
-            <p class="intro">
-              This party is all about <strong>getting to know each other</strong> and having fun together!
-            </p>
-            <div class="purpose">
-              💝 We've prepared some fun activities to help everyone share a bit about themselves, 
-              their favorite music, and memories. Your participation helps make this gathering special 
-              and meaningful for everyone!
-            </div>
+        <div class="invitation-card">
+          <div class="invitation-header">
+            <div class="invitation-ornament">✦</div>
+            <h2 class="invitation-title">${escapeHtml(party.title)}</h2>
+            <div class="invitation-ornament">✦</div>
           </div>
           
-          <div class="modal-features">
-            <div class="modal-feature">
-              <div class="icon">✨</div>
-              <div class="content">
-                <div class="title">Share About You</div>
-                <div class="description">
-                  Answer fun questions so everyone can get to know you better!
-                </div>
-              </div>
+          <div class="invitation-body">
+            <p class="invitation-hosts">
+              Sara & Waqar<br>
+              Ghazala & Aftab<br>
+              Fatima & Vajih
+            </p>
+            
+            <p class="invitation-greeting">
+              request the pleasure of your company
+            </p>
+            
+            <div class="invitation-event-details">
+              <p class="event-date">${escapeHtml(formattedDate)}</p>
+              <p class="event-time">${escapeHtml(formattedTime)}</p>
+              <p class="event-venue">${escapeHtml(venue)}</p>
             </div>
             
-            <div class="modal-feature">
-              <div class="icon">🎵</div>
-              <div class="content">
-                <div class="title">Favorite Songs</div>
-                <div class="description">
-                  Share songs you love and vote for others' picks!
-                </div>
-              </div>
-            </div>
+            <blockquote class="invitation-quote">
+              "Let the beauty of what you love be what you do."
+              <cite>— Rumi</cite>
+            </blockquote>
             
-            <div class="modal-feature">
-              <div class="icon">👶</div>
-              <div class="content">
-                <div class="title">Baby Photos</div>
-                <div class="description">
-                  Share a baby photo of yourself!
-                </div>
-              </div>
-            </div>
+            <p class="invitation-note">
+              The theme of the evening is <strong>getting to know you</strong>. We've prepared activities to help us all 
+              share and connect—favorite songs, memories, and stories that make gatherings meaningful.
+            </p>
           </div>
-        </div>
-        
-        <div class="modal-footer">
-          <button class="cta-button" id="startJourney">Let's Get Started! 🚀</button>
-          <a class="skip-link" id="skipWelcome">Skip and explore on my own</a>
+          
+          <div class="invitation-footer">
+            <button class="cta-button" id="startJourney">Continue</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1507,21 +1547,18 @@ async function showWelcomeModalIfNeeded(party, user) {
     const modal = document.getElementById('welcomeModal');
     const closeBtn = document.getElementById('closeWelcome');
     const startBtn = document.getElementById('startJourney');
-    const skipLink = document.getElementById('skipWelcome');
 
     console.log('[Welcome Modal] Elements:', {
       modal: modal,
       closeBtn: closeBtn,
-      startBtn: startBtn,
-      skipLink: skipLink
+      startBtn: startBtn
     });
 
-    if (!modal || !closeBtn || !startBtn || !skipLink) {
+    if (!modal || !closeBtn || !startBtn) {
       console.error('[Welcome Modal] Failed to find modal elements', {
         modal: !!modal,
         closeBtn: !!closeBtn,
-        startBtn: !!startBtn,
-        skipLink: !!skipLink
+        startBtn: !!startBtn
       });
       return;
     }
@@ -1570,13 +1607,6 @@ async function showWelcomeModalIfNeeded(party, user) {
       e.preventDefault();
       e.stopPropagation();
       console.log('[Welcome Modal] Close button clicked');
-      closeModal();
-    });
-    
-    skipLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('[Welcome Modal] Skip link clicked');
       closeModal();
     });
     

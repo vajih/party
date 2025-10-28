@@ -1,0 +1,177 @@
+/**
+ * Party App - Brand Tokens
+ * Design system foundation for consistent, warm, celebratory UI
+ */
+
+:root {
+  /* ========================================
+     Brand Colors
+     ======================================== */
+  
+  /* Neutrals - Sophisticated, warm grays */
+  --ink: #1A1A1A;           /* Primary text, deep charcoal */
+  --pearl: #FAFAF9;         /* Background/canvas, warm white */
+  --cloud: #FFFFFF;         /* Cards, elevated surfaces */
+  --slate: #E5E5E0;         /* Borders, dividers - warm gray */
+  --mist: #F5F5F3;          /* Subtle backgrounds */
+  
+  /* Primary Palette - Refined, professional */
+  --primary: #2D3142;       /* Deep navy-blue for trust/stability */
+  --primary-hover: #1F2332;
+  --primary-light: rgba(45, 49, 66, 0.08);
+  
+  --accent: #D4A574;        /* Warm gold - celebratory but professional */
+  --accent-hover: #C89660;
+  --accent-light: rgba(212, 165, 116, 0.12);
+  
+  --coral: #D4A574;         /* Map to accent for backward compatibility */
+  --coral-hover: #C89660;
+  --coral-ink: #FFFFFF;
+  --coral-tint: rgba(212, 165, 116, 0.12);
+  
+  /* Accent Colors - Muted, professional */
+  --gold: #D4A574;          /* Focus rings, highlights */
+  --mint: #2D9D7C;          /* Success - sophisticated green */
+  --amber: #E3A05A;         /* Warnings - muted orange */
+  --cranberry: #C85A54;     /* Errors - muted red */
+  
+  /* Tints (subtle backgrounds) */
+  --mint-tint: rgba(45, 157, 124, 0.08);
+  --amber-tint: rgba(227, 160, 90, 0.08);
+  --cranberry-tint: rgba(200, 90, 84, 0.08);
+  
+  /* Semantic Colors */
+  --text-primary: var(--ink);
+  --text-secondary: #6B6B66;
+  --text-muted: #9A9A94;
+  
+  /* ========================================
+     Typography
+     ======================================== */
+  
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+  
+  /* Font Sizes & Line Heights */
+  --fs-h1: 28px;
+  --lh-h1: 36px;
+  --fs-h2: 22px;
+  --lh-h2: 30px;
+  --fs-h3: 18px;
+  --lh-h3: 26px;
+  --fs-body: 16px;
+  --lh-body: 24px;
+  --fs-small: 14px;
+  --lh-small: 20px;
+  
+  /* Font Weights */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  
+  /* ========================================
+     Spacing Scale (4pt base)
+     ======================================== */
+  
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  
+  /* ========================================
+     Border Radius
+     ======================================== */
+  
+  --radius-base: 12px;      /* Buttons, inputs */
+  --radius-card: 16px;      /* Cards, panels */
+  --radius-modal: 20px;     /* Modals, sheets */
+  --radius-full: 9999px;    /* Pills, avatars */
+  
+  /* ========================================
+     Shadows (Subtle, Professional)
+     ======================================== */
+  
+  --shadow-low: 0 1px 3px rgba(26, 26, 26, 0.04), 0 1px 2px rgba(26, 26, 26, 0.02);
+  --shadow-mid: 0 4px 12px rgba(26, 26, 26, 0.06), 0 2px 4px rgba(26, 26, 26, 0.03);
+  --shadow-high: 0 12px 32px rgba(26, 26, 26, 0.08), 0 4px 8px rgba(26, 26, 26, 0.04);
+  --shadow-focus: 0 0 0 3px rgba(212, 165, 116, 0.2);
+  
+  /* ========================================
+     Motion & Transitions
+     ======================================== */
+  
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);   /* Smooth, natural easing */
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);   /* Hover states */
+  --t-fast: 150ms;          /* Micro interactions */
+  --t-base: 240ms;          /* Standard transitions */
+  --t-slow: 400ms;          /* Entrances, exits */
+  
+  /* ========================================
+     Component Tokens
+     ======================================== */
+  
+  /* Buttons */
+  --btn-height: 44px;       /* Minimum touch target */
+  --btn-padding-x: 16px;
+  --btn-radius: var(--radius-base);
+  --btn-font-size: var(--fs-body);
+  --btn-font-weight: var(--fw-medium);
+  
+  /* Inputs */
+  --input-height: 44px;
+  --input-radius: var(--radius-base);
+  --input-border: 1px solid var(--slate);
+  --input-padding-x: 12px;
+  
+  /* Cards */
+  --card-bg: var(--cloud);
+  --card-radius: var(--radius-card);
+  --card-shadow: var(--shadow-mid);
+  --card-padding: var(--space-5);
+  
+  /* Focus Ring */
+  --focus-ring: 2px solid var(--gold);
+  --focus-offset: 2px;
+}
+
+/* ========================================
+   Dark Mode (Future Ready)
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  /* Uncomment when ready for dark mode
+  :root {
+    --ink: #F7F7F5;
+    --pearl: #1F2937;
+    --cloud: #111827;
+    --slate: #4B5563;
+  }
+  */
+}
+
+/* ========================================
+   Reduced Motion
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 0ms;
+    --t-base: 0ms;
+    --t-slow: 0ms;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

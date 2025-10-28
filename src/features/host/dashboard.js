@@ -62,10 +62,10 @@ export async function initHostDashboard(user){
   const { initAdminNav } = await import('../../ui/adminNav.js');
   await initAdminNav();
 
-  // Ensure we have the required DOM elements
-  if (!hostPartiesList || !hostPartySelect || !hostGamesList) {
+  // Ensure we have the required DOM elements (hostPartySelect is optional - only in report section)
+  if (!hostPartiesList || !hostGamesList) {
     console.error('Missing required DOM elements for host dashboard. Elements found:', 
-      { hostPartiesList, hostPartySelect, hostGamesList });
+      { hostPartiesList, hostGamesList });
     return;
   }
 
@@ -188,8 +188,8 @@ export async function renderHostParties(user) {
 
   if (!parties?.length) {
     hostPartiesList.innerHTML = '<p class="small">No parties yet. Create one above.</p>';
-    // clear any party selects
-    ['#hostPartySelectList', '#hostPartySelect', '#gamePartySelect', '#cohostPartySelect'].forEach(sel => qsa(sel).forEach(el => el.innerHTML = ''));
+    // clear any party selects (removed #hostPartySelect as it's no longer in header)
+    ['#hostPartySelectList', '#gamePartySelect', '#cohostPartySelect'].forEach(sel => qsa(sel).forEach(el => el.innerHTML = ''));
     hostGamesList.innerHTML = '';
     return;
   }
@@ -242,8 +242,9 @@ export async function renderHostParties(user) {
     .map(p => `<option value="${p.id}">${escapeHtml(p.title)} (${escapeHtml(p.slug)})</option>`)
     .join('');
 
-  // Populate all relevant party selects (header, game add form, cohost selector)
-  const partySelectIds = ['#hostPartySelectList', '#hostPartySelect', '#gamePartySelect', '#cohostPartySelect'];
+  // Populate all relevant party selects (About You report, game add form, cohost selector)
+  // Note: removed #hostPartySelect from header as it was redundant
+  const partySelectIds = ['#hostPartySelectList', '#gamePartySelect', '#cohostPartySelect'];
   partySelectIds.forEach(sel => {
     qsa(sel).forEach(el => { el.innerHTML = opts; });
   });
@@ -301,7 +302,7 @@ function bindAddGame(){
   const form = qs('#newGameForm');
   if (!form) return;
 
-  const partySel = qs('#hostPartySelect');
+  const partySel = qs('#gamePartySelect'); // Use game form's party selector instead of header
   const typeSel  = qs('#gameType');
   const titleInp = qs('#gameTitle');
   
@@ -383,15 +384,15 @@ function bindAddGame(){
     alert('Game added!');
   });
 
-  qs('#hostPartySelect')?.addEventListener('change', renderHostGamesListFromSelect);
+  // Listen for party selection changes in the game form
   partySel?.addEventListener('change', renderHostGamesListFromSelect);
 }
 
 export async function renderHostGamesListFromSelect(){
-  const { hostPartySelect, hostGamesList } = getDashboardElements();
-  // Prefer the game-specific selector if present, otherwise fall back to header host select
+  const { hostGamesList } = getDashboardElements();
+  // Use the game-specific selector from the form
   const gamePartySel = qs('#gamePartySelect');
-  const partyId = (gamePartySel && gamePartySel.value) || hostPartySelect?.value;
+  const partyId = gamePartySel?.value;
   const list = hostGamesList;
   if (!list) return;
   if (!partyId) { list.innerHTML = '<p class="small">Pick a party above.</p>'; return; }

@@ -1,0 +1,233 @@
+/**
+ * Toast Notification Styles - Brand Aligned
+ * Success, info, warning, error states with warm colors
+ */
+
+/* ========================================
+   Toast Container
+   ======================================== */
+
+#toast-root {
+  position: fixed;
+  inset-inline-end: var(--space-4);
+  inset-block-start: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* ========================================
+   Toast Base
+   ======================================== */
+
+.toast {
+  pointer-events: auto;
+  min-width: 280px;
+  max-width: 420px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-base);
+  background: var(--cloud);
+  box-shadow: var(--shadow-mid);
+  border: 1px solid var(--slate);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  transition: all var(--t-base) var(--ease);
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast:hover {
+  box-shadow: var(--shadow-high);
+}
+
+/* Toast Icon */
+.toast__icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+/* Toast Message */
+.toast__message {
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--ink);
+}
+
+/* Toast Controls */
+.toast__controls {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.toast__action {
+  border: 1px solid var(--slate);
+  background: var(--cloud);
+  color: var(--ink);
+  font-size: var(--fs-small);
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease-out);
+}
+
+.toast__action:hover {
+  background: var(--coral-tint);
+  border-color: var(--coral);
+  color: var(--coral);
+}
+
+.toast__action:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.toast__close {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: #9CA3AF;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all var(--t-fast) var(--ease-out);
+}
+
+.toast__close:hover {
+  background: var(--pearl);
+  color: var(--ink);
+}
+
+.toast__close:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 1px;
+}
+
+/* ========================================
+   Toast Types (Brand Aligned)
+   ======================================== */
+
+/* Success - Mint */
+.toast--success {
+  background: var(--mint-tint);
+  border-left: 3px solid var(--mint);
+  border-color: var(--mint);
+}
+
+.toast--success .toast__icon {
+  color: var(--mint);
+}
+
+.toast--success .toast__message {
+  color: var(--ink);
+}
+
+/* Error - Cranberry */
+.toast--error {
+  background: var(--cranberry-tint);
+  border-left: 3px solid var(--cranberry);
+  border-color: var(--cranberry);
+}
+
+.toast--error .toast__icon {
+  color: var(--cranberry);
+}
+
+.toast--error .toast__message {
+  color: var(--ink);
+}
+
+/* Warning - Amber */
+.toast--warning {
+  background: var(--amber-tint);
+  border-left: 3px solid var(--amber);
+  border-color: var(--amber);
+}
+
+.toast--warning .toast__icon {
+  color: var(--amber);
+}
+
+.toast--warning .toast__message {
+  color: var(--ink);
+}
+
+/* Info - Coral */
+.toast--info {
+  background: var(--coral-tint);
+  border-left: 3px solid var(--coral);
+  border-color: var(--coral);
+}
+
+.toast--info .toast__icon {
+  color: var(--coral);
+}
+
+.toast--info .toast__message {
+  color: var(--ink);
+}
+
+/* Default */
+.toast--default {
+  background: var(--cloud);
+  border: 1px solid var(--slate);
+}
+
+/* ========================================
+   Animation States
+   ======================================== */
+
+.toast--entering {
+  transform: translateY(-6px);
+  opacity: 0;
+}
+
+.toast--entered {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast--exiting {
+  transform: translateY(-6px);
+  opacity: 0;
+}
+
+/* ========================================
+   Responsive (Mobile)
+   ======================================== */
+
+@media (max-width: 640px) {
+  #toast-root {
+    inset-inline-start: var(--space-4);
+    inset-inline-end: var(--space-4);
+  }
+  
+  .toast {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+/* ========================================
+   Reduced Motion
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transition: opacity var(--t-fast);
+  }
+  
+  .toast--entering,
+  .toast--exiting {
+    transform: none;
+  }
+}

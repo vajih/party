@@ -38,69 +38,88 @@ export const QUESTION_BATCHES = [
         category: 'food'
       },
       {
-        id: 'food_mango_chaunsa_anwar',
+        id: 'food_mango_supremacy',
         order: 3,
-        kind: 'either_or',
-        prompt: 'Mango: Chaunsa vs Anwar Ratol',
+        kind: 'single_choice',
+        prompt: 'Mango supremacy (top variety)',
         options: [
-          { id: 'A', label: 'Chaunsa' },
-          { id: 'B', label: 'Anwar Ratol' }
+          { id: 'chaunsa', label: 'Chaunsa' },
+          { id: 'anwar_ratol', label: 'Anwar Ratol' },
+          { id: 'sindhri', label: 'Sindhri' },
+          { id: 'langra', label: 'Langra' },
+          { id: 'alphonso', label: 'Alphonso' },
+          { id: 'whatever_ripe', label: '"Whatever\'s ripe!"' },
+          { id: 'other', label: 'Other', write_in: true }
         ],
         required: true,
-        flags: { allow_both: true, allow_neither: true },
+        write_in_placeholder: 'Which mango variety were you thinking?',
         category: 'food'
       },
       {
-        id: 'drink_roohafza_jameshirin',
+        id: 'food_comfort',
         order: 4,
-        kind: 'either_or',
-        prompt: 'Rooh Afza vs Jam-e-Shirin',
+        kind: 'single_choice',
+        prompt: 'Comfort food (your first pick)',
         options: [
-          { id: 'A', label: 'Rooh Afza' },
-          { id: 'B', label: 'Jam-e-Shirin' }
+          { id: 'daal_chawal', label: 'Daal Chawal' },
+          { id: 'aloo_gosht', label: 'Aloo Gosht + Naan' },
+          { id: 'aloo_paratha', label: 'Aloo Paratha + Raita' },
+          { id: 'nihari_paratha', label: 'Nihari + Paratha' },
+          { id: 'biryani', label: 'Biryani (any style)' },
+          { id: 'mcdonalds', label: "McDonald's burger & fries" },
+          { id: 'halwa_puri', label: 'Halwa Puri' },
+          { id: 'other', label: 'Other', write_in: true }
+        ],
+        required: true,
+        write_in_placeholder: 'What comfort food did you have in mind?',
+        category: 'food'
+      },
+      {
+        id: 'food_houston_halal',
+        order: 5,
+        kind: 'single_choice',
+        prompt: 'Houston-area bonus: best late-night halal fix',
+        options: [
+          { id: 'agas', label: "Aga's" },
+          { id: 'bismillah', label: 'Bismillah' },
+          { id: 'lasbela', label: 'Lasbela' },
+          { id: 'tempura', label: 'Tempura' },
+          { id: 'himalaya', label: 'Himalaya' },
+          { id: 'other', label: 'Other', write_in: true }
+        ],
+        required: true,
+        write_in_placeholder: 'Which spot were you thinking?',
+        category: 'food'
+      },
+      {
+        id: 'food_midnight_snack',
+        order: 6,
+        kind: 'single_choice',
+        prompt: 'Midnight "guilty-pleasure" desi snack',
+        options: [
+          { id: 'bun_kebab', label: 'Bun Kebab' },
+          { id: 'fry_unda_paratha', label: 'Fry unda - Paratha Roll' },
+          { id: 'chai_biscuits', label: 'Chai & Biscuits' },
+          { id: 'pakora', label: 'Pakora' },
+          { id: 'leftover_biryani', label: 'Leftover Biryani' },
+          { id: 'other', label: 'Other', write_in: true }
+        ],
+        required: true,
+        write_in_placeholder: 'What midnight snack were you thinking?',
+        category: 'food'
+      },
+      {
+        id: 'drink_chai_coffee',
+        order: 7,
+        kind: 'either_or',
+        prompt: 'Morning: Chai or Coffee',
+        options: [
+          { id: 'A', label: 'Chai' },
+          { id: 'B', label: 'Coffee' }
         ],
         required: true,
         flags: { allow_both: true, allow_neither: true },
         category: 'drink'
-      },
-      {
-        id: 'games_carrom_ludo',
-        order: 5,
-        kind: 'either_or',
-        prompt: 'Carrom vs Ludo',
-        options: [
-          { id: 'A', label: 'Carrom' },
-          { id: 'B', label: 'Ludo' }
-        ],
-        required: true,
-        flags: { allow_both: true, allow_neither: true },
-        category: 'nostalgia'
-      },
-      {
-        id: 'music_vitalsigns_junoon',
-        order: 6,
-        kind: 'either_or',
-        prompt: 'Vital Signs vs Junoon',
-        options: [
-          { id: 'A', label: 'Vital Signs' },
-          { id: 'B', label: 'Junoon' }
-        ],
-        required: true,
-        flags: { allow_both: true, allow_neither: true },
-        category: 'music'
-      },
-      {
-        id: 'qawwali_nusrat_sabri',
-        order: 7,
-        kind: 'either_or',
-        prompt: 'Nusrat Fateh Ali Khan vs Sabri Brothers',
-        options: [
-          { id: 'A', label: 'Nusrat Fateh Ali Khan' },
-          { id: 'B', label: 'Sabri Brothers' }
-        ],
-        required: true,
-        flags: { allow_both: true, allow_neither: true },
-        category: 'music'
       }
     ]
   },
@@ -126,83 +145,106 @@ export const QUESTION_BATCHES = [
         category: 'nostalgia'
       },
       {
-        id: 'mbti_travel_plan_wander',
+        id: 'remedy_desi_mom',
         order: 13,
-        kind: 'either_or',
-        prompt: 'When traveling, do you prefer...',
+        kind: 'single_choice',
+        prompt: 'A classic desi mom cure-all',
         options: [
-          { id: 'A', label: 'Planned itinerary' },
-          { id: 'B', label: 'Wander and discover' }
+          { id: 'haldi_doodh', label: 'Haldi Doodh' },
+          { id: 'ajwain', label: 'Ajwain' },
+          { id: 'adrak_honey', label: 'Adrak and Honey' },
+          { id: 'johar_joshanda', label: 'Johar Joshanda' },
+          { id: 'vicks_steam', label: 'Vicks & Steam Inhalation' },
+          { id: 'other', label: 'Other', write_in: true }
         ],
-        required: false,
-        flags: { allow_both: false, allow_neither: true },
-        category: 'personality',
-        dimension: 'J/P'
+        required: true,
+        write_in_placeholder: 'What remedy were you thinking?',
+        category: 'nostalgia'
       },
       {
-        id: 'mbti_day_plan_options',
+        id: 'smuggled_pakistan',
         order: 14,
-        kind: 'either_or',
-        prompt: 'For your day, you prefer...',
+        kind: 'single_choice',
+        prompt: 'What gets "smuggled" from Pakistan in suitcases',
         options: [
-          { id: 'A', label: 'A clear plan & checklist' },
-          { id: 'B', label: 'Keeping options open' }
+          { id: 'achar', label: 'Achar' },
+          { id: 'desi_joray', label: 'Desi Joray' },
+          { id: 'nimko_snacks', label: 'Nimko/Snacks' },
+          { id: 'seeds', label: 'Seeds' },
+          { id: 'mithai', label: 'Mithai' },
+          { id: 'other', label: 'Other', write_in: true }
         ],
-        required: false,
-        flags: { allow_both: false, allow_neither: true },
-        category: 'personality',
-        dimension: 'J/P'
+        required: true,
+        write_in_placeholder: 'What do you bring back?',
+        category: 'nostalgia'
       },
       {
-        id: 'mbti_problem_old_new',
+        id: 'auntie_analyze',
         order: 15,
-        kind: 'either_or',
-        prompt: 'When solving a problem, you lean toward...',
+        kind: 'single_choice',
+        prompt: 'What aunties most love to analyze',
         options: [
-          { id: 'A', label: "What's worked before" },
-          { id: 'B', label: 'Try a new approach' }
+          { id: 'outfits', label: 'Outfits' },
+          { id: 'weight', label: 'Weight' },
+          { id: 'who_brought_what', label: 'Who Brought What Dish' },
+          { id: 'jewelry', label: 'Jewelry/Diamonds' },
+          { id: 'home_decor', label: 'Home Décor' },
+          { id: 'other', label: 'Other', write_in: true }
         ],
-        required: false,
-        flags: { allow_both: false, allow_neither: true },
-        category: 'personality',
-        dimension: 'S/N'
+        required: true,
+        write_in_placeholder: 'What else do aunties analyze?',
+        category: 'nostalgia'
       },
       {
-        id: 'mbti_decisions_head_heart',
+        id: 'desi_dad_line',
         order: 16,
-        kind: 'either_or',
-        prompt: 'In decisions, you value...',
+        kind: 'single_choice',
+        prompt: 'A line every desi dad has said',
         options: [
-          { id: 'A', label: 'Head/logic first' },
-          { id: 'B', label: 'Heart/people first' }
+          { id: 'money_trees', label: '"Money Doesn\'t Grow on Trees"' },
+          { id: 'lights_off', label: '"Lights Off Karo"' },
+          { id: 'back_in_my_day', label: '"Back in My Day…"' },
+          { id: 'petrol', label: '"Petrol Kahan Se Aata Hai?"' },
+          { id: 'ask_mother', label: '"Ask Your Mother"' },
+          { id: 'other', label: 'Other', write_in: true }
         ],
-        required: false,
-        flags: { allow_both: false, allow_neither: true },
-        category: 'personality',
-        dimension: 'T/F'
+        required: true,
+        write_in_placeholder: 'What other classic dad line?',
+        category: 'nostalgia'
       },
       {
-        id: 'mbti_party_social',
+        id: 'relative_weight_comment',
         order: 17,
-        kind: 'either_or',
-        prompt: 'At a party, you usually...',
+        kind: 'single_choice',
+        prompt: 'Relative\'s go-to comment after you gain 5 lbs',
         options: [
-          { id: 'A', label: 'Meet many new people' },
-          { id: 'B', label: 'Stick with a small circle' }
+          { id: 'healthy_lag_rahe', label: '"Healthy Lag Rahe Ho"' },
+          { id: 'diet_karo', label: '"Diet Kar Lo"' },
+          { id: 'mashallah', label: '"Mashallah!"' },
+          { id: 'gym_kab', label: '"Gym Kab Jaoge?"' },
+          { id: 'kaam_mat_karo', label: '"Itna Kaam Mat Karo"' },
+          { id: 'other', label: 'Other', write_in: true }
         ],
-        required: false,
-        flags: { allow_both: false, allow_neither: true },
-        category: 'personality',
-        dimension: 'E/I'
+        required: true,
+        write_in_placeholder: 'What else do they say?',
+        category: 'nostalgia'
       },
       {
-        id: 'fav_english_band',
-        order: 9,
-        kind: 'short_text',
-        prompt: 'Favorite English band or artist',
-        placeholder: 'e.g., U2, Coldplay, The Beatles',
-        required: false,
-        category: 'music'
+        id: 'mehndi_drama',
+        order: 18,
+        kind: 'single_choice',
+        prompt: 'Typical mehndi drama topic',
+        options: [
+          { id: 'who_performs_first', label: 'Who Performs First' },
+          { id: 'matching_outfits', label: 'Matching Outfits Clash' },
+          { id: 'dj_volume', label: 'DJ Volume' },
+          { id: 'stage_lineup', label: 'Stage lineup' },
+          { id: 'stage_photos', label: 'Stage Photos' },
+          { id: 'other', label: 'Other', write_in: true }
+        ],
+        required: true,
+        write_in_placeholder: 'What other mehndi drama?',
+        category: 'nostalgia'
       }
     ]
   },

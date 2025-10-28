@@ -89,14 +89,292 @@ body.modal-open {
 
 /* Welcome Modal Specific Styles */
 .modal-welcome {
-  max-width: 650px;
-  max-height: 85vh;
+  max-width: 580px;
+  max-height: none; /* Remove scrolling constraint */
   display: flex;
   flex-direction: column;
 }
 
+/* Invitation Card Styling */
+.modal-invitation {
+  max-width: 520px;
+  background: #FFFEF9; /* Warm cream paper color */
+  border: 3px solid var(--brand-primary); /* Thicker golden border */
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.07),
+    0 10px 20px rgba(0, 0, 0, 0.10),
+    inset 0 0 60px rgba(212, 165, 116, 0.08), /* Subtle warm glow */
+    inset 0 0 0 8px rgba(212, 165, 116, 0.15), /* Inner golden border glow */
+    inset 0 0 0 12px rgba(0, 0, 0, 0.8); /* Inner black border for emphasis */
+  position: relative;
+}
+
+/* Decorative corner elements */
+.modal-invitation::before,
+.modal-invitation::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 2px solid rgba(212, 165, 116, 0.4);
+  pointer-events: none;
+}
+
+.modal-invitation::before {
+  top: 16px;
+  left: 16px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.modal-invitation::after {
+  bottom: 16px;
+  right: 16px;
+  border-left: none;
+  border-top: none;
+}
+
+.invitation-card {
+  padding: 48px 40px 40px;
+}
+
+.invitation-header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid rgba(212, 165, 116, 0.3);
+  border-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(212, 165, 116, 0.4) 20%,
+    rgba(212, 165, 116, 0.6) 50%,
+    rgba(212, 165, 116, 0.4) 80%,
+    transparent 100%
+  ) 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  position: relative;
+}
+
+.invitation-ornament {
+  color: var(--brand-primary);
+  font-size: 24px;
+  opacity: 0.7;
+  filter: drop-shadow(0 1px 2px rgba(212, 165, 116, 0.3));
+}
+
+.invitation-title {
+  color: var(--brand-darker);
+  font-size: 28px;
+  margin: 0;
+  font-weight: 700;
+  font-family: Georgia, 'Times New Roman', serif;
+  letter-spacing: 0.5px;
+}
+
+.invitation-body {
+  text-align: center;
+}
+
+.invitation-hosts {
+  font-size: 18px;
+  line-height: 1.8;
+  color: var(--text);
+  margin: 0 0 20px 0;
+  font-weight: 500;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.invitation-greeting {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin: 0 0 28px 0;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.invitation-event-details {
+  text-align: center;
+  margin: 28px 0 32px;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.invitation-event-details p {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.event-date {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.3px;
+}
+
+.event-time {
+  font-size: 17px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.event-venue {
+  font-size: 17px;
+  color: var(--text);
+  font-weight: 500;
+  margin-top: 12px !important;
+}
+
+.invitation-details {
+  margin: 32px 0;
+  padding: 24px;
+  background: rgba(212, 165, 116, 0.06);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(212, 165, 116, 0.2);
+}
+
+.detail-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.detail-icon {
+  font-size: 24px;
+  width: 32px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.detail-content {
+  flex: 1;
+}
+
+.detail-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--brand-primary);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.detail-value {
+  font-size: 16px;
+  color: var(--text);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.invitation-quote {
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--brand-darker);
+  margin: 28px auto 24px;
+  padding: 20px 24px;
+  background: rgba(212, 165, 116, 0.08);
+  border-left: 3px solid var(--brand-primary);
+  border-radius: var(--radius-sm);
+  max-width: 90%;
+  text-align: left;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.invitation-quote cite {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  font-style: normal;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-align: right;
+}
+
+.invitation-note {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  margin: 0;
+  padding-top: 24px;
+  border-top: 2px solid rgba(212, 165, 116, 0.3);
+  border-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(212, 165, 116, 0.4) 20%,
+    rgba(212, 165, 116, 0.6) 50%,
+    rgba(212, 165, 116, 0.4) 80%,
+    transparent 100%
+  ) 1;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.invitation-footer {
+  text-align: center;
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 2px solid rgba(212, 165, 116, 0.3);
+  border-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(212, 165, 116, 0.4) 20%,
+    rgba(212, 165, 116, 0.6) 50%,
+    rgba(212, 165, 116, 0.4) 80%,
+    transparent 100%
+  ) 1;
+}
+
+.invitation-footer .cta-button {
+  padding: 14px 56px;
+  font-size: 16px;
+  font-family: Georgia, 'Times New Roman', serif;
+  background: var(--brand-primary); /* Golden shimmer color */
+  color: #2D3142; /* Deep navy text for contrast */
+  border: 2px solid var(--brand-darker);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 
+    0 2px 8px rgba(212, 165, 116, 0.3),
+    0 4px 16px rgba(212, 165, 116, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 15px;
+}
+
+.invitation-footer .cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 12px rgba(212, 165, 116, 0.4),
+    0 8px 24px rgba(212, 165, 116, 0.3);
+  background: var(--brand-darker); /* Darker gold on hover */
+  border-color: var(--brand-darker);
+}
+
+.invitation-footer .cta-button:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 2px 8px rgba(212, 165, 116, 0.3),
+    0 4px 16px rgba(212, 165, 116, 0.2);
+}
+
 .modal-welcome .modal-body {
-  overflow-y: auto;
+  overflow-y: visible; /* No scrolling */
   flex: 1;
 }
 
@@ -106,6 +384,16 @@ body.modal-open {
   text-align: center;
   position: relative;
   overflow: hidden;
+}
+
+/* Compact header variant */
+.modal-header-compact {
+  padding: 24px 32px;
+  background: linear-gradient(135deg, var(--brand-darker) 0%, var(--brand-primary) 100%);
+}
+
+.modal-header-compact::before {
+  display: none; /* Remove shimmer effect for compact header */
 }
 
 .modal-header::before {
@@ -159,6 +447,12 @@ body.modal-open {
   -webkit-text-fill-color: white;
 }
 
+.modal-header-compact h2 {
+  font-size: 24px;
+  margin: 0;
+  font-weight: 700;
+}
+
 .modal-header .subtitle {
   color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
@@ -172,14 +466,45 @@ body.modal-open {
 
 .modal-welcome-message {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
+}
+
+.modal-welcome-message .host-greeting {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.modal-welcome-message .rumi-quote {
+  font-size: 16px;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--brand-primary);
+  margin: 24px auto;
+  padding: 20px 24px;
+  background: var(--brand-lightest);
+  border-left: 3px solid var(--brand-primary);
+  border-radius: var(--radius-sm);
+  max-width: 90%;
+  text-align: left;
+}
+
+.modal-welcome-message .rumi-quote cite {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  font-style: normal;
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
 .modal-welcome-message .intro {
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1.6;
-  color: var(--text);
-  margin-bottom: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 0;
 }
 
 .modal-welcome-message .purpose {
@@ -197,6 +522,52 @@ body.modal-open {
   display: grid;
   gap: 16px;
   margin-bottom: 32px;
+}
+
+/* Compact features: horizontal inline display */
+.modal-features-compact {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.modal-feature-compact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  min-width: 120px;
+}
+
+.modal-feature-compact:hover {
+  border-color: var(--brand-primary);
+  transform: translateY(-2px);
+}
+
+.modal-feature-compact .icon {
+  font-size: 32px;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-lightest);
+  border-radius: 12px;
+}
+
+.modal-feature-compact .label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  text-align: center;
 }
 
 .modal-feature {
@@ -253,30 +624,34 @@ body.modal-open {
 
 .modal-footer .cta-button {
   width: 100%;
-  padding: 16px 32px;
-  font-size: 16px;
-  background: var(--gradient-brand);
+  padding: 14px 32px;
+  font-size: 15px;
+  background: var(--brand-primary);
   color: white;
   border: none;
-  border-radius: var(--radius-sm);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: var(--glow);
+  box-shadow: var(--shadow-sm);
   position: relative;
   z-index: 2;
   pointer-events: auto;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-footer .cta-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  background: var(--brand-darker);
 }
 
 .modal-footer .cta-button:active {
   transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
 .modal-footer .skip-link {
@@ -311,6 +686,17 @@ body.modal-open {
   z-index: 10;
 }
 
+/* Close button for invitation card */
+.modal-invitation .modal-close {
+  background: rgba(212, 165, 116, 0.15);
+  color: var(--brand-darker);
+}
+
+.modal-invitation .modal-close:hover {
+  background: rgba(212, 165, 116, 0.25);
+  transform: rotate(90deg);
+}
+
 .modal-close:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: rotate(90deg);
@@ -343,8 +729,113 @@ body.modal-open {
     margin: 20px;
   }
   
+  .modal-invitation {
+    max-width: 100%;
+    margin: 16px;
+  }
+  
+  .invitation-card {
+    padding: 32px 24px 28px;
+  }
+  
+  .invitation-header {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    gap: 12px;
+  }
+  
+  .invitation-ornament {
+    font-size: 16px;
+  }
+  
+  .invitation-title {
+    font-size: 22px;
+  }
+  
+  .invitation-hosts {
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  
+  .invitation-greeting {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  
+  .invitation-event-details {
+    margin: 20px 0 24px;
+  }
+  
+  .event-date {
+    font-size: 16px;
+  }
+  
+  .event-time {
+    font-size: 15px;
+  }
+  
+  .event-venue {
+    font-size: 15px;
+  }
+  
+  .invitation-details {
+    padding: 20px 16px;
+    margin: 24px 0;
+  }
+  
+  .detail-row {
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+  
+  .detail-icon {
+    font-size: 20px;
+    width: 28px;
+  }
+  
+  .detail-label {
+    font-size: 11px;
+  }
+  
+  .detail-value {
+    font-size: 15px;
+  }
+  
+  .invitation-quote {
+    font-size: 14px;
+    padding: 16px 20px;
+    max-width: 100%;
+    margin: 24px 0 20px;
+  }
+  
+  .invitation-quote cite {
+    font-size: 12px;
+  }
+  
+  .invitation-note {
+    font-size: 13px;
+    padding-top: 20px;
+  }
+  
+  .invitation-footer {
+    margin-top: 24px;
+  }
+  
+  .invitation-footer .cta-button {
+    width: 100%;
+    min-width: auto;
+  }
+  
   .modal-header {
     padding: 32px 24px 24px;
+  }
+  
+  .modal-header-compact {
+    padding: 20px 24px;
+  }
+  
+  .modal-header-compact h2 {
+    font-size: 20px;
   }
   
   .modal-header .emoji-burst {
@@ -359,8 +850,37 @@ body.modal-open {
     padding: 24px;
   }
   
-  .modal-welcome-message .intro {
+  .modal-welcome-message .host-greeting {
     font-size: 16px;
+  }
+  
+  .modal-welcome-message .rumi-quote {
+    font-size: 15px;
+    padding: 16px 20px;
+    max-width: 100%;
+  }
+  
+  .modal-welcome-message .intro {
+    font-size: 14px;
+  }
+  
+  .modal-features-compact {
+    gap: 12px;
+  }
+  
+  .modal-feature-compact {
+    min-width: 100px;
+    padding: 10px 12px;
+  }
+  
+  .modal-feature-compact .icon {
+    width: 40px;
+    height: 40px;
+    font-size: 28px;
+  }
+  
+  .modal-feature-compact .label {
+    font-size: 13px;
   }
   
   .modal-footer {

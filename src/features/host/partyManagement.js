@@ -1,6 +1,6 @@
 // Party Management functionality
 import { supabase } from '../../services/supabaseClient.js';
-import { toast } from '../../ui/toast.js';
+import * as toast from '../../ui/toast.js';
 
 export async function editParty(partyId, updates) {
     if (!partyId || !updates) return { error: { message: 'Missing party ID or updates' } };
