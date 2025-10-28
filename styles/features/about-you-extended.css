@@ -239,8 +239,18 @@
 }
 
 .question-prompt .required {
-  color: var(--danger, #ef4444);
+  color: #ef4444;
   margin-left: 4px;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+/* Required indicator for basic info form labels */
+.game-panel[data-game-type="about_you"] label .required {
+  color: #ef4444;
+  margin-left: 4px;
+  font-weight: 700;
+  font-size: 1.125rem;
 }
 
 .question-prompt .optional {
@@ -463,17 +473,48 @@
   border: 2px solid var(--primary, #3b82f6);
   border-radius: 8px;
   font-size: 0.9375rem;
-  color: var(--text-primary, #1f2937);
+  background: #ffffff;
+  color: #1f2937;
+}
+
+.write-in-input::placeholder {
+  color: #9ca3af;
+  opacity: 0.7;
 }
 
 .write-in-input:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #ffffff;
 }
 
 /* ========================================
    Short Text Questions
    ======================================== */
+
+/* Fix input visibility - ensure white background and dark text */
+.game-panel[data-game-type="about_you"] input[type="text"],
+.game-panel[data-game-type="about_you"] input[type="email"],
+.game-panel[data-game-type="about_you"] textarea {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border: 2px solid #e5e7eb;
+}
+
+.game-panel[data-game-type="about_you"] input[type="text"]:focus,
+.game-panel[data-game-type="about_you"] input[type="email"]:focus,
+.game-panel[data-game-type="about_you"] textarea:focus {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.game-panel[data-game-type="about_you"] input::placeholder,
+.game-panel[data-game-type="about_you"] textarea::placeholder {
+  color: #9ca3af !important;
+  opacity: 0.7;
+}
 
 .text-input-answer {
   width: 100%;
@@ -481,14 +522,21 @@
   border: 2px solid var(--border-color, #e5e7eb);
   border-radius: 10px;
   font-size: 1rem;
-  color: var(--text-primary, #1f2937);
+  background: #ffffff;
+  color: #1f2937;
   transition: all 0.2s ease;
+}
+
+.text-input-answer::placeholder {
+  color: #9ca3af;
+  opacity: 0.7;
 }
 
 .text-input-answer:focus {
   outline: none;
   border-color: var(--primary, #3b82f6);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #ffffff;
 }
 
 .char-count {

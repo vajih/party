@@ -41,7 +41,7 @@ function renderEitherOrQuestion(question, currentAnswer = null) {
       <div class="question-header">
         <div class="question-prompt">
           ${escapeHtml(prompt)}
-          ${required ? '<span class="required">*</span>' : '<span class="optional">(optional)</span>'}
+          ${required ? '<span class="required">*</span>' : ''}
         </div>
         ${sensitive ? '<div class="privacy-badge">🔒 Private answer</div>' : ''}
         ${helpText ? `<div class="help-text">${escapeHtml(helpText)}</div>` : ''}
@@ -107,7 +107,7 @@ function renderSingleChoiceQuestion(question, currentAnswer = null) {
       <div class="question-header">
         <div class="question-prompt">
           ${escapeHtml(prompt)}
-          ${required ? '<span class="required">*</span>' : '<span class="optional">(optional)</span>'}
+          ${required ? '<span class="required">*</span>' : ''}
         </div>
         ${aggregate_only ? '<div class="info-badge">📊 Results shown in aggregate only</div>' : ''}
       </div>
@@ -153,7 +153,7 @@ function renderShortTextQuestion(question, currentAnswer = null) {
       <div class="question-header">
         <label for="input_${id}" class="question-prompt">
           ${escapeHtml(prompt)}
-          ${required ? '<span class="required">*</span>' : '<span class="optional">(optional)</span>'}
+          ${required ? '<span class="required">*</span>' : ''}
         </label>
       </div>
       

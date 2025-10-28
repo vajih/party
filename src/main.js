@@ -1176,6 +1176,16 @@ async function updateHeaderAuthState(user){
   const msg = document.getElementById('authMsgHeader');
   if (msg) msg.textContent = user?.email ? `Signed in as ${user.email}` : 'Sign in to continue';
 
+  // Update email display in header
+  const emailDisplay = document.getElementById('userEmailDisplay');
+  if (emailDisplay && user?.email) {
+    emailDisplay.textContent = user.email;
+    emailDisplay.style.display = 'inline-block';
+    emailDisplay.title = `Signed in as ${user.email}`;
+  } else if (emailDisplay) {
+    emailDisplay.style.display = 'none';
+  }
+
   const res = await fetchRole(user);
   setRoleBadge(res.role, res.source);
 }

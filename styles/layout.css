@@ -19,7 +19,38 @@
   margin-left: auto;
   display: flex;
   align-items: center;
+  gap: 12px;
   padding-right: 24px;
+}
+
+/* User Email Display */
+.user-email-display {
+  font-size: 0.875rem;
+  color: var(--text-2, #6b7280);
+  font-weight: 500;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 6px;
+  border: 1px solid var(--border, #e5e7eb);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: help;
+  transition: all 0.2s ease;
+}
+
+.user-email-display:hover {
+  background: rgba(0, 0, 0, 0.05);
+  max-width: none;
+  z-index: 100;
+}
+
+@media (max-width: 768px) {
+  .user-email-display {
+    max-width: 120px;
+    font-size: 0.8125rem;
+  }
 }
 
 .site-footer {
