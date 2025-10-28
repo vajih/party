@@ -433,7 +433,18 @@ async function handleBatchSubmit(e) {
   // Check if all batches complete
   const allComplete = QUESTION_BATCHES.every(batch => batchProgress[batch.id] === 'complete');
   if (allComplete) {
+    // Dispatch event to refresh progress tracker
+    window.dispatchEvent(new Event('submission-updated'));
+    
     alert('🎉 Congratulations! You\'ve completed your full profile!');
+    
+    // Navigate to Favorite Song game after a short delay to allow progress tracker to refresh
+    setTimeout(() => {
+      const favoriteSongStep = document.querySelector('.progress-step[data-game-id="favorite_song"]');
+      if (favoriteSongStep) {
+        favoriteSongStep.click();
+      }
+    }, 800);
   }
 }
 

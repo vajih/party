@@ -1336,6 +1336,27 @@ async function getGuestProgressSteps(games, partyId, userId) {
   
   const completedGameIds = new Set((submissions || []).map(s => s.game_id));
   
+  // Special check for About You - check if all batches are complete
+  const { data: profile } = await supabase
+    .from('party_profiles')
+    .select('batch_progress')
+    .eq('party_id', partyId)
+    .eq('user_id', userId)
+    .single();
+  
+  const aboutYouGame = games.find(g => g.type === 'about_you');
+  if (aboutYouGame && profile?.batch_progress) {
+    const batchProgress = profile.batch_progress;
+    const allBatchesComplete = 
+      batchProgress.batch_1 === 'complete' && 
+      batchProgress.batch_2 === 'complete' && 
+      batchProgress.batch_3 === 'complete';
+    
+    if (allBatchesComplete) {
+      completedGameIds.add(aboutYouGame.id);
+    }
+  }
+  
   // Build steps in recommended order
   const steps = [];
   const gamesByType = {};
