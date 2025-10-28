@@ -97,7 +97,7 @@ function renderEitherOrQuestion(question, currentAnswer = null) {
  * Render a single_choice question (radio buttons or cards)
  */
 function renderSingleChoiceQuestion(question, currentAnswer = null) {
-  const { id, prompt, options, required, aggregate_only } = question;
+  const { id, prompt, options, required } = question;
   
   const hasWriteIn = options.some(opt => opt.write_in);
   const writeInValue = currentAnswer && currentAnswer.startsWith('X:') ? currentAnswer.substring(2) : '';
@@ -109,7 +109,6 @@ function renderSingleChoiceQuestion(question, currentAnswer = null) {
           ${escapeHtml(prompt)}
           ${required ? '<span class="required">*</span>' : ''}
         </div>
-        ${aggregate_only ? '<div class="info-badge">📊 Results shown in aggregate only</div>' : ''}
       </div>
       
       <div class="single-choice-options">
@@ -131,7 +130,7 @@ function renderSingleChoiceQuestion(question, currentAnswer = null) {
           <input 
             type="text" 
             class="write-in-input" 
-            placeholder="Please specify..."
+            placeholder="Who were you thinking...?"
             value="${escapeHtml(writeInValue)}"
             maxlength="50">
         </div>

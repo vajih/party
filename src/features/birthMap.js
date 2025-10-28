@@ -19,21 +19,21 @@ export async function initBirthMap(partyId, userId, containerId = 'birthMap') {
     return;
   }
 
-  // Check if user has submitted their birth city
-  const hasSubmitted = await hasUserSubmittedBirthCity(partyId, userId);
+  // Check if user has completed all batches
+  const hasCompleted = await hasCompletedAllBatches(partyId, userId);
   
-  if (!hasSubmitted) {
+  if (!hasCompleted) {
     // Show locked state
     container.innerHTML = `
       <div class="birth-map-locked">
         <div class="lock-icon">🔒</div>
         <h3>Where is Everyone From?</h3>
-        <p>Unlock this interactive map by completing the "About You" activity and sharing your birth city!</p>
+        <p>Unlock this interactive world map by completing all three batches of the "About You" questionnaire!</p>
         <button class="link primary" onclick="
           const aboutYouStep = document.querySelector('.progress-step[data-game-id]');
           if (aboutYouStep) aboutYouStep.click();
         ">
-          Complete About You to Unlock →
+          Complete All Batches to Unlock →
         </button>
       </div>
     `;
@@ -137,25 +137,33 @@ function renderBirthMap(container, birthPoints) {
 }
 
 /**
- * Check if user has submitted their birth city
+ * Check if user has completed all 3 batches of About You questionnaire
  */
-async function hasUserSubmittedBirthCity(partyId, userId) {
+async function hasCompletedAllBatches(partyId, userId) {
   try {
     const { data, error } = await supabase
       .from('party_profiles')
-      .select('birth_city')
+      .select('batch_progress')
       .eq('party_id', partyId)
       .eq('user_id', userId)
       .maybeSingle();
     
     if (error) {
-      console.error('[hasUserSubmittedBirthCity] Error:', error);
+      console.error('[hasCompletedAllBatches] Error:', error);
       return false;
     }
     
-    return !!(data && data.birth_city);
+    // Check if all 3 batches are marked as 'complete'
+    if (!data || !data.batch_progress) {
+      return false;
+    }
+    
+    const batchProgress = data.batch_progress;
+    return batchProgress.batch_1 === 'complete' &&
+           batchProgress.batch_2 === 'complete' &&
+           batchProgress.batch_3 === 'complete';
   } catch (error) {
-    console.error('[hasUserSubmittedBirthCity] Error:', error);
+    console.error('[hasCompletedAllBatches] Error:', error);
     return false;
   }
 }

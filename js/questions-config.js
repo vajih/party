@@ -223,37 +223,30 @@ export const QUESTION_BATCHES = [
         category: 'travel'
       },
       {
-        id: 'fav_actor_90s',
+        id: 'bollywood_alter_ego',
         order: 10,
         kind: 'single_choice',
-        prompt: "'90s crush (actor)",
+        prompt: 'Your Bollywood alter ego?',
         options: [
-          { id: 'A', label: 'Amitabh' },
-          { id: 'B', label: 'Shah Rukh' },
-          { id: 'C', label: 'Salman' },
-          { id: 'D', label: 'Aamir' },
-          { id: 'E', label: 'Hrithik' },
+          { id: 'A', label: 'Amitabh Bachchan' },
+          { id: 'B', label: 'Shah Rukh Khan' },
+          { id: 'C', label: 'Salman Khan' },
+          { id: 'D', label: 'Aamir Khan' },
+          { id: 'E', label: 'Hrithik Roshan' },
+          { id: 'F', label: 'Ranbir Kapoor' },
+          { id: 'G', label: 'Ranveer Singh' },
+          { id: 'H', label: 'Vicky Kaushal' },
+          { id: 'I', label: 'Kajol' },
+          { id: 'J', label: 'Kareena Kapoor' },
+          { id: 'K', label: 'Raveena Tandon' },
+          { id: 'L', label: 'Karisma Kapoor' },
+          { id: 'M', label: 'Preity Zinta' },
+          { id: 'N', label: 'Deepika Padukone' },
+          { id: 'O', label: 'Priyanka Chopra' },
+          { id: 'P', label: 'Alia Bhatt' },
           { id: 'X', label: 'Other', write_in: true }
         ],
         required: false,
-        aggregate_only: true,
-        category: 'film'
-      },
-      {
-        id: 'fav_actress_90s',
-        order: 11,
-        kind: 'single_choice',
-        prompt: "'90s crush (actress)",
-        options: [
-          { id: 'A', label: 'Raveena' },
-          { id: 'B', label: 'Karisma' },
-          { id: 'C', label: 'Kajol' },
-          { id: 'D', label: 'Kareena' },
-          { id: 'E', label: 'Preity' },
-          { id: 'X', label: 'Other', write_in: true }
-        ],
-        required: false,
-        aggregate_only: true,
         category: 'film'
       },
       {
@@ -286,17 +279,15 @@ export const QUESTION_BATCHES = [
         id: 'culture_marriage_love_arranged',
         order: 20,
         kind: 'either_or',
-        prompt: 'Your view on marriage...',
+        prompt: 'Love or arranged marriage?',
         options: [
           { id: 'A', label: 'Love marriage' },
           { id: 'B', label: 'Arranged marriage' }
         ],
         required: false,
         flags: { allow_both: true, allow_neither: true },
-        sensitive: true,
         aggregate_only: true,
-        category: 'culture',
-        helpText: '🔒 Your answer is completely private'
+        category: 'culture'
       }
     ]
   }
