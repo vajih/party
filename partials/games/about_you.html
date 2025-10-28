@@ -1,23 +1,84 @@
 <div class="game-panel" data-game-type="about_you">
   <div class="panel-header">
     <h3 data-slot="title">About You</h3>
-    <div class="description" data-slot="description">Answer a few fun questions to help everyone get to know you better!</div>
+    <div class="description" data-slot="description">Answer fun questions in 3 easy batches to help everyone get to know you better!</div>
   </div>
 
-  <!-- Help Banner -->
-  <div class="info-banner" style="margin: 16px 0;">
+  <!-- Progress Overview -->
+  <div id="profileProgressOverview" class="profile-progress-overview" style="display: none;">
+    <div class="progress-header">
+      <div class="progress-title">
+        <span class="emoji">📊</span>
+        <span>Your Profile: <strong id="overallProgress">0%</strong> Complete</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="overallProgressBar" style="width: 0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Batch Selector -->
+  <div id="batchSelector" class="batch-selector" style="display: none;">
+    <div class="batch-list">
+      <div class="batch-card" data-batch="batch_1">
+        <div class="batch-icon">🎉</div>
+        <div class="batch-content">
+          <div class="batch-title">Fun Favorites</div>
+          <div class="batch-description">Pakistani food, music & culture</div>
+          <div class="batch-meta">7 questions · ~2 min</div>
+        </div>
+        <div class="batch-status">
+          <span class="status-badge" data-status="not_started">Start</span>
+        </div>
+      </div>
+
+      <div class="batch-card" data-batch="batch_2">
+        <div class="batch-icon">🧠</div>
+        <div class="batch-content">
+          <div class="batch-title">Know Yourself</div>
+          <div class="batch-description">Personality & preferences</div>
+          <div class="batch-meta">7 questions · ~2 min</div>
+        </div>
+        <div class="batch-status">
+          <span class="status-badge locked" data-status="locked">🔒 Locked</span>
+        </div>
+      </div>
+
+      <div class="batch-card" data-batch="batch_3">
+        <div class="batch-icon">💭</div>
+        <div class="batch-content">
+          <div class="batch-title">Deeper Reflections</div>
+          <div class="batch-description">Values, travel & more</div>
+          <div class="batch-meta">6 questions · ~2 min</div>
+        </div>
+        <div class="batch-status">
+          <span class="status-badge locked" data-status="locked">🔒 Locked</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Banner (shown on first visit) -->
+  <div class="info-banner" id="firstTimeBanner" style="margin: 16px 0; display: none;">
     <div class="icon">✨</div>
     <div class="content">
-      <div class="title">Tell Us About Yourself</div>
+      <div class="title">Welcome! Let's Get Started</div>
       <div class="description">
-        Answer the fun questions below! The host created these to help everyone at the party get to know each other. Your answers will be reviewed before sharing.
+        First, tell us your name and birthplace. Then answer fun questions in 3 short batches. Your answers help everyone get to know you!
       </div>
     </div>
   </div>
 
   <div class="panel-body">
     <div data-slot="hint"></div>
-    <form class="game-form" data-slot="form">
+    
+    <!-- Basic Info Form (shown first) -->
+    <form class="game-form" id="basicInfoForm" data-slot="form" style="display: none;">
+      <div class="form-section-title">
+        <span class="emoji">👋</span>
+        <span>Basic Information</span>
+      </div>
+      
       <div class="field">
         <label for="display_name">
           Display name
@@ -46,7 +107,47 @@
           required>
         <div class="city-suggestions" id="citySuggestions" style="display: none;"></div>
       </div>
-      
+
+      <button type="submit" class="btn primary">
+        Save & Continue to Questions
+      </button>
+    </form>
+
+    <!-- Batch Questions Form -->
+    <form class="game-form" id="batchQuestionsForm" style="display: none;">
+      <div class="batch-progress-header">
+        <button type="button" class="btn-back" id="backToBatches">
+          ← Back to Batches
+        </button>
+        <div class="batch-progress-info">
+          <div class="batch-title-current" id="currentBatchTitle"></div>
+          <div class="questions-progress">
+            Question <span id="currentQuestion">1</span> of <span id="totalQuestions">7</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-bar-container small">
+        <div class="progress-bar-fill" id="batchProgressBar" style="width: 0%"></div>
+      </div>
+
+      <!-- Dynamic questions container -->
+      <div id="questionsContainer" class="questions-container">
+        <!-- Questions will be dynamically rendered here -->
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn secondary" id="saveDraftBtn">
+          Save Draft
+        </button>
+        <button type="submit" class="btn primary" id="completeBatchBtn">
+          Complete Batch
+        </button>
+      </div>
+    </form>
+
+    <!-- OLD LEGACY FORM (keep for backwards compatibility with old games) -->
+    <form class="game-form legacy-form" id="legacyQuestionsForm" style="display: none;">
       <!-- Question fields will be dynamically inserted here -->
       
       <div class="panel-footer" data-slot="footer" style="padding: 0; margin-top: 24px;">

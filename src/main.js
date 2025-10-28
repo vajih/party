@@ -1,6 +1,7 @@
 import { supabase } from './services/supabaseClient.js';
 import { initHostDashboard } from './features/host/dashboard.js';
 import { toast } from './ui/toast.js';
+import { initAboutYouExtended } from '../js/about-you-controller.js';
 
 /* -------- DOM helpers -------- */
 const qs  = (s, r=document) => r.querySelector(s);
@@ -243,8 +244,15 @@ async function route(userFromEvent) {
     
     await loadFragment('#game-content', p);
     
-    // For about_you games, dynamically inject question fields from config
+    // For about_you games, initialize the extended question experience
     if (type === 'about_you') {
+      console.log('[about_you] Initializing extended questions');
+      await initAboutYouExtended(party.id, user.id);
+      return; // Extended controller handles everything
+    }
+    
+    // Legacy: For about_you games with old config, dynamically inject question fields
+    if (type === 'about_you_legacy') {
       const form = qs('#game-content .game-form');
       if (form && game) {
         // Check if questions are already rendered (prevent duplicates)

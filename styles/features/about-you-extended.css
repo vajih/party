@@ -1,0 +1,564 @@
+/**
+ * About You Extended Questions - Styles
+ * Batch selector, progress tracking, and question type components
+ */
+
+/* ========================================
+   Profile Progress Overview
+   ======================================== */
+
+.profile-progress-overview {
+  background: linear-gradient(135deg, var(--primary-light, #eff6ff) 0%, var(--primary-lighter, #f0f9ff) 100%);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0 24px;
+  border: 1px solid var(--primary-border, #dbeafe);
+}
+
+.progress-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.progress-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: var(--text-primary, #1f2937);
+}
+
+.progress-title .emoji {
+  font-size: 1.5rem;
+}
+
+.progress-title strong {
+  color: var(--primary, #3b82f6);
+  font-size: 1.125rem;
+}
+
+.progress-bar-container {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  height: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-container.small {
+  height: 6px;
+  margin: 12px 0 20px;
+}
+
+.progress-bar-fill {
+  background: linear-gradient(90deg, var(--primary, #3b82f6) 0%, var(--primary-dark, #2563eb) 100%);
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* ========================================
+   Batch Selector
+   ======================================== */
+
+.batch-selector {
+  margin: 24px 0;
+}
+
+.batch-list {
+  display: grid;
+  gap: 16px;
+}
+
+.batch-card {
+  background: var(--card-bg, #ffffff);
+  border: 2px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.batch-card:hover:not(.locked) {
+  border-color: var(--primary, #3b82f6);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+.batch-card.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.batch-card.complete {
+  border-color: var(--success, #10b981);
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+}
+
+.batch-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.batch-content {
+  flex: 1;
+}
+
+.batch-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+  margin-bottom: 4px;
+}
+
+.batch-description {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+  margin-bottom: 6px;
+}
+
+.batch-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted, #9ca3af);
+  font-weight: 500;
+}
+
+.batch-status {
+  flex-shrink: 0;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.status-badge[data-status="not_started"] {
+  background: var(--primary, #3b82f6);
+  color: white;
+}
+
+.status-badge[data-status="in_progress"] {
+  background: var(--warning, #f59e0b);
+  color: white;
+}
+
+.status-badge[data-status="complete"] {
+  background: var(--success, #10b981);
+  color: white;
+}
+
+.status-badge.locked {
+  background: var(--muted-bg, #f3f4f6);
+  color: var(--text-muted, #6b7280);
+}
+
+/* ========================================
+   Batch Questions Form
+   ======================================== */
+
+.batch-progress-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.btn-back {
+  background: var(--muted-bg, #f3f4f6);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--text-primary, #1f2937);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+  background: var(--muted-hover, #e5e7eb);
+}
+
+.batch-progress-info {
+  flex: 1;
+}
+
+.batch-title-current {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+  margin-bottom: 4px;
+}
+
+.questions-progress {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+}
+
+/* ========================================
+   Question Cards
+   ======================================== */
+
+.questions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 24px 0;
+}
+
+.question-card {
+  background: var(--card-bg, #ffffff);
+  border: 2px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.2s ease;
+}
+
+.question-card:focus-within {
+  border-color: var(--primary, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.question-header {
+  margin-bottom: 16px;
+}
+
+.question-prompt {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+  line-height: 1.5;
+}
+
+.question-prompt .required {
+  color: var(--danger, #ef4444);
+  margin-left: 4px;
+}
+
+.question-prompt .optional {
+  color: var(--text-muted, #9ca3af);
+  font-size: 0.875rem;
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+.privacy-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted, #6b7280);
+  background: var(--muted-bg, #f3f4f6);
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-top: 8px;
+}
+
+.info-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--primary, #3b82f6);
+  background: var(--primary-lighter, #eff6ff);
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-top: 8px;
+}
+
+.help-text {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* ========================================
+   Either/Or Questions
+   ======================================== */
+
+.either-or-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.option-btn {
+  position: relative;
+  background: var(--card-bg, #ffffff);
+  border: 2px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  padding: 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.option-btn:hover {
+  border-color: var(--primary, #3b82f6);
+  background: var(--primary-lighter, #eff6ff);
+}
+
+.option-btn.selected {
+  border-color: var(--primary, #3b82f6);
+  background: var(--primary, #3b82f6);
+  color: white;
+}
+
+.option-btn .check-icon {
+  display: none;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.option-btn.selected .check-icon {
+  display: block;
+}
+
+.option-label {
+  text-align: center;
+}
+
+.modifier-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.modifier-btn {
+  background: var(--muted-bg, #f3f4f6);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modifier-btn:hover {
+  background: var(--muted-hover, #e5e7eb);
+}
+
+.modifier-btn.active {
+  background: var(--primary-lighter, #dbeafe);
+  border-color: var(--primary, #3b82f6);
+  color: var(--primary, #3b82f6);
+}
+
+/* ========================================
+   Single Choice Questions
+   ======================================== */
+
+.single-choice-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.choice-btn {
+  position: relative;
+  background: var(--card-bg, #ffffff);
+  border: 2px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 0.9375rem;
+  color: var(--text-primary, #1f2937);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.choice-btn:hover {
+  border-color: var(--primary, #3b82f6);
+  background: var(--primary-lighter, #eff6ff);
+}
+
+.choice-btn.selected {
+  border-color: var(--primary, #3b82f6);
+  background: var(--primary-lighter, #eff6ff);
+}
+
+.radio-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color, #d1d5db);
+  background: white;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.choice-btn.selected .radio-indicator {
+  border-color: var(--primary, #3b82f6);
+  background: var(--primary, #3b82f6);
+}
+
+.choice-btn.selected .radio-indicator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+.choice-label {
+  flex: 1;
+}
+
+.choice-btn .check-icon {
+  display: none;
+  color: var(--primary, #3b82f6);
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.choice-btn.selected .check-icon {
+  display: block;
+}
+
+.write-in-container {
+  margin-top: 12px;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.write-in-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--primary, #3b82f6);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  color: var(--text-primary, #1f2937);
+}
+
+.write-in-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ========================================
+   Short Text Questions
+   ======================================== */
+
+.text-input-answer {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  font-size: 1rem;
+  color: var(--text-primary, #1f2937);
+  transition: all 0.2s ease;
+}
+
+.text-input-answer:focus {
+  outline: none;
+  border-color: var(--primary, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.char-count {
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--text-muted, #9ca3af);
+  margin-top: 6px;
+}
+
+.char-count .current {
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+}
+
+/* ========================================
+   Form Actions
+   ======================================== */
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border-color, #e5e7eb);
+}
+
+.form-section-title .emoji {
+  font-size: 1.5rem;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 640px) {
+  .either-or-buttons {
+    grid-template-columns: 1fr;
+  }
+  
+  .option-btn {
+    padding: 16px;
+  }
+  
+  .batch-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .batch-icon {
+    font-size: 2rem;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .form-actions button {
+    width: 100%;
+  }
+}

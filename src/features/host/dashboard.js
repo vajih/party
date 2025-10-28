@@ -73,10 +73,11 @@ export async function initHostDashboard(user){
   try {
     const rb = document.getElementById('roleBadge');
     if (rb) {
-      rb.textContent = 'Host';
+      rb.textContent = 'H';
       rb.dataset.role = 'host';
       rb.setAttribute('data-role','host');
       rb.setAttribute('aria-pressed','true');
+      rb.setAttribute('title', 'Host');
     }
   } catch(e) { /* ignore DOM timing issues */ }
 
@@ -105,6 +106,7 @@ export async function initHostDashboard(user){
     await renderHostParties(user);
     await renderHostGamesListFromSelect();
     await renderModQueue(user);
+    await renderAboutYouReport(user);
 
   } catch (err) {
     console.error('Error initializing host dashboard:', err);
@@ -156,7 +158,7 @@ function bindCreateParty(user){
 
     title.value = date.value = venue.value = desc.value = slug.value = '';
     exp.value = '';
-    await renderYourParties(user);
+    await renderHostParties(user);
     alert('Party created!');
   });
 }
@@ -551,3 +553,585 @@ async function renderModQueue(user){
     });
   });
 }
+
+/**
+ * ABOUT YOU REPORT
+ * Displays aggregated answers from guests for About You questions
+ */
+async function renderAboutYouReport(user) {
+  const reportPartySelect = qs('#reportPartySelect');
+  const reportContent = qs('#reportContent');
+  const refreshBtn = qs('#refreshReportBtn');
+  const exportBtn = qs('#exportReportBtn');
+  const viewModeSelect = qs('#reportViewMode');
+  const filterSelect = qs('#reportFilterCompletion');
+
+  if (!reportPartySelect || !reportContent) return;
+
+  // Populate party selector
+  const { data: parties } = await supabase
+    .from('parties')
+    .select('id, slug, title')
+    .eq('host_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (!parties || parties.length === 0) {
+    reportContent.innerHTML = '<p class="small muted">You have no parties yet. Create a party to see reports.</p>';
+    return;
+  }
+
+  reportPartySelect.innerHTML = '<option value="">Select a party...</option>' +
+    parties.map(p => `<option value="${p.id}">${escapeHtml(p.title)}</option>`).join('');
+
+  // Handle party selection change
+  const loadReport = async () => {
+    const partyId = reportPartySelect.value;
+    if (!partyId) {
+      reportContent.innerHTML = '<p class="small muted">Select a party to view the About You report.</p>';
+      return;
+    }
+
+    // Query all profiles for this party with batch_progress and extended_answers
+    const { data: profiles, error } = await supabase
+      .from('party_profiles')
+      .select('party_id, user_id, display_name, batch_progress, extended_answers')
+      .eq('party_id', partyId)
+      .order('display_name');
+
+    if (error) {
+      console.error('[report] error fetching profiles', error);
+      console.error('[report] error details:', error.message, error.code, error.details);
+      
+      // Check if columns don't exist yet
+      if (error.message && (error.message.includes('batch_progress') || error.message.includes('extended_answers'))) {
+        reportContent.innerHTML = `
+          <div class="card" style="padding: 24px; text-align: center;">
+            <h3 style="color: var(--warning-text); margin-bottom: 16px;">⚠️ Database Migration Required</h3>
+            <p style="margin-bottom: 16px;">The About You Report requires new database columns. Please run the migration:</p>
+            <ol style="text-align: left; margin: 0 auto; max-width: 500px; line-height: 1.8;">
+              <li>Open Supabase Dashboard → SQL Editor</li>
+              <li>Copy the contents of <code>sql/migration_about_you_batches.sql</code></li>
+              <li>Run the migration script</li>
+              <li>Refresh this page</li>
+            </ol>
+            <p style="margin-top: 16px; font-size: 0.875rem; color: var(--text-2);">
+              Error: ${escapeHtml(error.message)}
+            </p>
+          </div>
+        `;
+      } else {
+        toast('Error loading report: ' + error.message, 'error');
+        reportContent.innerHTML = `<p class="small muted">Error loading report: ${escapeHtml(error.message)}</p>`;
+      }
+      return;
+    }
+
+    if (!profiles || profiles.length === 0) {
+      reportContent.innerHTML = '<p class="small muted">No guest profiles found for this party.</p>';
+      return;
+    }
+
+    // Calculate stats
+    const total = profiles.length;
+    const withProgress = profiles.filter(p => p.batch_progress);
+    const completed = withProgress.filter(p => {
+      const bp = p.batch_progress || {};
+      return bp.batch_1 === 'complete' && bp.batch_2 === 'complete' && bp.batch_3 === 'complete';
+    }).length;
+    const inProgress = withProgress.filter(p => {
+      const bp = p.batch_progress || {};
+      return (bp.batch_1 || bp.batch_2 || bp.batch_3) && 
+        !(bp.batch_1 === 'complete' && bp.batch_2 === 'complete' && bp.batch_3 === 'complete');
+    }).length;
+
+    // Calculate average completion percentage
+    const avgCompletion = withProgress.length > 0
+      ? Math.round(withProgress.reduce((sum, p) => {
+          const bp = p.batch_progress || {};
+          let count = 0;
+          if (bp.batch_1 === 'complete') count++;
+          if (bp.batch_2 === 'complete') count++;
+          if (bp.batch_3 === 'complete') count++;
+          return sum + (count / 3 * 100);
+        }, 0) / withProgress.length)
+      : 0;
+
+    // Update stats
+    qs('#reportTotalProfiles').textContent = total;
+    qs('#reportCompleted').textContent = completed;
+    qs('#reportInProgress').textContent = inProgress;
+    qs('#reportAvgCompletion').textContent = `${avgCompletion}%`;
+
+    // Filter profiles based on selection
+    const filterMode = filterSelect.value;
+    let filteredProfiles = profiles;
+    if (filterMode === 'complete') {
+      filteredProfiles = profiles.filter(p => {
+        const bp = p.batch_progress || {};
+        return bp.batch_1 === 'complete' && bp.batch_2 === 'complete' && bp.batch_3 === 'complete';
+      });
+    } else if (filterMode === 'incomplete') {
+      filteredProfiles = profiles.filter(p => {
+        const bp = p.batch_progress || {};
+        return !(bp.batch_1 === 'complete' && bp.batch_2 === 'complete' && bp.batch_3 === 'complete');
+      });
+    }
+
+    // Render based on view mode
+    const viewMode = viewModeSelect.value;
+    if (viewMode === 'summary') {
+      renderSummaryView(filteredProfiles);
+    } else if (viewMode === 'detailed') {
+      renderDetailedView(filteredProfiles);
+    } else if (viewMode === 'aggregate') {
+      renderAggregateView(profiles);
+    }
+  };
+
+  // Render summary view (list of guests with progress)
+  function renderSummaryView(profiles) {
+    if (profiles.length === 0) {
+      reportContent.innerHTML = '<p class="small muted">No profiles match the selected filter.</p>';
+      return;
+    }
+
+    const html = `
+      <ul class="report-guest-list">
+        ${profiles.map(p => {
+          const bp = p.batch_progress || {};
+          const b1 = bp.batch_1 || 'not_started';
+          const b2 = bp.batch_2 || 'not_started';
+          const b3 = bp.batch_3 || 'not_started';
+          
+          let completedCount = 0;
+          if (b1 === 'complete') completedCount++;
+          if (b2 === 'complete') completedCount++;
+          if (b3 === 'complete') completedCount++;
+          const percentage = Math.round((completedCount / 3) * 100);
+
+          return `
+            <li class="report-guest-item" data-profile-user-id="${p.user_id}">
+              <div class="report-guest-header">
+                <span class="report-guest-name">${escapeHtml(p.display_name || 'Anonymous')}</span>
+                <div class="report-batch-status">
+                  <span class="report-batch-badge ${b1 === 'complete' ? 'complete' : b1 === 'in_progress' ? 'in-progress' : ''}" title="Batch 1">1</span>
+                  <span class="report-batch-badge ${b2 === 'complete' ? 'complete' : b2 === 'in_progress' ? 'in-progress' : ''}" title="Batch 2">2</span>
+                  <span class="report-batch-badge ${b3 === 'complete' ? 'complete' : b3 === 'in_progress' ? 'in-progress' : ''}" title="Batch 3">3</span>
+                </div>
+              </div>
+              <div class="report-progress-bar">
+                <div class="report-progress-fill" style="width: ${percentage}%"></div>
+              </div>
+              <div class="report-completion-text">${completedCount} of 3 batches complete (${percentage}%)</div>
+              ${p.extended_answers ? '<button class="report-view-details-btn link" data-profile-user-id="' + p.user_id + '">View Answers</button>' : '<span class="small muted">No answers yet</span>'}
+            </li>
+          `;
+        }).join('')}
+      </ul>
+    `;
+
+    reportContent.innerHTML = html;
+
+    // Add click handlers for view details
+    qsa('.report-view-details-btn', reportContent).forEach(btn => {
+      btn.addEventListener('click', () => {
+        const userId = btn.getAttribute('data-profile-user-id');
+        const profile = profiles.find(p => p.user_id === userId);
+        if (profile) showAnswerDetailsModal(profile);
+      });
+    });
+  }
+
+  // Render detailed view (all answers for each guest)
+  function renderDetailedView(profiles) {
+    if (profiles.length === 0) {
+      reportContent.innerHTML = '<p class="small muted">No profiles match the selected filter.</p>';
+      return;
+    }
+
+    // Import questions config dynamically
+    import('../../../js/questions-config.js').then(module => {
+      const { QUESTION_BATCHES } = module;
+      const allQuestions = {};
+      QUESTION_BATCHES.forEach(batch => {
+        batch.questions.forEach(q => {
+          allQuestions[q.id] = q;
+        });
+      });
+
+      const html = profiles.map(p => {
+        const answers = p.extended_answers || {};
+        const hasAnswers = Object.keys(answers).length > 0;
+
+        if (!hasAnswers) {
+          return `
+            <div style="margin-bottom: 32px;">
+              <h3>${escapeHtml(p.display_name || 'Anonymous')}</h3>
+              <p class="small muted">No answers submitted yet.</p>
+            </div>
+          `;
+        }
+
+        const answerHtml = Object.entries(answers).map(([qId, answer]) => {
+          const question = allQuestions[qId];
+          if (!question) return '';
+
+          let displayAnswer = '';
+          if (question.kind === 'either_or') {
+            displayAnswer = answer.selected || 'No answer';
+            if (answer.modifiers && answer.modifiers.length > 0) {
+              displayAnswer += ` <span class="detailed-answer-tag">${answer.modifiers.join(', ')}</span>`;
+            }
+          } else if (question.kind === 'single_choice') {
+            displayAnswer = answer || 'No answer';
+          } else if (question.kind === 'short_text') {
+            displayAnswer = answer || 'No answer';
+          }
+
+          return `
+            <div class="detailed-answer-item">
+              <div class="detailed-answer-question">${escapeHtml(question.prompt)}</div>
+              <div class="detailed-answer-response">${escapeHtml(displayAnswer)}</div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="detailed-guest-section">
+            <h3>${escapeHtml(p.display_name || 'Anonymous')}</h3>
+            ${answerHtml}
+          </div>
+        `;
+      }).join('');
+
+      reportContent.innerHTML = html || '<p class="small muted">No answers to display.</p>';
+    });
+  }
+
+  // Initialize birth city map
+  function initBirthCityMap(profiles) {
+    const mapContainer = document.getElementById('birthCityMap');
+    if (!mapContainer) return;
+
+    // Check if Leaflet is loaded
+    if (typeof L === 'undefined') {
+      console.error('Leaflet not loaded');
+      return;
+    }
+
+    // Clear any existing map
+    mapContainer.innerHTML = '';
+    
+    // Create map
+    const map = L.map('birthCityMap').setView([30, 0], 2);
+    
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 18
+    }).addTo(map);
+
+    // Add markers for birth cities
+    const bounds = [];
+    profiles.forEach(p => {
+      if (p.birth_lat && p.birth_lng && p.birth_city) {
+        const marker = L.marker([p.birth_lat, p.birth_lng]).addTo(map);
+        marker.bindPopup(`<strong>${escapeHtml(p.display_name || 'Guest')}</strong><br/>${escapeHtml(p.birth_city)}`);
+        bounds.push([p.birth_lat, p.birth_lng]);
+      }
+    });
+
+    // Fit map to show all markers
+    if (bounds.length > 0) {
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }
+
+  // Render aggregate view (statistics across all guests)
+  function renderAggregateView(profiles) {
+    import('../../../js/questions-config.js').then(async module => {
+      const { QUESTION_BATCHES } = module;
+      
+      const html = QUESTION_BATCHES.map(batch => {
+        const batchHtml = batch.questions.map(q => {
+          const answers = profiles
+            .map(p => (p.extended_answers || {})[q.id])
+            .filter(a => a !== undefined && a !== null && a !== '');
+
+          if (answers.length === 0) {
+            return `
+              <div class="aggregate-question-block">
+                <div class="aggregate-question-title">${escapeHtml(q.prompt)}</div>
+                <p class="small muted" style="color: #9ca3af; font-size: 0.9375rem;">No responses yet</p>
+              </div>
+            `;
+          }
+
+          let resultsHtml = '';
+          
+          // Special handling for birth_city - show map
+          if (q.id === 'birth_city') {
+            const cities = answers.filter(a => a);
+            if (cities.length > 0) {
+              resultsHtml = `
+                <div class="report-map-container" id="birthCityMap"></div>
+                <p style="color: #6b7280; font-size: 0.875rem; margin-top: 12px; text-align: center;">
+                  ${cities.length} ${cities.length === 1 ? 'city' : 'cities'} marked
+                </p>
+              `;
+              
+              // Initialize map after DOM is ready
+              setTimeout(() => initBirthCityMap(profiles), 100);
+            } else {
+              resultsHtml = '<div class="report-no-map-data"><i class="fas fa-map-marked-alt" style="margin-right: 8px;"></i> No birth cities with coordinates available</div>';
+            }
+          } 
+          else if (q.kind === 'either_or') {
+            const counts = {};
+            answers.forEach(a => {
+              const selected = a.selected || 'No answer';
+              counts[selected] = (counts[selected] || 0) + 1;
+            });
+
+            const total = answers.length;
+            resultsHtml = Object.entries(counts)
+              .sort(([, a], [, b]) => b - a)
+              .map(([option, count]) => {
+                const percentage = Math.round((count / total) * 100);
+                return `
+                  <li class="aggregate-result-item">
+                    <span class="aggregate-result-label">${escapeHtml(option)}</span>
+                    <div class="aggregate-result-bar">
+                      <div class="aggregate-result-fill" style="width: ${percentage}%">${percentage}%</div>
+                    </div>
+                    <span class="aggregate-result-count">${count} guests</span>
+                  </li>
+                `;
+              }).join('');
+
+          } else if (q.kind === 'single_choice') {
+            const counts = {};
+            answers.forEach(a => {
+              counts[a] = (counts[a] || 0) + 1;
+            });
+
+            const total = answers.length;
+            resultsHtml = Object.entries(counts)
+              .sort(([, a], [, b]) => b - a)
+              .map(([option, count]) => {
+                const percentage = Math.round((count / total) * 100);
+                return `
+                  <li class="aggregate-result-item">
+                    <span class="aggregate-result-label">${escapeHtml(option)}</span>
+                    <div class="aggregate-result-bar">
+                      <div class="aggregate-result-fill" style="width: ${percentage}%">${percentage}%</div>
+                    </div>
+                    <span class="aggregate-result-count">${count} guests</span>
+                  </li>
+                `;
+              }).join('');
+
+          } else if (q.kind === 'short_text') {
+            // Show list of text responses
+            resultsHtml = `
+              <div style="max-height: 300px; overflow-y: auto; padding: 12px; background: #f9fafb; border-radius: 8px;">
+                ${answers.map(a => `
+                  <div style="padding: 8px 12px; margin-bottom: 8px; background: white; border-radius: 6px; border-left: 3px solid #3b82f6; color: #374151; font-size: 0.9375rem;">
+                    "${escapeHtml(a)}"
+                  </div>
+                `).join('')}
+              </div>
+              <p style="color: #6b7280; font-size: 0.875rem; margin-top: 12px; text-align: center;">
+                ${answers.length} ${answers.length === 1 ? 'response' : 'responses'}
+              </p>
+            `;
+          }
+
+          return `
+            <div class="aggregate-question-block">
+              <div class="aggregate-question-title">${escapeHtml(q.prompt)}</div>
+              <ul class="aggregate-results-list">${resultsHtml}</ul>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="aggregate-batch-section">
+            <h3>${batch.emoji || ''} ${batch.title}</h3>
+            ${batchHtml}
+          </div>
+        `;
+      }).join('');
+
+      reportContent.innerHTML = html || '<p class="small muted">No data to display.</p>';
+    });
+  }
+
+  // Show modal with detailed answers
+  function showAnswerDetailsModal(profile) {
+    console.log('[Report] Profile data:', profile);
+    console.log('[Report] Extended answers:', profile.extended_answers);
+    
+    import('../../../js/questions-config.js').then(module => {
+      const { QUESTION_BATCHES } = module;
+      const allQuestions = {};
+      QUESTION_BATCHES.forEach(batch => {
+        batch.questions.forEach(q => {
+          allQuestions[q.id] = q;
+        });
+      });
+
+      const answers = profile.extended_answers || {};
+      console.log('[Report] Processing answers:', answers);
+      console.log('[Report] All questions:', allQuestions);
+      
+      const answerHtml = Object.entries(answers).map(([qId, answer]) => {
+        const question = allQuestions[qId];
+        if (!question) {
+          console.warn('[Report] Question not found for ID:', qId);
+          return '';
+        }
+
+        console.log('[Report] Question:', question.prompt, 'Answer:', answer, 'Kind:', question.kind);
+
+        let displayAnswer = '';
+        if (question.kind === 'either_or') {
+          // Check if answer is an object with 'selected' property or just a string
+          if (typeof answer === 'object' && answer.selected) {
+            displayAnswer = answer.selected;
+            if (answer.modifiers && answer.modifiers.length > 0) {
+              displayAnswer += ` (${answer.modifiers.join(', ')})`;
+            }
+          } else if (typeof answer === 'string') {
+            displayAnswer = answer;
+          } else {
+            displayAnswer = 'No answer';
+          }
+        } else {
+          displayAnswer = answer || 'No answer';
+        }
+        
+        console.log('[Report] Display answer:', displayAnswer);
+
+        return `
+          <div style="margin-bottom: 20px; padding: 16px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #3b82f6;">
+            <div style="font-weight: 600; font-size: 0.9375rem; color: #6b7280; margin-bottom: 8px; line-height: 1.4;">
+              ${escapeHtml(question.prompt)}
+            </div>
+            <div style="font-size: 1.0625rem; color: #111827; font-weight: 500;">${escapeHtml(displayAnswer)}</div>
+          </div>
+        `;
+      }).join('');
+
+      const modalHtml = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);" id="answerModal">
+          <div style="background: #ffffff; border-radius: 16px; padding: 32px; max-width: 700px; width: 90%; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <button style="position: absolute; top: 20px; right: 20px; background: #f3f4f6; border: none; width: 32px; height: 32px; border-radius: 8px; font-size: 1.25rem; cursor: pointer; color: #6b7280; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" id="closeModal" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">&times;</button>
+            <h2 style="margin-bottom: 28px; font-size: 1.5rem; font-weight: 700; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;">${escapeHtml(profile.display_name || 'Anonymous')}'s Answers</h2>
+            ${answerHtml || '<p style="color: #9ca3af; font-size: 0.9375rem; text-align: center; padding: 40px 0;">No answers submitted yet.</p>'}
+          </div>
+        </div>
+      `;
+
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      
+      qs('#closeModal').addEventListener('click', () => {
+        qs('#answerModal')?.remove();
+      });
+      qs('#answerModal').addEventListener('click', (e) => {
+        if (e.target.id === 'answerModal') {
+          qs('#answerModal')?.remove();
+        }
+      });
+    });
+  }
+
+  // Export to CSV
+  async function exportToCSV() {
+    const partyId = reportPartySelect.value;
+    if (!partyId) {
+      toast('Please select a party first', 'error');
+      return;
+    }
+
+    const { data: profiles } = await supabase
+      .from('party_profiles')
+      .select('display_name, batch_progress, extended_answers')
+      .eq('party_id', partyId)
+      .order('display_name');
+
+    if (!profiles || profiles.length === 0) {
+      toast('No data to export', 'error');
+      return;
+    }
+
+    // Import questions to get prompts
+    import('../../../js/questions-config.js').then(module => {
+      const { QUESTION_BATCHES } = module;
+      const allQuestions = {};
+      QUESTION_BATCHES.forEach(batch => {
+        batch.questions.forEach(q => {
+          allQuestions[q.id] = q;
+        });
+      });
+
+      // Build CSV header
+      const questionIds = Object.keys(allQuestions).sort();
+      const headers = ['Guest Name', 'Batch 1 Status', 'Batch 2 Status', 'Batch 3 Status', ...questionIds.map(qId => allQuestions[qId].prompt)];
+      
+      // Build CSV rows
+      const rows = profiles.map(p => {
+        const bp = p.batch_progress || {};
+        const answers = p.extended_answers || {};
+        
+        const row = [
+          p.display_name || 'Anonymous',
+          bp.batch_1 || 'not_started',
+          bp.batch_2 || 'not_started',
+          bp.batch_3 || 'not_started'
+        ];
+
+        questionIds.forEach(qId => {
+          const answer = answers[qId];
+          const question = allQuestions[qId];
+          let cell = '';
+          
+          if (question.kind === 'either_or' && answer) {
+            cell = answer.selected || '';
+            if (answer.modifiers && answer.modifiers.length > 0) {
+              cell += ` (${answer.modifiers.join(', ')})`;
+            }
+          } else {
+            cell = answer || '';
+          }
+          
+          row.push(cell);
+        });
+
+        return row;
+      });
+
+      // Convert to CSV string
+      const csvContent = [headers, ...rows]
+        .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+
+      // Download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `about-you-report-${new Date().toISOString().slice(0,10)}.csv`;
+      link.click();
+      
+      toast('Report exported successfully', 'success');
+    });
+  }
+
+  // Event listeners
+  reportPartySelect.addEventListener('change', loadReport);
+  viewModeSelect?.addEventListener('change', loadReport);
+  filterSelect?.addEventListener('change', loadReport);
+  refreshBtn?.addEventListener('click', loadReport);
+  exportBtn?.addEventListener('click', exportToCSV);
+}
+

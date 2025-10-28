@@ -25,6 +25,10 @@
           <i class="fas fa-gamepad"></i>
           Games
         </a>
+        <a href="#aboutyou-report" class="nav-item">
+          <i class="fas fa-chart-bar"></i>
+          About You Report
+        </a>
         <a href="#playlists" class="nav-item">
           <i class="fas fa-music"></i>
           Playlists
@@ -51,7 +55,7 @@
       <select id="hostPartySelect"></select>
     </div>
     <div class="actions">
-      <button id="createPartyBtn" class="primary">
+      <button id="headerCreatePartyBtn" class="primary">
         <i class="fas fa-plus"></i>
         New Party
       </button>
@@ -66,7 +70,7 @@
       <div class="section-header">
         <h2>Dashboard Overview</h2>
         <div class="actions">
-          <button id="createPartyBtn" class="primary">
+          <button id="overviewCreatePartyBtn" class="primary">
             <i class="fas fa-plus"></i>
             New Party
           </button>
@@ -142,14 +146,14 @@
       <div class="section-header">
         <h2>Manage Parties</h2>
         <div class="actions">
-          <button id="createNewPartyBtn" class="primary">
+          <button id="scrollToCreateFormBtn" class="primary">
             <i class="fas fa-plus"></i>
             Create Party
           </button>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="createPartyCard">
         <h3>Create a new party</h3>
         <form id="createPartyForm" class="stack">
           <div class="row"><label>Title</label><input id="partyTitle" required placeholder="FriendsGiving 2025" /></div>
@@ -198,7 +202,7 @@
       <div id="newGameCard" class="card">
         <h3>Add a game</h3>
         <form id="newGameForm" class="stack">
-          <div class="row"><label>Party</label><select id="hostPartySelect"></select></div>
+          <div class="row"><label>Party</label><select id="gamePartySelect"></select></div>
           <div class="row">
             <label>Game Type</label>
             <select id="gameType">
@@ -258,6 +262,75 @@
           </form>
           <div id="cohostList" class="list" style="margin-top:12px;"></div>
         </div>
+      </div>
+    </section>
+
+    <!-- Playlists Section -->
+    <section id="playlists" class="section" hidden>
+      <div class="section-header">
+        <h2>Playlists</h2>
+      </div>
+      <div class="card">
+        <p class="small muted">Playlist management coming soon. In the meantime, use the Favorite Song game to collect music from your guests.</p>
+      </div>
+    </section>
+
+    <!-- About You Report Section -->
+    <section id="aboutyou-report" class="section" hidden>
+      <div class="section-header">
+        <h2>About You Report</h2>
+        <div class="actions">
+          <select id="reportPartySelect"></select>
+          <button id="exportReportBtn" class="secondary">
+            <i class="fas fa-download"></i>
+            Export CSV
+          </button>
+          <button id="refreshReportBtn" class="link">Refresh</button>
+        </div>
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="stats-grid" style="margin-bottom: 24px;">
+        <div class="stat-card">
+          <h3>Total Profiles</h3>
+          <div class="value" id="reportTotalProfiles">-</div>
+        </div>
+        <div class="stat-card">
+          <h3>Completed (100%)</h3>
+          <div class="value" id="reportCompleted">-</div>
+        </div>
+        <div class="stat-card">
+          <h3>In Progress</h3>
+          <div class="value" id="reportInProgress">-</div>
+        </div>
+        <div class="stat-card">
+          <h3>Avg Completion</h3>
+          <div class="value" id="reportAvgCompletion">-</div>
+        </div>
+      </div>
+
+      <!-- Filter/View Options -->
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="row" style="display: flex; gap: 16px; align-items: center;">
+          <label>View:</label>
+          <select id="reportViewMode" style="flex: 1; max-width: 200px;">
+            <option value="summary">Summary View</option>
+            <option value="detailed">Detailed Answers</option>
+            <option value="aggregate">Aggregate Results</option>
+          </select>
+          
+          <label>Filter:</label>
+          <select id="reportFilterCompletion" style="flex: 1; max-width: 200px;">
+            <option value="all">All Guests</option>
+            <option value="complete">100% Complete</option>
+            <option value="incomplete">Incomplete</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Report Content -->
+      <div id="reportContent" class="card">
+        <p class="small muted">Select a party to view the About You report.</p>
       </div>
     </section>
 

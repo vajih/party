@@ -13,6 +13,10 @@ export function initAdminNav() {
     newGame: qs('#newGameBtn'),
     inviteCohost: qs('#inviteCohostBtn'),
     checkMod: qs('#checkModQueueBtn'),
+    headerCreateParty: qs('#headerCreatePartyBtn'),
+    overviewCreateParty: qs('#overviewCreatePartyBtn'),
+    scrollToCreateForm: qs('#scrollToCreateFormBtn'),
+    newGameToggle: qs('#newGameToggle'),
   };
 
   // Show initial section (Overview)
@@ -45,6 +49,45 @@ export function initAdminNav() {
     updateActiveNav('moderation');
   });
 
+  // Handle "Create Party" buttons from header and overview
+  const handleCreateParty = () => {
+    showSection('parties');
+    updateActiveNav('parties');
+    // Scroll to create form after a brief delay to ensure section is visible
+    setTimeout(() => {
+      const createCard = qs('#createPartyCard');
+      if (createCard) {
+        createCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
+  quickActions.headerCreateParty?.addEventListener('click', handleCreateParty);
+  quickActions.overviewCreateParty?.addEventListener('click', handleCreateParty);
+  quickActions.scrollToCreateForm?.addEventListener('click', () => {
+    const createCard = qs('#createPartyCard');
+    if (createCard) {
+      createCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  // Handle "Add Game" toggle button
+  quickActions.newGameToggle?.addEventListener('click', () => {
+    const newGameCard = qs('#newGameCard');
+    if (newGameCard) {
+      const isHidden = newGameCard.style.display === 'none';
+      newGameCard.style.display = isHidden ? 'block' : 'none';
+      quickActions.newGameToggle.textContent = isHidden ? 'Hide Form' : 'Add Game';
+      
+      if (isHidden) {
+        // Scroll to form when showing
+        setTimeout(() => {
+          newGameCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+    }
+  });
+
   // Handle URL hash changes
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.slice(1) || 'overview';
@@ -63,31 +106,53 @@ export function initAdminNav() {
 
     if (!stats.totalParties) return;
 
-    // Count parties
-    const { data: parties } = await supabase
+    // Get current user to filter by host
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Count parties for this host
+    const { count: partyCount } = await supabase
       .from('parties')
-      .select('id', { count: 'exact', head: true });
-    stats.totalParties.textContent = parties?.count || 0;
-
-    // Count active games
-    const { data: games } = await supabase
-      .from('games')
       .select('id', { count: 'exact', head: true })
-      .eq('status', 'open');
-    stats.activeGames.textContent = games?.count || 0;
+      .eq('host_id', user.id);
+    stats.totalParties.textContent = partyCount || 0;
 
-    // Count guests
-    const { data: guests } = await supabase
-      .from('party_profiles')
-      .select('user_id', { count: 'exact', head: true });
-    stats.totalGuests.textContent = guests?.count || 0;
+    // Get party IDs for this host
+    const { data: hostParties } = await supabase
+      .from('parties')
+      .select('id')
+      .eq('host_id', user.id);
+    
+    const partyIds = hostParties?.map(p => p.id) || [];
 
-    // Count pending mods
-    const { data: mods } = await supabase
-      .from('submissions')
-      .select('id', { count: 'exact', head: true })
-      .eq('moderation_status', 'pending');
-    stats.pendingMods.textContent = mods?.count || 0;
+    // Count active games for host's parties
+    if (partyIds.length > 0) {
+      const { count: gameCount } = await supabase
+        .from('games')
+        .select('id', { count: 'exact', head: true })
+        .in('party_id', partyIds)
+        .eq('status', 'open');
+      stats.activeGames.textContent = gameCount || 0;
+
+      // Count guests across host's parties
+      const { count: guestCount } = await supabase
+        .from('party_profiles')
+        .select('user_id', { count: 'exact', head: true })
+        .in('party_id', partyIds);
+      stats.totalGuests.textContent = guestCount || 0;
+
+      // Count pending mods for host's parties
+      const { count: modCount } = await supabase
+        .from('submissions')
+        .select('id', { count: 'exact', head: true })
+        .in('party_id', partyIds)
+        .eq('moderation_status', 'pending');
+      stats.pendingMods.textContent = modCount || 0;
+    } else {
+      stats.activeGames.textContent = '0';
+      stats.totalGuests.textContent = '0';
+      stats.pendingMods.textContent = '0';
+    }
   }
 
   // Update stats on first load

@@ -257,3 +257,354 @@
 .admin-table tr:hover {
   background: var(--surface-2);
 }
+
+/* Report View Styles */
+.report-guest-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.report-guest-item {
+  border: 1px solid var(--border-1, #e5e7eb);
+  border-radius: 12px;
+  padding: 20px;
+  background: #ffffff;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.report-guest-item:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.report-guest-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.report-guest-name {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: #111827;
+  letter-spacing: -0.01em;
+}
+
+.report-batch-status {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.report-batch-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  background: #f3f4f6;
+  color: #9ca3af;
+  border: 2px solid #e5e7eb;
+}
+
+.report-batch-badge.complete {
+  background: #dcfce7;
+  color: #16a34a;
+  border-color: #86efac;
+}
+
+.report-batch-badge.in-progress {
+  background: #fef3c7;
+  color: #d97706;
+  border-color: #fde68a;
+}
+
+.report-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.report-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+.report-completion-text {
+  font-size: 0.9375rem;
+  color: #6b7280;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.report-view-details-btn {
+  margin-top: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #3b82f6;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.report-view-details-btn:hover {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+/* Aggregate Results View */
+.aggregate-question-block {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.aggregate-question-title {
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-bottom: 20px;
+  color: #111827;
+  line-height: 1.4;
+}
+
+.aggregate-results-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.aggregate-result-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.aggregate-result-label {
+  flex: 0 0 180px;
+  font-size: 0.9375rem;
+  color: #374151;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.aggregate-result-bar {
+  flex: 1;
+  height: 32px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.aggregate-result-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+  transition: width 0.5s ease;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  min-width: 40px;
+}
+
+.aggregate-result-count {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #111827;
+  min-width: 90px;
+  text-align: right;
+}
+
+.aggregate-batch-section {
+  margin-bottom: 48px;
+}
+
+.aggregate-batch-section h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* Map Container for Cities */
+.report-map-container {
+  width: 100%;
+  height: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 16px 0;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.report-no-map-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  background: #f9fafb;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  color: #6b7280;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+/* Detailed Answers View */
+.detailed-answer-item {
+  border-left: 4px solid #3b82f6;
+  padding: 16px;
+  padding-left: 20px;
+  margin-bottom: 24px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.detailed-answer-question {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: #6b7280;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.detailed-answer-response {
+  font-size: 1.0625rem;
+  color: #111827;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.detailed-answer-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: #eff6ff;
+  color: #3b82f6;
+  margin-left: 8px;
+  border: 1px solid #bfdbfe;
+}
+
+.detailed-guest-section {
+  margin-bottom: 48px;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.detailed-guest-section h3 {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* Report-specific improvements */
+#reportContent {
+  background: #f9fafb;
+  padding: 24px;
+  border-radius: 12px;
+  min-height: 300px;
+}
+
+#reportContent .small.muted {
+  color: #9ca3af;
+  font-size: 0.9375rem;
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* Filter section styling */
+#aboutyou-report .card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+#aboutyou-report label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9375rem;
+}
+
+#aboutyou-report select {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.9375rem;
+  color: #111827;
+  background: #ffffff;
+  transition: all 0.2s;
+}
+
+#aboutyou-report select:hover {
+  border-color: #3b82f6;
+}
+
+#aboutyou-report select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Stats grid improvements */
+#aboutyou-report .stats-grid {
+  gap: 16px;
+}
+
+#aboutyou-report .stat-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+#aboutyou-report .stat-card h3 {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+#aboutyou-report .stat-card .value {
+  color: #111827;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
