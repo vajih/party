@@ -131,18 +131,26 @@ export const QUESTION_BATCHES = [
     estimatedTime: '2 min',
     questions: [
       {
-        id: 'tv_4way_classics',
+        id: 'zodiac_sign',
         order: 8,
-        kind: 'single_choice',
-        prompt: 'Pick your favorite Pakistani TV classic',
+        kind: 'dropdown',
+        prompt: "What's your zodiac?",
         options: [
-          { id: 'A', label: 'Alpha Bravo Charlie' },
-          { id: 'B', label: 'Sunehray Din' },
-          { id: 'C', label: 'Dhoop Kinare' },
-          { id: 'D', label: 'Tanhaiyaan' }
+          { id: 'aries', label: 'Aries' },
+          { id: 'taurus', label: 'Taurus' },
+          { id: 'gemini', label: 'Gemini' },
+          { id: 'cancer', label: 'Cancer' },
+          { id: 'leo', label: 'Leo' },
+          { id: 'virgo', label: 'Virgo' },
+          { id: 'libra', label: 'Libra' },
+          { id: 'scorpio', label: 'Scorpio' },
+          { id: 'sagittarius', label: 'Sagittarius' },
+          { id: 'capricorn', label: 'Capricorn' },
+          { id: 'aquarius', label: 'Aquarius' },
+          { id: 'pisces', label: 'Pisces' }
         ],
         required: true,
-        category: 'nostalgia'
+        category: 'personality'
       },
       {
         id: 'remedy_desi_mom',
@@ -265,56 +273,53 @@ export const QUESTION_BATCHES = [
         category: 'travel'
       },
       {
-        id: 'bollywood_alter_ego',
+        id: 'tsa_luggage',
         order: 10,
         kind: 'single_choice',
-        prompt: 'Your Bollywood alter ego?',
+        prompt: 'What TSA side-eyes in your luggage',
         options: [
-          { id: 'A', label: 'Amitabh Bachchan' },
-          { id: 'B', label: 'Shah Rukh Khan' },
-          { id: 'C', label: 'Salman Khan' },
-          { id: 'D', label: 'Aamir Khan' },
-          { id: 'E', label: 'Hrithik Roshan' },
-          { id: 'F', label: 'Ranbir Kapoor' },
-          { id: 'G', label: 'Ranveer Singh' },
-          { id: 'H', label: 'Vicky Kaushal' },
-          { id: 'I', label: 'Kajol' },
-          { id: 'J', label: 'Kareena Kapoor' },
-          { id: 'K', label: 'Raveena Tandon' },
-          { id: 'L', label: 'Karisma Kapoor' },
-          { id: 'M', label: 'Preity Zinta' },
-          { id: 'N', label: 'Deepika Padukone' },
-          { id: 'O', label: 'Priyanka Chopra' },
-          { id: 'P', label: 'Alia Bhatt' },
-          { id: 'X', label: 'Other', write_in: true }
+          { id: 'tea_bags', label: 'Everyday & Tapal Tea Bags' },
+          { id: 'spice_packets', label: 'Spice Packets Galore' },
+          { id: 'supari', label: 'Shahi Supari Roll' },
+          { id: 'henna', label: 'Henna Cones' },
+          { id: 'achar', label: 'Achar Jar' },
+          { id: 'other', label: 'Other', write_in: true }
         ],
-        required: false,
-        category: 'film'
+        required: true,
+        write_in_placeholder: 'What else raises TSA eyebrows?',
+        category: 'travel'
       },
       {
-        id: 'gift_love_notes_surprise',
+        id: 'reunion_brag',
         order: 18,
-        kind: 'either_or',
-        prompt: 'Prefer giving...',
+        kind: 'single_choice',
+        prompt: "Auntie's RSVP minutes before the event",
         options: [
-          { id: 'A', label: 'Love notes' },
-          { id: 'B', label: 'Surprise gifts' }
+          { id: 'five_mins', label: '"Five Minutes Away"' },
+          { id: 'on_road', label: '"On the Road"' },
+          { id: 'leaving_now', label: '"Leaving Now"' },
+          { id: 'send_address', label: '"Send Address Again?"' },
+          { id: 'other', label: 'Other', write_in: true }
         ],
-        required: false,
-        flags: { allow_both: true, allow_neither: true },
-        category: 'values'
+        required: true,
+        write_in_placeholder: 'What else does auntie say?',
+        category: 'nostalgia'
       },
       {
-        id: 'civic_charity_vs_volunteer',
+        id: 'couple_photo_prep',
         order: 19,
-        kind: 'either_or',
-        prompt: 'Prefer to...',
+        kind: 'single_choice',
+        prompt: 'What people do before posting couple photos',
         options: [
-          { id: 'A', label: 'Give Charity' },
-          { id: 'B', label: 'Volunteer Time' }
+          { id: 'crop_someone', label: 'Crop someone out' },
+          { id: 'check_partner', label: 'Check with partner' },
+          { id: 'filter_smooth', label: 'Filter + smooth' },
+          { id: 'caption_consult', label: 'Caption consult with friend' },
+          { id: 'hide_ring', label: 'Hide ring hand' },
+          { id: 'other', label: 'Other', write_in: true }
         ],
-        required: false,
-        flags: { allow_both: true, allow_neither: true },
+        required: true,
+        write_in_placeholder: 'What else do they do?',
         category: 'values'
       },
       {

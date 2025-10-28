@@ -142,6 +142,37 @@ function renderSingleChoiceQuestion(question, currentAnswer = null) {
 }
 
 /**
+ * Render a dropdown question (select element)
+ */
+function renderDropdownQuestion(question, currentAnswer = null) {
+  const { id, prompt, required, options } = question;
+  
+  return `
+    <div class="question-card dropdown" data-question-id="${id}">
+      <div class="question-header">
+        <label for="select_${id}" class="question-prompt">
+          ${escapeHtml(prompt)}
+          ${required ? '<span class="required">*</span>' : ''}
+        </label>
+      </div>
+      
+      <select 
+        id="select_${id}"
+        name="${id}"
+        class="dropdown-select"
+        ${required ? 'required' : ''}>
+        <option value="">Select an option...</option>
+        ${options.map(opt => `
+          <option value="${opt.id}" ${currentAnswer === opt.id ? 'selected' : ''}>
+            ${escapeHtml(opt.label)}
+          </option>
+        `).join('')}
+      </select>
+    </div>
+  `;
+}
+
+/**
  * Render a short_text question (text input)
  */
 function renderShortTextQuestion(question, currentAnswer = null) {
@@ -182,6 +213,8 @@ export function renderQuestion(question, currentAnswer = null) {
       return renderEitherOrQuestion(question, currentAnswer);
     case 'single_choice':
       return renderSingleChoiceQuestion(question, currentAnswer);
+    case 'dropdown':
+      return renderDropdownQuestion(question, currentAnswer);
     case 'short_text':
       return renderShortTextQuestion(question, currentAnswer);
     default:
@@ -296,6 +329,34 @@ function bindSingleChoiceHandlers(container) {
 }
 
 /**
+ * Wire up event handlers for dropdown questions
+ */
+function bindDropdownHandlers(container) {
+  const cards = qsa('.dropdown', container);
+  
+  cards.forEach(card => {
+    const selectElement = qs('.dropdown-select', card);
+    
+    if (selectElement) {
+      // No special handling needed - standard select behavior
+      // Just ensure proper validation styling
+      selectElement.addEventListener('change', () => {
+        if (selectElement.value) {
+          selectElement.classList.add('has-value');
+        } else {
+          selectElement.classList.remove('has-value');
+        }
+      });
+      
+      // Initialize state
+      if (selectElement.value) {
+        selectElement.classList.add('has-value');
+      }
+    }
+  });
+}
+
+/**
  * Wire up event handlers for short_text questions
  */
 function bindShortTextHandlers(container) {
@@ -319,6 +380,7 @@ function bindShortTextHandlers(container) {
 export function bindQuestionHandlers(container) {
   bindEitherOrHandlers(container);
   bindSingleChoiceHandlers(container);
+  bindDropdownHandlers(container);
   bindShortTextHandlers(container);
 }
 
@@ -327,7 +389,7 @@ export function bindQuestionHandlers(container) {
  */
 export function extractAnswers(container) {
   const answers = {};
-  const inputs = qsa('input[type="hidden"], input.text-input-answer', container);
+  const inputs = qsa('input[type="hidden"], input.text-input-answer, select.dropdown-select', container);
   
   inputs.forEach(input => {
     if (input.name && input.value) {
