@@ -205,6 +205,49 @@ function renderShortTextQuestion(question, currentAnswer = null) {
 }
 
 /**
+ * Render a photo upload question
+ */
+function renderPhotoUploadQuestion(question, currentAnswer = null) {
+  const { id, prompt, required, instructions } = question;
+  
+  return `
+    <div class="question-card photo-upload" data-question-id="${id}">
+      <div class="question-header">
+        <label for="input_${id}" class="question-prompt">
+          ${escapeHtml(prompt)}
+          ${required ? '<span class="required">*</span>' : ''}
+        </label>
+        ${instructions ? `<p class="photo-instructions">${escapeHtml(instructions)}</p>` : ''}
+      </div>
+      
+      <div class="photo-upload-container">
+        <input 
+          type="file" 
+          id="input_${id}"
+          name="${id}"
+          class="photo-input"
+          accept="image/*"
+          ${required ? 'required' : ''}
+          style="display: none;">
+        
+        <div class="photo-preview" id="preview_${id}" style="display: none;">
+          <img src="" alt="Preview" class="preview-image">
+          <button type="button" class="remove-photo" data-input-id="input_${id}">
+            <span>×</span> Remove
+          </button>
+        </div>
+        
+        <button type="button" class="photo-upload-btn" data-input-id="input_${id}">
+          📷 Choose Photo
+        </button>
+        
+        <p class="photo-hint">Recommended: Clear photo of you as a baby or toddler</p>
+      </div>
+    </div>
+  `;
+}
+
+/**
  * Render a question based on its type
  */
 export function renderQuestion(question, currentAnswer = null) {
@@ -217,6 +260,8 @@ export function renderQuestion(question, currentAnswer = null) {
       return renderDropdownQuestion(question, currentAnswer);
     case 'short_text':
       return renderShortTextQuestion(question, currentAnswer);
+    case 'photo_upload':
+      return renderPhotoUploadQuestion(question, currentAnswer);
     default:
       return `<div class="error">Unknown question type: ${question.kind}</div>`;
   }
@@ -375,6 +420,52 @@ function bindShortTextHandlers(container) {
 }
 
 /**
+ * Wire up event handlers for photo upload questions
+ */
+function bindPhotoUploadHandlers(container) {
+  const cards = qsa('.photo-upload', container);
+  
+  cards.forEach(card => {
+    const fileInput = qs('.photo-input', card);
+    const uploadBtn = qs('.photo-upload-btn', card);
+    const preview = qs('.photo-preview', card);
+    const previewImg = qs('.preview-image', card);
+    const removeBtn = qs('.remove-photo', card);
+    
+    if (!fileInput || !uploadBtn) return;
+    
+    // Click upload button to trigger file input
+    uploadBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+    
+    // Handle file selection
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          previewImg.src = event.target.result;
+          preview.style.display = 'block';
+          uploadBtn.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // Handle photo removal
+    if (removeBtn) {
+      removeBtn.addEventListener('click', () => {
+        fileInput.value = '';
+        previewImg.src = '';
+        preview.style.display = 'none';
+        uploadBtn.style.display = 'block';
+      });
+    }
+  });
+}
+
+/**
  * Wire up all question handlers
  */
 export function bindQuestionHandlers(container) {
@@ -382,6 +473,7 @@ export function bindQuestionHandlers(container) {
   bindSingleChoiceHandlers(container);
   bindDropdownHandlers(container);
   bindShortTextHandlers(container);
+  bindPhotoUploadHandlers(container);
 }
 
 /**
@@ -394,6 +486,15 @@ export function extractAnswers(container) {
   inputs.forEach(input => {
     if (input.name && input.value) {
       answers[input.name] = input.value;
+    }
+  });
+  
+  // Handle photo uploads - store file reference
+  const photoInputs = qsa('input.photo-input', container);
+  photoInputs.forEach(input => {
+    if (input.name && input.files && input.files.length > 0) {
+      answers[input.name] = 'photo_uploaded'; // Flag that photo exists
+      answers[`${input.name}_file`] = input.files[0]; // Store file reference
     }
   });
   

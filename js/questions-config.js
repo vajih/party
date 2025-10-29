@@ -12,6 +12,15 @@ export const QUESTION_BATCHES = [
     estimatedTime: '2 min',
     questions: [
       {
+        id: 'birth_city',
+        order: 0,
+        kind: 'short_text',
+        prompt: 'City where you were born',
+        placeholder: 'e.g., Karachi, Lahore, Houston',
+        required: true,
+        category: 'personal'
+      },
+      {
         id: 'food_pulao_biryani',
         order: 1,
         kind: 'either_or',
@@ -147,7 +156,8 @@ export const QUESTION_BATCHES = [
           { id: 'sagittarius', label: 'Sagittarius' },
           { id: 'capricorn', label: 'Capricorn' },
           { id: 'aquarius', label: 'Aquarius' },
-          { id: 'pisces', label: 'Pisces' }
+          { id: 'pisces', label: 'Pisces' },
+          { id: 'idk', label: "I don't know" }
         ],
         required: true,
         category: 'personality'
@@ -335,6 +345,25 @@ export const QUESTION_BATCHES = [
         flags: { allow_both: true, allow_neither: true },
         aggregate_only: true,
         category: 'culture'
+      }
+    ]
+  },
+  {
+    id: 'batch_4',
+    title: "Who's the Baby?",
+    description: 'Upload your cutest baby photo for the guessing game',
+    emoji: '👶',
+    estimatedTime: '1 min',
+    questions: [
+      {
+        id: 'baby_photo',
+        order: 20,
+        kind: 'photo_upload',
+        prompt: 'Upload your baby photo',
+        placeholder: 'Choose a photo from your device',
+        required: true,
+        category: 'photo',
+        instructions: 'Pick a clear photo of you as a baby or toddler. This will be used in a fun guessing game at the party!'
       }
     ]
   }

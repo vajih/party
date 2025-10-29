@@ -261,12 +261,6 @@ function bindEventHandlers() {
     });
   }
   
-  // Save draft button
-  const saveDraftBtn = qs('#saveDraftBtn');
-  if (saveDraftBtn) {
-    saveDraftBtn.addEventListener('click', handleSaveDraft);
-  }
-  
   // Complete batch button
   const batchForm = qs('#batchQuestionsForm');
   if (batchForm) {
@@ -281,37 +275,21 @@ async function handleBasicInfoSubmit(e) {
   e.preventDefault();
   
   const displayName = qs('#display_name').value.trim();
-  const birthCity = qs('#birth_city').value.trim();
+  const whatsappNumber = qs('#whatsapp_number').value.trim();
   
-  if (!displayName || !birthCity) {
-    alert('Please fill in all fields');
+  if (!displayName) {
+    alert('Please enter your display name');
     return;
   }
   
-  // Geocode birth city
-  let birthLat = null;
-  let birthLng = null;
-  
-  try {
-    const geocodeResult = await geocodeCity(birthCity);
-    if (geocodeResult) {
-      birthLat = geocodeResult.lat;
-      birthLng = geocodeResult.lng;
-    }
-  } catch (err) {
-    console.warn('[AboutYouExtended] Geocoding failed:', err);
-  }
-  
-  // Upsert profile
+  // Upsert profile (birth city will be added in batch 1)
   const { error } = await supabase
     .from('party_profiles')
     .upsert({
       party_id: currentState.partyId,
       user_id: currentState.userId,
       display_name: displayName,
-      birth_city: birthCity,
-      birth_lat: birthLat,
-      birth_lng: birthLng,
+      whatsapp_number: whatsappNumber || null,
       batch_progress: {},
       extended_answers: {}
     }, {
@@ -325,42 +303,6 @@ async function handleBasicInfoSubmit(e) {
   }
   
   // Reload profile and show batch selector
-  await loadProfileData();
-  showBatchSelector();
-}
-
-/**
- * Handle save draft
- */
-async function handleSaveDraft(e) {
-  e.preventDefault();
-  
-  const container = qs('#questionsContainer');
-  const answers = extractAnswers(container);
-  
-  // Merge with existing answers
-  currentState.answers = { ...currentState.answers, ...answers };
-  
-  // Save to database
-  const batchProgress = currentState.profileData?.batch_progress || {};
-  batchProgress[currentState.currentBatch] = 'in_progress';
-  
-  const { error } = await supabase
-    .from('party_profiles')
-    .update({
-      extended_answers: currentState.answers,
-      batch_progress: batchProgress
-    })
-    .eq('party_id', currentState.partyId)
-    .eq('user_id', currentState.userId);
-  
-  if (error) {
-    console.error('[AboutYouExtended] Error saving draft:', error);
-    alert('Failed to save draft. Please try again.');
-    return;
-  }
-  
-  alert('✓ Draft saved! You can continue later.');
   await loadProfileData();
   showBatchSelector();
 }
@@ -381,6 +323,50 @@ async function handleBatchSubmit(e) {
   if (!validation.valid) {
     alert(validation.message);
     return;
+  }
+  
+  // Handle birth_city geocoding if this is batch_1
+  if (currentState.currentBatch === 'batch_1' && answers.birth_city) {
+    try {
+      const geocodeResult = await geocodeCity(answers.birth_city);
+      if (geocodeResult) {
+        // Update profile with birth city coordinates
+        await supabase
+          .from('party_profiles')
+          .update({
+            birth_city: answers.birth_city,
+            birth_lat: geocodeResult.lat,
+            birth_lng: geocodeResult.lng
+          })
+          .eq('party_id', currentState.partyId)
+          .eq('user_id', currentState.userId);
+      }
+    } catch (err) {
+      console.warn('[AboutYouExtended] Geocoding failed:', err);
+    }
+  }
+  
+  // Handle baby photo upload if present - convert to base64
+  if (answers.baby_photo_file) {
+    const file = answers.baby_photo_file;
+    
+    // Convert to base64
+    const reader = new FileReader();
+    const base64Promise = new Promise((resolve, reject) => {
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    
+    try {
+      const base64Data = await base64Promise;
+      answers.baby_photo = base64Data; // Store base64 string
+      delete answers.baby_photo_file;
+    } catch (error) {
+      console.error('[AboutYouExtended] Photo conversion error:', error);
+      alert('Failed to process photo. Please try again.');
+      return;
+    }
   }
   
   // Merge with existing answers
@@ -429,6 +415,9 @@ async function handleBatchSubmit(e) {
   // Reload profile and show batch selector
   await loadProfileData();
   showBatchSelector();
+  
+  // Scroll to top of the page to show next batch
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   
   // Check if all batches complete
   const allComplete = QUESTION_BATCHES.every(batch => batchProgress[batch.id] === 'complete');

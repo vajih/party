@@ -91,21 +91,18 @@
       </div>
       
       <div class="field">
-        <label for="birth_city">
-          City where you were born
+        <label for="whatsapp_number">
+          WhatsApp number
           <span class="tooltip">
             <span class="help-icon">?</span>
-            <span class="tooltip-text">This helps create a cool map showing where all guests are from! Unlock the map by completing all three batches.</span>
+            <span class="tooltip-text">Optional. Helps hosts coordinate party details with you.</span>
           </span>
         </label>
         <input 
-          type="text" 
-          name="birth_city" 
-          id="birth_city" 
-          placeholder="e.g., New York, Tokyo, London" 
-          autocomplete="off"
-          required>
-        <div class="city-suggestions" id="citySuggestions" style="display: none;"></div>
+          type="tel" 
+          name="whatsapp_number" 
+          id="whatsapp_number" 
+          placeholder="e.g., +1 (555) 123-4567">
       </div>
 
       <button type="submit" class="btn primary">
@@ -137,9 +134,6 @@
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn secondary" id="saveDraftBtn">
-          Save Draft
-        </button>
         <button type="submit" class="btn primary" id="completeBatchBtn">
           Submit Answers
         </button>

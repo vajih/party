@@ -245,6 +245,7 @@
   font-weight: 600;
   color: var(--text-primary, #1f2937);
   line-height: 1.5;
+  text-transform: none;
 }
 
 .question-prompt .required {
@@ -665,6 +666,108 @@
 
 .dropdown-select:invalid {
   color: #9ca3af;
+}
+
+/* ========================================
+   Photo Upload Questions
+   ======================================== */
+
+.question-card.photo-upload {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 24px;
+}
+
+.question-card.photo-upload .question-header {
+  margin-bottom: 16px;
+}
+
+.photo-instructions {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 8px 0 0 0;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.photo-upload-container {
+  text-align: center;
+}
+
+.photo-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+}
+
+.photo-upload-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+.photo-upload-btn:active {
+  transform: translateY(0);
+}
+
+.photo-preview {
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: block;
+  margin: 0 auto 12px;
+}
+
+.remove-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.remove-photo:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.remove-photo span {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.photo-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  font-style: italic;
 }
 
 /* ========================================
