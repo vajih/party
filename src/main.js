@@ -1521,13 +1521,18 @@ async function showWelcomeModalIfNeeded(party, user) {
               Fatima & Vajih
             </p>
             
+            <p class="invitation-thank-you">
+              Thank you for being our guest and confirming your attendance.
+            </p>
+            
             <p class="invitation-greeting">
-              request the pleasure of your company
+              We request the pleasure of your company on
             </p>
             
             <div class="invitation-event-details">
               <p class="event-date">${escapeHtml(formattedDate)}</p>
               <p class="event-time">${escapeHtml(formattedTime)}</p>
+              <p class="event-at">at</p>
               <p class="event-venue">${escapeHtml(venue)}</p>
             </div>
             
@@ -1539,6 +1544,11 @@ async function showWelcomeModalIfNeeded(party, user) {
             <p class="invitation-note">
               The theme of the evening is <strong>getting to know you</strong>. We've prepared activities to help us all 
               share and connect—favorite songs, memories, and stories that make gatherings meaningful.
+              
+            </p>
+            
+            <p class="invitation-cta">
+              Please take a few moments to complete the interactive activities ahead. Your stories and participation will help create an unforgettable evening together!
             </p>
           </div>
           
