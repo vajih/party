@@ -162,14 +162,15 @@ async function route(userFromEvent) {
     <section class="card">
       ${progressHtml}
       <div id="game-content" style="margin-top:24px;"></div>
-      <div id="birthMap" class="birth-map-container" style="margin-top:32px;"></div>
+      <!-- Birth map temporarily hidden -->
+      <!-- <div id="birthMap" class="birth-map-container" style="margin-top:32px;"></div> -->
     </section>`;
   
   // Initialize countdown timer in header
   initHeaderCountdown(party.date);
   
-  // Initialize birth map
-  initBirthMapComponent(party.id, user.id);
+  // Initialize birth map - temporarily disabled
+  // initBirthMapComponent(party.id, user.id);
 
   // Wire up progress tracker clicks to load content directly
   document.querySelectorAll('.progress-step').forEach(step => {
