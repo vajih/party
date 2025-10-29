@@ -1516,7 +1516,7 @@ async function showWelcomeModalIfNeeded(party, user) {
           
           <div class="invitation-body">
             <p class="invitation-hosts">
-              Sara & Waqar<br>
+              Sarah & Waqar<br>
               Ghazala & Aftab<br>
               Fatima & Vajih
             </p>
