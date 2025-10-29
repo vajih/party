@@ -1406,27 +1406,14 @@ function getStepDescription(type) {
 function buildProgressTracker(steps) {
   if (!steps || steps.length === 0) return '';
   
-  const currentStep = steps.find(s => s.isActive);
   const completedCount = steps.filter(s => s.isCompleted).length;
   const totalCount = steps.length;
   
-  // Current task banner
+  // Show completion celebration banner only when all done
   let bannerHtml = '';
-  if (currentStep) {
-    const emoji = currentStep.type === 'about_you' ? '✨' : 
-                  currentStep.type === 'favorite_song' ? '🎵' : '👶';
+  if (completedCount === totalCount) {
     bannerHtml = `
-      <div class="current-task-banner">
-        <div class="icon">${emoji}</div>
-        <div class="content">
-          <div class="title">Next Step: ${escapeHtml(currentStep.title)}</div>
-          <div class="description">${escapeHtml(currentStep.description)}</div>
-        </div>
-      </div>
-    `;
-  } else if (completedCount === totalCount) {
-    bannerHtml = `
-      <div class="current-task-banner" style="background: var(--gradient-accent);">
+      <div class="current-task-banner completion-banner">
         <div class="icon">🎉</div>
         <div class="content">
           <div class="title">All Done!</div>
@@ -1516,12 +1503,6 @@ async function showWelcomeModalIfNeeded(party, user) {
           </div>
           
           <div class="invitation-body">
-            <p class="invitation-hosts">
-              Sarah & Waqar<br>
-              Ghazala & Aftab<br>
-              Fatima & Vajih
-            </p>
-            
             <p class="invitation-thank-you">
               Thank you for being our guest and confirming your attendance.
             </p>
@@ -1551,6 +1532,10 @@ async function showWelcomeModalIfNeeded(party, user) {
             <p class="invitation-cta">
               Please take a few moments to complete the interactive activities ahead. Your stories and participation will help create an unforgettable evening together!
             </p>
+            
+            <div class="invitation-hosts-bottom">
+              Sarah & Waqar <span class="host-separator">•</span> Ghazala & Aftab <span class="host-separator">•</span> Fatima & Vajih
+            </div>
           </div>
           
           <div class="invitation-footer">

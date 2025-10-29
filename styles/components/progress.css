@@ -4,7 +4,7 @@
 /* Progress Tracker for Guest Onboarding */
 .progress-tracker {
   background: var(--card);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: var(--radius);
   padding: 24px;
   margin-bottom: 32px;
@@ -12,15 +12,35 @@
   top: 80px;
   z-index: 40;
   box-shadow: var(--shadow-lg);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .progress-tracker .title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   color: var(--brand);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-tracker .title::before {
+  content: '📋';
+  font-size: 24px;
 }
 
 .progress-steps {
@@ -60,12 +80,14 @@
 }
 
 .progress-step.active {
-  background: var(--brand-light);
+  background: linear-gradient(135deg, var(--brand-light) 0%, rgba(139, 92, 246, 0.1) 100%);
   border-color: var(--brand);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
 }
 
 .progress-step.active::before {
   opacity: 1;
+  width: 6px;
 }
 
 .progress-step.completed {
@@ -136,20 +158,23 @@
 }
 
 .progress-step .step-badge {
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   background: var(--badge);
   color: var(--badge-text);
+  transition: var(--transition);
 }
 
 .progress-step.active .step-badge {
   background: var(--brand);
   color: white;
   animation: bounce 1s ease-in-out infinite;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  padding: 6px 16px;
 }
 
 @keyframes bounce {
@@ -166,7 +191,7 @@
   color: white;
 }
 
-/* Current Task Highlight */
+/* Current Task Highlight - Only shown on completion */
 .current-task-banner {
   background: var(--gradient-brand);
   color: white;
@@ -178,6 +203,11 @@
   gap: 16px;
   box-shadow: var(--glow);
   animation: slideDown 0.4s ease-out;
+}
+
+.current-task-banner.completion-banner {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
 }
 
 .current-task-banner .icon {

@@ -9,21 +9,31 @@
   font-size: 0.875rem;
   font-weight: 400;
   color: var(--text);
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .party-header-line1 {
   display: flex;
   align-items: center;
   gap: 8px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .party-name {
   font-weight: 500;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1;
 }
 
 .party-separator {
   color: var(--text-muted);
   font-weight: 300;
+  flex-shrink: 0;
 }
 
 .party-countdown-inline {
@@ -33,12 +43,16 @@
   text-align: center;
   width: 100%;
   margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .party-date-inline {
   font-size: 0.8125rem;
   color: var(--text);
   font-weight: 400;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .countdown-loading-inline {
@@ -114,10 +128,11 @@
   .header-party-info {
     font-size: 0.8125rem;
     gap: 6px;
+    max-width: calc(100vw - 200px);
   }
   
   .party-name {
-    max-width: 120px;
+    max-width: 150px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -133,10 +148,15 @@
   .header-party-info {
     flex-wrap: wrap;
     gap: 4px;
+    max-width: calc(100vw - 150px);
+  }
+  
+  .party-name {
+    max-width: 100px;
   }
   
   .party-date-inline {
-    display: none; /* Hide date on very small screens to save space */
+    font-size: 0.7rem;
   }
 }
 
