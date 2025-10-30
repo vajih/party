@@ -1,64 +1,65 @@
 :root{
   /* ========================================
-     Legacy Token Mappings (Bridge Layer)
-     Maps old token names to new brand tokens
+     Legacy Token Mappings (Elegant Minimal)
+     Maps old token names to new Elegant Minimal tokens
      ======================================== */
   
-  /* Backgrounds - Now light/warm */
-  --bg: var(--pearl);
-  --bg-secondary: var(--cloud);
-  --card: var(--cloud);
-  --card-hover: #F9F9F7;
-  --border: var(--slate);
+  /* Backgrounds - Pure white and champagne */
+  --bg: var(--pearl);                      /* #FFFFFF - Pure white */
+  --bg-secondary: var(--champagne);        /* #EFE2D3 - Soft champagne */
+  --card: var(--pearl);
+  --card-hover: #FDFDFB;                   /* Off-white on hover */
+  --border: #E8E4DB;                       /* Very soft border */
   
-  /* Text - Dark on light */
-  --text: var(--ink);
-  --text-secondary: #6B7280;
-  --muted: #9CA3AF;
+  /* Text - Soft charcoal on white */
+  --text: var(--ink);                      /* #2C2C2C - Soft charcoal */
+  --text-secondary: var(--warm-gray);      /* #B0A49B - Warm gray */
+  --muted: var(--warm-gray);
   
-  /* Brand colors - Now Coral primary */
-  --brand: var(--coral);
-  --brand-hover: var(--coral-hover);
-  --brand-light: var(--coral-tint);
-  --accent: var(--gold);
-  --accent-hover: #FFB020;
+  /* Brand colors - Olive primary */
+  --brand: var(--olive);                   /* #7E7B52 - Olive */
+  --brand-hover: #6D6A48;                  /* Darker olive */
+  --brand-light: rgba(126, 123, 82, 0.1);  /* Light olive tint */
+  --accent: var(--champagne);              /* #EFE2D3 - Champagne accent */
+  --accent-hover: #E5D5C0;                 /* Darker champagne */
   
-  /* Link colors */
-  --link: var(--coral);
-  --link-hover: var(--coral-hover);
+  /* Link colors - Olive */
+  --link: var(--olive);
+  --link-hover: #6D6A48;
   
-  /* Badge/pill colors */
-  --badge: var(--coral-tint);
-  --badge-text: var(--coral);
+  /* Badge/pill colors - Soft champagne */
+  --badge: var(--champagne);
+  --badge-text: var(--ink);
   
-  /* Status colors */
-  --success: var(--mint);
-  --success-color: var(--mint);
-  --success-light: var(--mint-tint);
-  --danger: var(--cranberry);
-  --error-color: var(--cranberry);
-  --error-light: var(--cranberry-tint);
-  --warning: var(--amber);
-  --warning-color: var(--amber);
-  --warning-light: var(--amber-tint);
+  /* Status colors - Muted, elegant tones */
+  --success: #6D6A48;                      /* Soft olive */
+  --success-color: #6D6A48;
+  --success-light: rgba(126, 123, 82, 0.1);
+  --danger: #A84838;                       /* Muted terracotta */
+  --error-color: #A84838;
+  --error-light: rgba(180, 95, 85, 0.08);
+  --warning: #B89865;                      /* Warm amber */
+  --warning-color: #B89865;
+  --warning-light: rgba(184, 152, 101, 0.1);
   
-  /* Effects */
-  --radius: var(--radius-card);
-  --radius-sm: var(--radius-base);
-  --radius-lg: var(--radius-modal);
-  --shadow: var(--shadow-mid);
-  --shadow-lg: var(--shadow-high);
-  --glow: 0 0 20px rgba(255, 106, 92, 0.2);
+  /* Effects - Soft, generous */
+  --radius: var(--radius-card);            /* 24px */
+  --radius-sm: var(--radius-base);         /* 16px */
+  --radius-lg: var(--radius-modal);        /* 32px */
+  --shadow: var(--shadow-low);             /* Very subtle */
+  --shadow-lg: var(--shadow-mid);
+  --glow: 0 0 32px rgba(126, 123, 82, 0.15);  /* Soft olive glow */
   
-  /* Transitions */
-  --transition: all var(--t-base) var(--ease);
-  --transition-slow: all var(--t-slow) var(--ease);
+  /* Transitions - Elegant, slow */
+  --transition: all var(--t-base) var(--ease);         /* 350ms elegant */
+  --transition-slow: all var(--t-slow) var(--ease);    /* 600ms slow */
   
-  /* Glassmorphism (updated for light mode) */
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.1);
+  /* Glassmorphism - Minimal, barely-there */
+  --glass-bg: rgba(255, 255, 255, 0.92);
+  --glass-border: rgba(126, 123, 82, 0.08);
   
-  /* Gradients - Warm accents */
-  --gradient-brand: linear-gradient(135deg, var(--coral) 0%, var(--gold) 100%);
-  --gradient-accent: linear-gradient(135deg, var(--coral) 0%, var(--amber) 100%);
+  /* Gradients - Soft whispers */
+  --gradient-brand: var(--gradient-olive);
+  --gradient-accent: var(--gradient-champagne);
 }
+

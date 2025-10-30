@@ -1,144 +1,198 @@
 /**
  * Party App - Brand Tokens
- * Design system foundation for consistent, warm, celebratory UI
+ * Elegant Minimal (Hosts Edition) - Calm luxury brunch feel
+ * Refined, timeless beauty for barndominium venue parties
  */
 
 :root {
   /* ========================================
-     Brand Colors
+     Brand Colors - Elegant Minimal
      ======================================== */
   
-  /* Neutrals - Sophisticated, warm grays */
-  --ink: #1A1A1A;           /* Primary text, deep charcoal */
-  --pearl: #FAFAF9;         /* Background/canvas, warm white */
-  --cloud: #FFFFFF;         /* Cards, elevated surfaces */
-  --slate: #E5E5E0;         /* Borders, dividers - warm gray */
-  --mist: #F5F5F3;          /* Subtle backgrounds */
+  /* Neutrals - Soft, sophisticated palette */
+  --ink: #2C2C2C;           /* Primary text, soft charcoal */
+  --pearl: #FFFFFF;         /* Background/canvas, pure white */
+  --cloud: #FAFAFA;         /* Cards, elevated surfaces */
+  --slate: #E8E3DB;         /* Borders, dividers - champagne tint */
+  --mist: #F5F1EB;          /* Subtle backgrounds */
   
-  /* Primary Palette - Refined, professional */
-  --primary: #2D3142;       /* Deep navy-blue for trust/stability */
-  --primary-hover: #1F2332;
-  --primary-light: rgba(45, 49, 66, 0.08);
+  /* Primary Palette - Champagne & Warm Gray */
+  --primary: #7E7B52;       /* Olive - calm and grounded */
+  --primary-hover: #6A6845;
+  --primary-light: rgba(126, 123, 82, 0.08);
   
-  --accent: #D4A574;        /* Warm gold - celebratory but professional */
-  --accent-hover: #C89660;
-  --accent-light: rgba(212, 165, 116, 0.12);
+  --accent: #EFE2D3;        /* Champagne - soft and luxurious */
+  --accent-hover: #E5D5C3;
+  --accent-light: rgba(239, 226, 211, 0.15);
   
-  --coral: #D4A574;         /* Map to accent for backward compatibility */
-  --coral-hover: #C89660;
-  --coral-ink: #FFFFFF;
-  --coral-tint: rgba(212, 165, 116, 0.12);
+  --coral: #EFE2D3;         /* Map to champagne for backward compatibility */
+  --coral-hover: #E5D5C3;
+  --coral-ink: #2C2C2C;
+  --coral-tint: rgba(239, 226, 211, 0.15);
   
-  /* Accent Colors - Muted, professional */
-  --gold: #D4A574;          /* Focus rings, highlights */
-  --mint: #2D9D7C;          /* Success - sophisticated green */
-  --amber: #E3A05A;         /* Warnings - muted orange */
-  --cranberry: #C85A54;     /* Errors - muted red */
+  /* Accent Colors - Muted, elegant */
+  --gold: #B0A49B;          /* Warm gray - sophisticated accent */
+  --olive: #7E7B52;         /* Olive green - natural elegance */
+  --mint: #8FA888;          /* Success - muted sage green */
+  --amber: #D4C4A8;         /* Warnings - soft tan */
+  --cranberry: #A68B8B;     /* Errors - muted mauve */
   
   /* Tints (subtle backgrounds) */
-  --mint-tint: rgba(45, 157, 124, 0.08);
-  --amber-tint: rgba(227, 160, 90, 0.08);
-  --cranberry-tint: rgba(200, 90, 84, 0.08);
+  --olive-tint: rgba(126, 123, 82, 0.06);
+  --mint-tint: rgba(143, 168, 136, 0.08);
+  --amber-tint: rgba(212, 196, 168, 0.08);
+  --cranberry-tint: rgba(166, 139, 139, 0.08);
   
   /* Semantic Colors */
   --text-primary: var(--ink);
-  --text-secondary: #6B6B66;
-  --text-muted: #9A9A94;
+  --text-secondary: #5C5C5C;
+  --text-muted: #8B8B8B;
   
   /* ========================================
-     Typography
+     Typography - Elegant Minimal
      ======================================== */
   
-  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-display: "Cormorant Garamond", Georgia, serif;  /* Elegant, refined headings */
+  --font-sans: "Raleway", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
   
-  /* Font Sizes & Line Heights */
-  --fs-h1: 28px;
-  --lh-h1: 36px;
-  --fs-h2: 22px;
-  --lh-h2: 30px;
-  --fs-h3: 18px;
-  --lh-h3: 26px;
-  --fs-body: 16px;
-  --lh-body: 24px;
-  --fs-small: 14px;
-  --lh-small: 20px;
+  /* Font Sizes & Line Heights - Generous spacing */
+  --fs-h1: 36px;
+  --lh-h1: 48px;
+  --fs-h2: 28px;
+  --lh-h2: 38px;
+  --fs-h3: 22px;
+  --lh-h3: 32px;
+  --fs-body: 17px;
+  --lh-body: 28px;
+  --fs-small: 15px;
+  --lh-small: 24px;
   
-  /* Font Weights */
+  /* Font Weights - Light and elegant */
+  --fw-light: 300;
   --fw-regular: 400;
   --fw-medium: 500;
   --fw-semibold: 600;
   --fw-bold: 700;
   
   /* ========================================
-     Spacing Scale (4pt base)
+     Spacing Scale (Generous negative space)
      ======================================== */
   
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+  --space-10: 64px;
+  --space-12: 80px;
+  --space-16: 120px;
   
   /* ========================================
-     Border Radius
+     Border Radius - Soft, gentle curves
      ======================================== */
   
-  --radius-base: 12px;      /* Buttons, inputs */
-  --radius-card: 16px;      /* Cards, panels */
-  --radius-modal: 20px;     /* Modals, sheets */
+  --radius-base: 16px;      /* Buttons, inputs */
+  --radius-card: 24px;      /* Cards, panels */
+  --radius-modal: 32px;     /* Modals, sheets */
   --radius-full: 9999px;    /* Pills, avatars */
   
   /* ========================================
-     Shadows (Subtle, Professional)
+     Shadows (Soft, Subtle)
      ======================================== */
   
-  --shadow-low: 0 1px 3px rgba(26, 26, 26, 0.04), 0 1px 2px rgba(26, 26, 26, 0.02);
-  --shadow-mid: 0 4px 12px rgba(26, 26, 26, 0.06), 0 2px 4px rgba(26, 26, 26, 0.03);
-  --shadow-high: 0 12px 32px rgba(26, 26, 26, 0.08), 0 4px 8px rgba(26, 26, 26, 0.04);
-  --shadow-focus: 0 0 0 3px rgba(212, 165, 116, 0.2);
+  --shadow-low: 0 2px 8px rgba(126, 123, 82, 0.04), 0 1px 4px rgba(126, 123, 82, 0.02);
+  --shadow-mid: 0 8px 24px rgba(126, 123, 82, 0.06), 0 4px 12px rgba(126, 123, 82, 0.03);
+  --shadow-high: 0 16px 48px rgba(126, 123, 82, 0.08), 0 8px 24px rgba(126, 123, 82, 0.04);
+  --shadow-focus: 0 0 0 4px rgba(126, 123, 82, 0.15);
+  
+  /* Soft glow effects */
+  --glow-champagne: 0 0 32px rgba(239, 226, 211, 0.4);
+  --glow-olive: 0 0 24px rgba(126, 123, 82, 0.2);
   
   /* ========================================
-     Motion & Transitions
+     Motion & Transitions - Soft, elegant
      ======================================== */
   
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);   /* Smooth, natural easing */
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);   /* Hover states */
-  --t-fast: 150ms;          /* Micro interactions */
-  --t-base: 240ms;          /* Standard transitions */
-  --t-slow: 400ms;          /* Entrances, exits */
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);   /* Elegant, refined easing */
+  --ease-out: cubic-bezier(0, 0, 0.3, 1);   /* Gentle deceleration */
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);   /* Smooth both ways */
+  --t-fast: 200ms;          /* Micro interactions */
+  --t-base: 350ms;          /* Standard transitions */
+  --t-slow: 600ms;          /* Entrances, exits */
   
   /* ========================================
-     Component Tokens
+     Component Tokens (Soft, Minimal)
      ======================================== */
   
-  /* Buttons */
-  --btn-height: 44px;       /* Minimum touch target */
-  --btn-padding-x: 16px;
+  /* Buttons - Clean, minimal touch targets */
+  --btn-height: 48px;       /* Generous touch target */
+  --btn-padding-x: 24px;    /* More breathing room */
   --btn-radius: var(--radius-base);
   --btn-font-size: var(--fs-body);
   --btn-font-weight: var(--fw-medium);
+  --btn-bg: var(--olive);
+  --btn-text: var(--pearl);
+  --btn-hover: #6D6A48;     /* Darker olive */
+  --btn-secondary-bg: var(--champagne);
+  --btn-secondary-text: var(--ink);
+  --btn-secondary-hover: #E5D5C0;   /* Darker champagne */
   
-  /* Inputs */
-  --input-height: 44px;
+  /* Inputs - Light, open fields */
+  --input-height: 48px;
   --input-radius: var(--radius-base);
-  --input-border: 1px solid var(--slate);
-  --input-padding-x: 12px;
+  --input-border: 1px solid #D9D5CC;
+  --input-padding-x: 16px;
+  --input-bg: var(--pearl);
+  --input-focus: var(--olive);
+  --input-text: var(--ink);
+  --input-placeholder: var(--warm-gray);
   
-  /* Cards */
-  --card-bg: var(--cloud);
+  /* Cards - Soft, minimal containers */
+  --card-bg: var(--pearl);
   --card-radius: var(--radius-card);
-  --card-shadow: var(--shadow-mid);
-  --card-padding: var(--space-5);
+  --card-shadow: var(--shadow-low);
+  --card-padding: var(--space-6);
+  --card-border: 1px solid #E8E4DB;
+  --card-hover-shadow: var(--shadow-mid);
   
-  /* Focus Ring */
-  --focus-ring: 2px solid var(--gold);
-  --focus-offset: 2px;
+  /* Panels - Subtle layering */
+  --panel-bg: #FDFDFB;         /* Off-white for depth */
+  
+  /* Toast Messages - Soft, muted tones */
+  --toast-success-bg: rgba(126, 123, 82, 0.08);
+  --toast-success-border: rgba(126, 123, 82, 0.2);
+  --toast-success-text: #5E5C3F;
+  --toast-error-bg: rgba(180, 95, 85, 0.06);
+  --toast-error-border: rgba(180, 95, 85, 0.15);
+  --toast-error-text: #A84838;
+  --toast-info-bg: rgba(176, 164, 155, 0.08);
+  --toast-info-border: rgba(176, 164, 155, 0.2);
+  --toast-info-text: #7A7169;
+  
+  /* Progress & Status - Elegant indicators */
+  --progress-track: #E8E4DB;
+  --progress-fill: var(--olive);
+  --status-complete: var(--olive);
+  --status-pending: var(--warm-gray);
+  --status-disabled: #D9D5CC;
+  
+  /* Overlays & Modals - Soft, dreamy */
+  --overlay-bg: rgba(44, 44, 44, 0.25);
+  --modal-bg: var(--pearl);
+  --modal-shadow: var(--shadow-high);
+  
+  /* Gradients - Barely-there whispers */
+  --gradient-champagne: linear-gradient(135deg, rgba(239, 226, 211, 0.2) 0%, rgba(239, 226, 211, 0) 70%);
+  --gradient-olive: linear-gradient(180deg, rgba(126, 123, 82, 0.04) 0%, rgba(126, 123, 82, 0) 100%);
+  --gradient-warmgray: linear-gradient(90deg, rgba(176, 164, 155, 0.08) 0%, rgba(176, 164, 155, 0) 60%);
+  --bg-gradient: linear-gradient(135deg, rgba(239, 226, 211, 0.05) 0%, rgba(176, 164, 155, 0.03) 50%, rgba(126, 123, 82, 0.02) 100%);
+  
+  /* Focus Ring - Soft, clear */
+  --focus-ring: 2px solid var(--olive);
+  --focus-offset: 3px;
 }
 
 /* ========================================
