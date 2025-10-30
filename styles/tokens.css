@@ -1,43 +1,44 @@
 :root{
   /* ========================================
      Legacy Token Mappings (Bridge Layer)
-     Maps old token names to new brand tokens
+     Maps old token names to Desi Heritage brand tokens
      ======================================== */
   
-  /* Backgrounds - Now light/warm */
+  /* Backgrounds - Warm ivory palette */
   --bg: var(--pearl);
-  --bg-secondary: var(--cloud);
+  --bg-secondary: var(--mist);
   --card: var(--cloud);
-  --card-hover: #F9F9F7;
+  --card-hover: #FFFEFA;
   --border: var(--slate);
   
-  /* Text - Dark on light */
+  /* Text - Dark on light ivory */
   --text: var(--ink);
-  --text-secondary: #6B7280;
-  --muted: #9CA3AF;
+  --text-secondary: #4A4A4A;
+  --muted: #7A7A7A;
   
-  /* Brand colors - Now Coral primary */
-  --brand: var(--coral);
-  --brand-hover: var(--coral-hover);
-  --brand-light: var(--coral-tint);
-  --accent: var(--gold);
-  --accent-hover: #FFB020;
+  /* Brand colors - Indigo & Saffron */
+  --brand: var(--primary);      /* Indigo */
+  --brand-hover: var(--primary-hover);
+  --brand-light: var(--primary-light);
+  --accent: var(--gold);        /* Saffron accent */
+  --accent-hover: #C28F00;
+  --accent-light: var(--accent-light);
   
-  /* Link colors */
-  --link: var(--coral);
-  --link-hover: var(--coral-hover);
+  /* Link colors - Saffron for cultural warmth */
+  --link: var(--gold);
+  --link-hover: #C28F00;
   
   /* Badge/pill colors */
-  --badge: var(--coral-tint);
-  --badge-text: var(--coral);
+  --badge: var(--accent-light);
+  --badge-text: var(--gold);
   
   /* Status colors */
   --success: var(--mint);
   --success-color: var(--mint);
   --success-light: var(--mint-tint);
-  --danger: var(--cranberry);
-  --error-color: var(--cranberry);
-  --error-light: var(--cranberry-tint);
+  --danger: var(--rosewood);     /* Use rosewood for danger */
+  --error-color: var(--rosewood);
+  --error-light: var(--rosewood-tint);
   --warning: var(--amber);
   --warning-color: var(--amber);
   --warning-light: var(--amber-tint);
@@ -48,17 +49,17 @@
   --radius-lg: var(--radius-modal);
   --shadow: var(--shadow-mid);
   --shadow-lg: var(--shadow-high);
-  --glow: 0 0 20px rgba(255, 106, 92, 0.2);
+  --glow: var(--glow-saffron);
   
   /* Transitions */
   --transition: all var(--t-base) var(--ease);
   --transition-slow: all var(--t-slow) var(--ease);
   
-  /* Glassmorphism (updated for light mode) */
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.1);
+  /* Glassmorphism (updated for warm ivory mode) */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(43, 46, 131, 0.1);
   
-  /* Gradients - Warm accents */
-  --gradient-brand: linear-gradient(135deg, var(--coral) 0%, var(--gold) 100%);
-  --gradient-accent: linear-gradient(135deg, var(--coral) 0%, var(--amber) 100%);
+  /* Gradients - Desi Heritage */
+  --gradient-brand: var(--gradient-heritage);
+  --gradient-accent: var(--gradient-saffron);
 }

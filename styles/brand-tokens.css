@@ -1,64 +1,69 @@
 /**
  * Party App - Brand Tokens
- * Design system foundation for consistent, warm, celebratory UI
+ * Desi Heritage Meets Tech - Cultural richness with minimal UX
+ * Pakistani craft & music heritage in a clean mobile UI
  */
 
 :root {
   /* ========================================
-     Brand Colors
+     Brand Colors - Desi Heritage
      ======================================== */
   
-  /* Neutrals - Sophisticated, warm grays */
+  /* Neutrals - Warm, elegant */
   --ink: #1A1A1A;           /* Primary text, deep charcoal */
-  --pearl: #FAFAF9;         /* Background/canvas, warm white */
+  --pearl: #FEF7E5;         /* Background/canvas, warm ivory */
   --cloud: #FFFFFF;         /* Cards, elevated surfaces */
-  --slate: #E5E5E0;         /* Borders, dividers - warm gray */
-  --mist: #F5F5F3;          /* Subtle backgrounds */
+  --slate: #E8DCC8;         /* Borders, dividers - warm beige */
+  --mist: #FBF3DD;          /* Subtle backgrounds */
   
-  /* Primary Palette - Refined, professional */
-  --primary: #2D3142;       /* Deep navy-blue for trust/stability */
-  --primary-hover: #1F2332;
-  --primary-light: rgba(45, 49, 66, 0.08);
+  /* Primary Palette - Indigo & Rosewood */
+  --primary: #2B2E83;       /* Indigo - rich and cultural */
+  --primary-hover: #1F2261;
+  --primary-light: rgba(43, 46, 131, 0.08);
   
-  --accent: #D4A574;        /* Warm gold - celebratory but professional */
-  --accent-hover: #C89660;
-  --accent-light: rgba(212, 165, 116, 0.12);
+  --accent: #E1A500;        /* Saffron - warm and vibrant */
+  --accent-hover: #C28F00;
+  --accent-light: rgba(225, 165, 0, 0.12);
   
-  --coral: #D4A574;         /* Map to accent for backward compatibility */
-  --coral-hover: #C89660;
-  --coral-ink: #FFFFFF;
-  --coral-tint: rgba(212, 165, 116, 0.12);
+  --coral: #E1A500;         /* Map to saffron for backward compatibility */
+  --coral-hover: #C28F00;
+  --coral-ink: #1A1A1A;
+  --coral-tint: rgba(225, 165, 0, 0.12);
   
-  /* Accent Colors - Muted, professional */
-  --gold: #D4A574;          /* Focus rings, highlights */
+  /* Accent Colors - Rosewood & Supporting */
+  --gold: #E1A500;          /* Saffron highlights */
+  --rosewood: #4A171E;      /* Deep rosewood - rich accent */
   --mint: #2D9D7C;          /* Success - sophisticated green */
-  --amber: #E3A05A;         /* Warnings - muted orange */
-  --cranberry: #C85A54;     /* Errors - muted red */
+  --amber: #E1A500;         /* Warnings - use saffron */
+  --cranberry: #4A171E;     /* Errors - use rosewood */
   
   /* Tints (subtle backgrounds) */
+  --rosewood-tint: rgba(74, 23, 30, 0.08);
   --mint-tint: rgba(45, 157, 124, 0.08);
-  --amber-tint: rgba(227, 160, 90, 0.08);
-  --cranberry-tint: rgba(200, 90, 84, 0.08);
+  --amber-tint: rgba(225, 165, 0, 0.08);
+  --cranberry-tint: rgba(74, 23, 30, 0.08);
   
   /* Semantic Colors */
   --text-primary: var(--ink);
-  --text-secondary: #6B6B66;
-  --text-muted: #9A9A94;
+  --text-secondary: #4A4A4A;
+  --text-muted: #7A7A7A;
   
   /* ========================================
-     Typography
+     Typography - Desi Heritage
      ======================================== */
   
-  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-display: "Rubik", sans-serif;  /* Clean, modern headings */
+  --font-sans: "Lato", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-urdu: "Noto Nastaliq Urdu", serif;  /* For Urdu/cultural elements */
   --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
   
   /* Font Sizes & Line Heights */
-  --fs-h1: 28px;
-  --lh-h1: 36px;
-  --fs-h2: 22px;
-  --lh-h2: 30px;
-  --fs-h3: 18px;
-  --lh-h3: 26px;
+  --fs-h1: 32px;
+  --lh-h1: 40px;
+  --fs-h2: 24px;
+  --lh-h2: 32px;
+  --fs-h3: 20px;
+  --lh-h3: 28px;
   --fs-body: 16px;
   --lh-body: 24px;
   --fs-small: 14px;
@@ -86,59 +91,72 @@
   --space-16: 64px;
   
   /* ========================================
-     Border Radius
+     Border Radius - Minimal Clean
      ======================================== */
   
-  --radius-base: 12px;      /* Buttons, inputs */
-  --radius-card: 16px;      /* Cards, panels */
-  --radius-modal: 20px;     /* Modals, sheets */
+  --radius-base: 8px;       /* Buttons, inputs - minimal */
+  --radius-card: 12px;      /* Cards, panels - clean */
+  --radius-modal: 16px;     /* Modals, sheets */
   --radius-full: 9999px;    /* Pills, avatars */
   
   /* ========================================
-     Shadows (Subtle, Professional)
+     Shadows (Subtle, Flat Design)
      ======================================== */
   
-  --shadow-low: 0 1px 3px rgba(26, 26, 26, 0.04), 0 1px 2px rgba(26, 26, 26, 0.02);
-  --shadow-mid: 0 4px 12px rgba(26, 26, 26, 0.06), 0 2px 4px rgba(26, 26, 26, 0.03);
-  --shadow-high: 0 12px 32px rgba(26, 26, 26, 0.08), 0 4px 8px rgba(26, 26, 26, 0.04);
-  --shadow-focus: 0 0 0 3px rgba(212, 165, 116, 0.2);
+  --shadow-low: 0 1px 3px rgba(43, 46, 131, 0.08), 0 1px 2px rgba(43, 46, 131, 0.06);
+  --shadow-mid: 0 4px 12px rgba(43, 46, 131, 0.1), 0 2px 6px rgba(43, 46, 131, 0.08);
+  --shadow-high: 0 8px 24px rgba(43, 46, 131, 0.12), 0 4px 12px rgba(43, 46, 131, 0.1);
+  --shadow-focus: 0 0 0 3px rgba(225, 165, 0, 0.3);
+  
+  /* Glow effects for accents */
+  --glow-saffron: 0 0 16px rgba(225, 165, 0, 0.3);
+  --glow-indigo: 0 0 16px rgba(43, 46, 131, 0.2);
   
   /* ========================================
-     Motion & Transitions
+     Motion & Transitions - Smooth
      ======================================== */
   
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);   /* Smooth, natural easing */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);   /* Material Design easing */
   --ease-out: cubic-bezier(0, 0, 0.2, 1);   /* Hover states */
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);  /* Playful bounce */
   --t-fast: 150ms;          /* Micro interactions */
-  --t-base: 240ms;          /* Standard transitions */
+  --t-base: 250ms;          /* Standard transitions */
   --t-slow: 400ms;          /* Entrances, exits */
   
   /* ========================================
      Component Tokens
      ======================================== */
   
-  /* Buttons */
-  --btn-height: 44px;       /* Minimum touch target */
-  --btn-padding-x: 16px;
+  /* Buttons - Flat, minimal */
+  --btn-height: 48px;
+  --btn-padding-x: 24px;
   --btn-radius: var(--radius-base);
   --btn-font-size: var(--fs-body);
-  --btn-font-weight: var(--fw-medium);
+  --btn-font-weight: var(--fw-semibold);
   
   /* Inputs */
-  --input-height: 44px;
+  --input-height: 48px;
   --input-radius: var(--radius-base);
   --input-border: 1px solid var(--slate);
-  --input-padding-x: 12px;
+  --input-padding-x: 16px;
   
-  /* Cards */
+  /* Cards - Flat with borders */
   --card-bg: var(--cloud);
   --card-radius: var(--radius-card);
-  --card-shadow: var(--shadow-mid);
-  --card-padding: var(--space-5);
+  --card-shadow: var(--shadow-low);
+  --card-padding: var(--space-6);
   
   /* Focus Ring */
-  --focus-ring: 2px solid var(--gold);
+  --focus-ring: 3px solid var(--accent);
   --focus-offset: 2px;
+  
+  /* Gradients - Desi Heritage */
+  --gradient-heritage: linear-gradient(135deg, #2B2E83 0%, #4A171E 100%);
+  --gradient-saffron: linear-gradient(135deg, #E1A500 0%, #F5B800 100%);
+  --gradient-sunset: linear-gradient(135deg, #E1A500 0%, #4A171E 100%);
+  
+  /* Patterns - Mughal geometric (via CSS) */
+  --pattern-opacity: 0.03;
 }
 
 /* ========================================
