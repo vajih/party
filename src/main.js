@@ -1371,6 +1371,7 @@ async function getGuestProgressSteps(games, partyId, userId) {
     steps.push({
       number: index + 1,
       gameId: game.id,
+      gameType: type,
       title: game.title || type,
       type: type,
       description: getStepDescription(type),
@@ -1420,8 +1421,11 @@ function buildProgressTracker(steps) {
     
     const statusIcon = step.isCompleted ? '✓' : step.number;
     
-    const badgeText = step.isCompleted ? 'Done' : 
-                     step.isActive ? 'Start' : 'Locked';
+    // For Song Requests (favorite_song), always show "Add" to encourage more submissions
+    const isSongRequest = step.gameType === 'favorite_song';
+    const badgeText = isSongRequest ? 'Add' :
+                     (step.isCompleted ? 'Done' : 
+                     step.isActive ? 'Start' : 'Locked');
     
     return `
       <div class="progress-step ${statusClass}" data-game-id="${step.gameId}">
