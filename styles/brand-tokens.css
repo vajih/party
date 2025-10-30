@@ -1,79 +1,89 @@
 /**
- * Party App - Brand Tokens
- * Design system foundation for consistent, warm, celebratory UI
+ * Party App - HyperTech Dark Theme
+ * NASA Command Center / Star Wars Holographic Interface
+ * High-tech, futuristic, digital warfare aesthetic
  */
 
 :root {
   /* ========================================
-     Brand Colors
+     Core Colors - Dark Command Center
      ======================================== */
   
-  /* Neutrals - Sophisticated, warm grays */
-  --ink: #1A1A1A;           /* Primary text, deep charcoal */
-  --pearl: #FAFAF9;         /* Background/canvas, warm white */
-  --cloud: #FFFFFF;         /* Cards, elevated surfaces */
-  --slate: #E5E5E0;         /* Borders, dividers - warm gray */
-  --mist: #F5F5F3;          /* Subtle backgrounds */
+  /* Neutrals - Deep space blacks and grays */
+  --void: #0A0E17;          /* Deep space background */
+  --hull: #151A25;          /* Elevated surface, panels */
+  --steel: #1E2536;         /* Cards, modules */
+  --metal: #2A3447;         /* Interactive surfaces */
+  --smoke: #3D4A5F;         /* Borders, dividers */
+  --fog: #546279;           /* Muted elements */
   
-  /* Primary Palette - Refined, professional */
-  --primary: #2D3142;       /* Deep navy-blue for trust/stability */
-  --primary-hover: #1F2332;
-  --primary-light: rgba(45, 49, 66, 0.08);
+  /* Primary - Cyan Holographic Glow */
+  --primary: #00D9FF;       /* Electric cyan - holographic displays */
+  --primary-hover: #00F0FF;
+  --primary-dark: #0098B8;
+  --primary-glow: rgba(0, 217, 255, 0.25);
   
-  --accent: #D4A574;        /* Warm gold - celebratory but professional */
-  --accent-hover: #C89660;
-  --accent-light: rgba(212, 165, 116, 0.12);
+  /* Accent - Electric Magenta/Purple */
+  --accent: #FF006E;        /* Hot magenta - critical alerts */
+  --accent-hover: #FF3D8F;
+  --accent-glow: rgba(255, 0, 110, 0.25);
   
-  --coral: #D4A574;         /* Map to accent for backward compatibility */
-  --coral-hover: #C89660;
-  --coral-ink: #FFFFFF;
-  --coral-tint: rgba(212, 165, 116, 0.12);
+  /* Secondary - Neon Orange */
+  --warning: #FF6B00;       /* Warning systems - bright orange */
+  --warning-hover: #FF8533;
+  --warning-glow: rgba(255, 107, 0, 0.25);
   
-  /* Accent Colors - Muted, professional */
-  --gold: #D4A574;          /* Focus rings, highlights */
-  --mint: #2D9D7C;          /* Success - sophisticated green */
-  --amber: #E3A05A;         /* Warnings - muted orange */
-  --cranberry: #C85A54;     /* Errors - muted red */
+  /* Success - Matrix Green */
+  --success: #00FF88;       /* System operational - bright green */
+  --success-hover: #33FFA3;
+  --success-glow: rgba(0, 255, 136, 0.25);
   
-  /* Tints (subtle backgrounds) */
-  --mint-tint: rgba(45, 157, 124, 0.08);
-  --amber-tint: rgba(227, 160, 90, 0.08);
-  --cranberry-tint: rgba(200, 90, 84, 0.08);
+  /* Error - Alert Red */
+  --danger: #FF3366;        /* System failure - bright red */
+  --danger-hover: #FF5C85;
+  --danger-glow: rgba(255, 51, 102, 0.25);
   
-  /* Semantic Colors */
-  --text-primary: var(--ink);
-  --text-secondary: #6B6B66;
-  --text-muted: #9A9A94;
+  /* Text Colors - High contrast for readability */
+  --text-primary: #E8EDF5;      /* Almost white - primary text */
+  --text-secondary: #B4BFCF;    /* Muted text */
+  --text-muted: #7A8699;        /* Disabled text */
+  --text-inverse: #0A0E17;      /* Text on bright backgrounds */
   
   /* ========================================
-     Typography
+     Typography - Futuristic Sans
      ======================================== */
   
-  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+  --font-display: "Orbitron", "Rajdhani", "Exo 2", sans-serif;  /* Tech display font */
+  --font-sans: "Inter", "Roboto", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Courier New", monospace;
   
-  /* Font Sizes & Line Heights */
-  --fs-h1: 28px;
-  --lh-h1: 36px;
-  --fs-h2: 22px;
-  --lh-h2: 30px;
-  --fs-h3: 18px;
-  --lh-h3: 26px;
+  /* Font Sizes - Larger for readability on dark */
+  --fs-h1: 40px;
+  --lh-h1: 52px;
+  --fs-h2: 32px;
+  --lh-h2: 42px;
+  --fs-h3: 24px;
+  --lh-h3: 34px;
   --fs-body: 16px;
-  --lh-body: 24px;
+  --lh-body: 26px;
   --fs-small: 14px;
-  --lh-small: 20px;
+  --lh-small: 22px;
+  --fs-tiny: 12px;
+  --lh-tiny: 18px;
   
   /* Font Weights */
+  --fw-light: 300;
   --fw-regular: 400;
   --fw-medium: 500;
   --fw-semibold: 600;
   --fw-bold: 700;
+  --fw-black: 900;
   
   /* ========================================
-     Spacing Scale (4pt base)
+     Spacing Scale - Tight and precise
      ======================================== */
   
+  --space-0: 0px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -84,62 +94,185 @@
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
+  --space-20: 80px;
   
   /* ========================================
-     Border Radius
+     Border Radius - Sharp edges, minimal curves
      ======================================== */
   
-  --radius-base: 12px;      /* Buttons, inputs */
-  --radius-card: 16px;      /* Cards, panels */
-  --radius-modal: 20px;     /* Modals, sheets */
-  --radius-full: 9999px;    /* Pills, avatars */
+  --radius-none: 0px;
+  --radius-sm: 4px;         /* Buttons, inputs - sharp */
+  --radius-base: 6px;       /* Cards, small panels */
+  --radius-md: 8px;         /* Medium panels */
+  --radius-lg: 12px;        /* Large modals */
+  --radius-full: 9999px;    /* Pills, badges */
   
   /* ========================================
-     Shadows (Subtle, Professional)
+     Shadows - Glowing, futuristic
      ======================================== */
   
-  --shadow-low: 0 1px 3px rgba(26, 26, 26, 0.04), 0 1px 2px rgba(26, 26, 26, 0.02);
-  --shadow-mid: 0 4px 12px rgba(26, 26, 26, 0.06), 0 2px 4px rgba(26, 26, 26, 0.03);
-  --shadow-high: 0 12px 32px rgba(26, 26, 26, 0.08), 0 4px 8px rgba(26, 26, 26, 0.04);
-  --shadow-focus: 0 0 0 3px rgba(212, 165, 116, 0.2);
+  --shadow-base: 0 2px 8px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.8);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.9);
+  
+  /* Glowing shadows - holographic effects */
+  --shadow-glow-cyan: 0 0 20px var(--primary-glow), 0 0 40px var(--primary-glow);
+  --shadow-glow-magenta: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow);
+  --shadow-glow-green: 0 0 20px var(--success-glow), 0 0 40px var(--success-glow);
+  --shadow-glow-orange: 0 0 20px var(--warning-glow), 0 0 40px var(--warning-glow);
+  
+  /* Focus rings - bright and visible */
+  --shadow-focus: 0 0 0 3px var(--primary-glow), var(--shadow-glow-cyan);
   
   /* ========================================
-     Motion & Transitions
+     Motion & Transitions - Snappy, digital
      ======================================== */
   
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);   /* Smooth, natural easing */
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);   /* Hover states */
-  --t-fast: 150ms;          /* Micro interactions */
-  --t-base: 240ms;          /* Standard transitions */
-  --t-slow: 400ms;          /* Entrances, exits */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  --t-instant: 0ms;
+  --t-fast: 150ms;          /* Quick responses */
+  --t-base: 250ms;          /* Standard transitions */
+  --t-slow: 400ms;          /* Complex animations */
+  --t-slower: 600ms;        /* Dramatic entrances */
   
   /* ========================================
-     Component Tokens
+     Component Tokens - High-Tech UI
      ======================================== */
   
-  /* Buttons */
-  --btn-height: 44px;       /* Minimum touch target */
-  --btn-padding-x: 16px;
-  --btn-radius: var(--radius-base);
+  /* Buttons - Glowing, futuristic */
+  --btn-height: 44px;
+  --btn-padding-x: 24px;
+  --btn-padding-y: 12px;
+  --btn-radius: var(--radius-sm);
   --btn-font-size: var(--fs-body);
-  --btn-font-weight: var(--fw-medium);
+  --btn-font-weight: var(--fw-semibold);
+  --btn-text-transform: uppercase;
+  --btn-letter-spacing: 0.05em;
   
-  /* Inputs */
+  /* Button Primary - Cyan glow */
+  --btn-primary-bg: var(--primary);
+  --btn-primary-text: var(--void);
+  --btn-primary-hover: var(--primary-hover);
+  --btn-primary-shadow: var(--shadow-glow-cyan);
+  
+  /* Button Secondary - Steel with cyan border */
+  --btn-secondary-bg: transparent;
+  --btn-secondary-text: var(--primary);
+  --btn-secondary-border: 2px solid var(--primary);
+  --btn-secondary-hover-bg: rgba(0, 217, 255, 0.1);
+  
+  /* Button Danger - Magenta glow */
+  --btn-danger-bg: var(--accent);
+  --btn-danger-text: var(--text-inverse);
+  --btn-danger-shadow: var(--shadow-glow-magenta);
+  
+  /* Inputs - Dark with cyan accents */
   --input-height: 44px;
-  --input-radius: var(--radius-base);
-  --input-border: 1px solid var(--slate);
-  --input-padding-x: 12px;
+  --input-padding-x: 16px;
+  --input-radius: var(--radius-sm);
+  --input-bg: var(--hull);
+  --input-border: 1px solid var(--smoke);
+  --input-text: var(--text-primary);
+  --input-placeholder: var(--text-muted);
+  --input-focus-border: var(--primary);
+  --input-focus-shadow: var(--shadow-focus);
   
-  /* Cards */
-  --card-bg: var(--cloud);
-  --card-radius: var(--radius-card);
-  --card-shadow: var(--shadow-mid);
-  --card-padding: var(--space-5);
+  /* Cards - Elevated dark panels */
+  --card-bg: var(--steel);
+  --card-border: 1px solid var(--smoke);
+  --card-radius: var(--radius-base);
+  --card-padding: var(--space-6);
+  --card-shadow: var(--shadow-md);
+  --card-hover-shadow: var(--shadow-lg);
   
-  /* Focus Ring */
-  --focus-ring: 2px solid var(--gold);
-  --focus-offset: 2px;
+  /* Panels - Slightly lighter than cards */
+  --panel-bg: var(--hull);
+  --panel-border: 1px solid var(--smoke);
+  
+  /* Toast Messages - Bright alerts */
+  --toast-success-bg: rgba(0, 255, 136, 0.15);
+  --toast-success-border: var(--success);
+  --toast-success-text: var(--success);
+  --toast-error-bg: rgba(255, 51, 102, 0.15);
+  --toast-error-border: var(--danger);
+  --toast-error-text: var(--danger);
+  --toast-warning-bg: rgba(255, 107, 0, 0.15);
+  --toast-warning-border: var(--warning);
+  --toast-warning-text: var(--warning);
+  --toast-info-bg: rgba(0, 217, 255, 0.15);
+  --toast-info-border: var(--primary);
+  --toast-info-text: var(--primary);
+  
+  /* Progress & Status - Neon indicators */
+  --progress-track: var(--smoke);
+  --progress-fill: var(--primary);
+  --status-active: var(--success);
+  --status-pending: var(--warning);
+  --status-error: var(--danger);
+  --status-disabled: var(--fog);
+  
+  /* Overlays - Deep space darkness */
+  --overlay-bg: rgba(10, 14, 23, 0.85);
+  --modal-bg: var(--steel);
+  --modal-border: 1px solid var(--smoke);
+  --modal-shadow: var(--shadow-xl);
+  
+  /* ========================================
+     Gradients - Holographic Effects
+     ======================================== */
+  
+  --gradient-cyber: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  --gradient-hologram: linear-gradient(45deg, var(--primary) 0%, var(--success) 50%, var(--warning) 100%);
+  --gradient-matrix: linear-gradient(180deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 255, 136, 0) 100%);
+  --gradient-scan: linear-gradient(90deg, transparent 0%, var(--primary-glow) 50%, transparent 100%);
+  
+  /* Background gradients - subtle depth */
+  --bg-gradient: radial-gradient(ellipse at top, rgba(0, 217, 255, 0.05) 0%, transparent 50%),
+                 radial-gradient(ellipse at bottom right, rgba(255, 0, 110, 0.03) 0%, transparent 50%);
+  
+  /* ========================================
+     Grid & Borders - Technical aesthetics
+     ======================================== */
+  
+  --grid-color: rgba(0, 217, 255, 0.1);
+  --grid-glow: rgba(0, 217, 255, 0.3);
+  --border-width: 1px;
+  --border-thick: 2px;
+  --border-style: solid;
 }
+
+/* ========================================
+   Dark Mode Support (Already implemented)
+   ======================================== */
+
+/* ========================================
+   Reduced Motion
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-instant: 0ms;
+    --t-fast: 0ms;
+    --t-base: 0ms;
+    --t-slow: 0ms;
+    --t-slower: 0ms;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 
 /* ========================================
    Dark Mode (Future Ready)

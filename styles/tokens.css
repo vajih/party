@@ -1,64 +1,81 @@
-:root{
+/**
+ * HyperTech Dark - Legacy Token Mappings
+ * Maps old names to new dark theme tokens
+ */
+
+:root {
   /* ========================================
-     Legacy Token Mappings (Bridge Layer)
-     Maps old token names to new brand tokens
+     Background Mappings - Dark Surfaces
      ======================================== */
   
-  /* Backgrounds - Now light/warm */
-  --bg: var(--pearl);
-  --bg-secondary: var(--cloud);
-  --card: var(--cloud);
-  --card-hover: #F9F9F7;
-  --border: var(--slate);
+  --bg: var(--void);                    /* #0A0E17 - Deep space */
+  --bg-secondary: var(--hull);          /* #151A25 - Elevated */
+  --card: var(--steel);                 /* #1E2536 - Card panels */
+  --card-hover: var(--metal);           /* #2A3447 - Hover state */
+  --border: var(--smoke);               /* #3D4A5F - Borders */
   
-  /* Text - Dark on light */
-  --text: var(--ink);
-  --text-secondary: #6B7280;
-  --muted: #9CA3AF;
+  /* Text Mappings - High Contrast */
+  --text: var(--text-primary);          /* #E8EDF5 - Primary text */
+  --text-secondary: var(--text-secondary);  /* #B4BFCF - Secondary */
+  --muted: var(--text-muted);           /* #7A8699 - Muted */
   
-  /* Brand colors - Now Coral primary */
-  --brand: var(--coral);
-  --brand-hover: var(--coral-hover);
-  --brand-light: var(--coral-tint);
-  --accent: var(--gold);
-  --accent-hover: #FFB020;
+  /* Brand Colors - Cyan Primary */
+  --brand: var(--primary);              /* #00D9FF - Electric cyan */
+  --brand-hover: var(--primary-hover);  /* #00F0FF - Brighter cyan */
+  --brand-light: var(--primary-glow);   /* Cyan glow */
+  --accent: var(--accent);              /* #FF006E - Hot magenta */
+  --accent-hover: var(--accent-hover);  /* #FF3D8F - Lighter magenta */
   
-  /* Link colors */
-  --link: var(--coral);
-  --link-hover: var(--coral-hover);
+  /* Link Colors - Cyan Links */
+  --link: var(--primary);
+  --link-hover: var(--primary-hover);
   
-  /* Badge/pill colors */
-  --badge: var(--coral-tint);
-  --badge-text: var(--coral);
+  /* Badge Colors - Cyan Badges */
+  --badge: rgba(0, 217, 255, 0.15);
+  --badge-text: var(--primary);
   
-  /* Status colors */
-  --success: var(--mint);
-  --success-color: var(--mint);
-  --success-light: var(--mint-tint);
-  --danger: var(--cranberry);
-  --error-color: var(--cranberry);
-  --error-light: var(--cranberry-tint);
-  --warning: var(--amber);
-  --warning-color: var(--amber);
-  --warning-light: var(--amber-tint);
+  /* Status Colors - Neon Indicators */
+  --success: var(--success);            /* #00FF88 - Matrix green */
+  --success-color: var(--success);
+  --success-light: var(--success-glow);
+  --danger: var(--danger);              /* #FF3366 - Alert red */
+  --error-color: var(--danger);
+  --error-light: var(--danger-glow);
+  --warning: var(--warning);            /* #FF6B00 - Warning orange */
+  --warning-color: var(--warning);
+  --warning-light: var(--warning-glow);
   
-  /* Effects */
-  --radius: var(--radius-card);
-  --radius-sm: var(--radius-base);
-  --radius-lg: var(--radius-modal);
-  --shadow: var(--shadow-mid);
-  --shadow-lg: var(--shadow-high);
-  --glow: 0 0 20px rgba(255, 106, 92, 0.2);
+  /* Effects - Glowing, Futuristic */
+  --radius: var(--radius-base);         /* 6px - Sharp edges */
+  --radius-sm: var(--radius-sm);        /* 4px */
+  --radius-lg: var(--radius-lg);        /* 12px */
+  --shadow: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --glow: var(--shadow-glow-cyan);
   
-  /* Transitions */
-  --transition: all var(--t-base) var(--ease);
-  --transition-slow: all var(--t-slow) var(--ease);
+  /* Transitions - Snappy */
+  --transition: all var(--t-base) var(--ease-out);
+  --transition-slow: all var(--t-slow) var(--ease-out);
   
-  /* Glassmorphism (updated for light mode) */
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.1);
+  /* Glassmorphism - Dark Mode */
+  --glass-bg: rgba(30, 37, 54, 0.7);
+  --glass-border: rgba(0, 217, 255, 0.2);
   
-  /* Gradients - Warm accents */
-  --gradient-brand: linear-gradient(135deg, var(--coral) 0%, var(--gold) 100%);
-  --gradient-accent: linear-gradient(135deg, var(--coral) 0%, var(--amber) 100%);
+  /* Gradients - Cyber Effects */
+  --gradient-brand: var(--gradient-cyber);
+  --gradient-accent: var(--gradient-hologram);
+  
+  /* Legacy coral mappings for compatibility */
+  --coral: var(--primary);
+  --coral-hover: var(--primary-hover);
+  --coral-ink: var(--text-inverse);
+  --coral-tint: var(--primary-glow);
+  --mint: var(--success);
+  --mint-tint: var(--success-glow);
+  --amber: var(--warning);
+  --amber-tint: var(--warning-glow);
+  --cranberry: var(--danger);
+  --cranberry-tint: var(--danger-glow);
+  --gold: var(--primary);
 }
+

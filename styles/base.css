@@ -1,3 +1,18 @@
+/**
+ * HyperTech Dark Theme - Base Styles
+ * NASA Command Center / Star Wars Holographic Interface
+ */
+
+/* ========================================
+   Font Imports - Futuristic Typography
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ========================================
+   Global Reset
+   ======================================== */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -8,17 +23,21 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow-x: hidden;
   width: 100%;
 }
 
 body {
-  font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: var(--text);
-  background: var(--bg);
+  font-family: var(--font-sans);           /* Inter */
+  font-size: var(--fs-body);               /* 16px */
+  line-height: var(--lh-body);             /* 26px */
+  color: var(--text);                      /* #E8EDF5 */
+  background: var(--void);                 /* #0A0E17 - Deep space */
+  background-image: var(--bg-gradient);    /* Subtle radial gradients */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   max-width: 100vw;
+  font-weight: var(--fw-regular);
 }
 
 #app {
@@ -26,83 +45,183 @@ body {
   max-width: 100vw;
   margin: 0 auto;
   overflow-x: hidden;
+  position: relative;
 }
 
+/* Subtle scanning line effect - optional */
+#app::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-scan);
+  opacity: 0.3;
+  animation: scan 4s linear infinite;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes scan {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(100vh); }
+}
+
+/* ========================================
+   Typography - Tech Display Headers
+   ======================================== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);        /* Orbitron */
+  font-weight: var(--fw-bold);
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  text-shadow: 0 0 10px var(--primary-glow);
+}
+
+h1 {
+  font-size: var(--fs-h1);                 /* 40px */
+  line-height: var(--lh-h1);               /* 52px */
+  font-weight: var(--fw-black);            /* 900 */
+  color: var(--primary);                   /* Cyan */
+}
+
+h2 {
+  font-size: var(--fs-h2);                 /* 32px */
+  line-height: var(--lh-h2);               /* 42px */
+}
+
+h3 {
+  font-size: var(--fs-h3);                 /* 24px */
+  line-height: var(--lh-h3);               /* 34px */
+}
+
+/* ========================================
+   Links - Glowing Cyan
+   ======================================== */
+
 a {
-  color: var(--link);
+  color: var(--link);                      /* Cyan */
   text-decoration: none;
   transition: var(--transition);
+  position: relative;
 }
 
 a:hover {
-  color: var(--link-hover);
-  text-decoration: none;
+  color: var(--link-hover);                /* Brighter cyan */
+  text-shadow: var(--shadow-glow-cyan);
 }
+
+a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--primary);
+  transition: width var(--t-base) var(--ease-out);
+}
+
+a:hover::after {
+  width: 100%;
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+/* ========================================
+   Containers
+   ======================================== */
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px;
+  padding: var(--space-6);                 /* 24px */
   width: 100%;
   box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
   .container {
-    padding: 16px 12px;
+    padding: var(--space-4);               /* 16px */
   }
 }
 
-/* Modern Card Styling */
+/* ========================================
+   Cards - Dark Tech Panels
+   ======================================== */
+
 .card {
-  background: var(--card);
-  border: 1px solid var(--slate);
-  border-radius: var(--radius);
-  padding: 24px;
-  box-shadow: var(--shadow-low);
+  background: var(--card);                 /* #1E2536 - Steel */
+  border: var(--card-border);              /* Smoke border */
+  border-radius: var(--radius);            /* 6px - Sharp */
+  padding: var(--space-6);                 /* 24px */
+  box-shadow: var(--shadow);               /* Deep shadow */
   transition: var(--transition);
   max-width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
+  position: relative;
+}
+
+/* Holographic edge effect */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  opacity: 0.3;
 }
 
 @media (max-width: 768px) {
   .card {
-    padding: 16px;
+    padding: var(--space-4);               /* 16px */
   }
 }
 
 .card:hover {
-  box-shadow: var(--shadow-mid);
-  transform: translateY(-1px);
-  border-color: var(--accent);
+  box-shadow: var(--card-hover-shadow), var(--shadow-glow-cyan);
+  transform: translateY(-2px);
+  border-color: var(--primary);
 }
 
-/* Layout utilities */
+/* ========================================
+   Layout Utilities
+   ======================================== */
+
 .row {
   display: flex;
-  gap: 12px;
+  gap: var(--space-3);                     /* 12px */
   align-items: center;
   flex-wrap: wrap;
 }
 
 .stack {
   display: grid;
-  gap: 16px;
+  gap: var(--space-4);                     /* 16px */
 }
 
-/* Modern List Items */
+/* ========================================
+   List Items - Tech Modules
+   ======================================== */
+
 .list .item {
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 20px;
-  margin-bottom: 12px;
+  border: var(--card-border);
+  border-radius: var(--radius-sm);         /* 4px - Very sharp */
+  padding: var(--space-5);                 /* 20px */
+  margin-bottom: var(--space-3);           /* 12px */
   transition: var(--transition);
   position: relative;
   overflow: hidden;
 }
 
+/* Cyber accent line */
 .list .item::before {
   content: '';
   position: absolute;
@@ -110,145 +229,164 @@ a:hover {
   top: 0;
   height: 100%;
   width: 3px;
-  background: var(--gradient-brand);
+  background: var(--primary);
   opacity: 0;
-  transition: var(--transition);
+  transition: opacity var(--t-base) var(--ease-out);
+  box-shadow: var(--shadow-glow-cyan);
 }
 
 .list .item:hover {
-  background: var(--card-hover);
-  border-color: var(--brand);
+  background: var(--metal);
+  border-color: var(--primary);
   transform: translateX(4px);
+  box-shadow: var(--shadow-glow-cyan);
 }
 
 .list .item:hover::before {
   opacity: 1;
 }
 
-/* Modern Form Controls */
+/* ========================================
+   Form Controls - Futuristic Inputs
+   ======================================== */
+
 input, textarea, select, button {
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--slate);
-  background: var(--cloud);
-  color: var(--text);
+  padding: var(--space-3) var(--space-4);  /* 12px 16px */
+  border-radius: var(--radius-sm);         /* 4px */
+  border: var(--input-border);             /* Smoke border */
+  background: var(--input-bg);             /* Hull background */
+  color: var(--text);                      /* Light text */
   font: inherit;
+  font-size: var(--fs-body);
   transition: var(--transition);
   outline: none;
 }
 
 input:focus, textarea:focus, select:focus {
-  border-color: var(--accent);
-  background: var(--cloud);
-}
-
-input:focus-visible, textarea:focus-visible, select:focus-visible {
-  box-shadow: var(--shadow-focus);
-  border-color: var(--accent);
+  border-color: var(--input-focus-border);   /* Cyan */
+  background: var(--hull);
+  box-shadow: var(--input-focus-shadow);     /* Cyan glow */
 }
 
 input::placeholder, textarea::placeholder {
-  color: var(--text-muted);
+  color: var(--input-placeholder);         /* Muted gray */
 }
 
-/* Modern Buttons - Brand Aligned */
+/* ========================================
+   Buttons - Glowing Action Buttons
+   ======================================== */
+
 button {
-  min-height: var(--btn-height);
-  padding: 0 var(--btn-padding-x);
-  background: var(--accent);
-  color: var(--cloud);
-  font-weight: var(--fw-medium);
-  font-size: var(--btn-font-size);
+  min-height: var(--btn-height);           /* 44px */
+  padding: 0 var(--btn-padding-x);         /* 24px */
+  background: var(--btn-primary-bg);       /* Cyan */
+  color: var(--btn-primary-text);          /* Dark text on cyan */
+  font-weight: var(--btn-font-weight);     /* 600 semibold */
+  font-size: var(--btn-font-size);         /* 16px */
   border: none;
-  border-radius: var(--btn-radius);
+  border-radius: var(--btn-radius);        /* 4px */
   cursor: pointer;
   transition: all var(--t-base) var(--ease-out);
-  text-transform: none;
-  letter-spacing: -0.01em;
-  box-shadow: var(--shadow-low);
+  text-transform: var(--btn-text-transform);  /* UPPERCASE */
+  letter-spacing: var(--btn-letter-spacing);  /* 0.05em */
+  box-shadow: var(--btn-primary-shadow);   /* Cyan glow */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Holographic shimmer effect */
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left var(--t-slow) var(--ease-out);
+}
+
+button:hover::before {
+  left: 100%;
 }
 
 button:hover {
-  background: var(--accent-hover);
-  box-shadow: var(--shadow-mid);
+  background: var(--btn-primary-hover);    /* Brighter cyan */
+  box-shadow: var(--btn-primary-shadow), 0 0 30px var(--primary-glow);
+  transform: translateY(-1px);
 }
 
 button:active {
-  transform: translateY(1px);
-  box-shadow: var(--shadow-low);
+  transform: translateY(0px);
+  box-shadow: var(--btn-primary-shadow);
 }
 
 button:focus-visible {
   outline: none;
-  box-shadow: var(--shadow-focus), var(--shadow-mid);
+  box-shadow: var(--shadow-focus);
 }
 
+/* Button Variants */
 button.link {
   background: transparent;
-  border: 1px solid var(--slate);
-  color: var(--ink);
+  border: var(--btn-secondary-border);     /* Cyan border */
+  color: var(--btn-secondary-text);        /* Cyan text */
   box-shadow: none;
 }
 
 button.link:hover {
-  background: var(--mist);
-  border-color: var(--accent);
-  box-shadow: none;
-  transform: none;
+  background: var(--btn-secondary-hover-bg);  /* Subtle cyan tint */
+  box-shadow: var(--shadow-glow-cyan);
+  transform: translateY(0);
 }
 
 button.primary {
-  background: var(--primary);
-  color: var(--cloud);
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  box-shadow: var(--btn-primary-shadow);
 }
 
 button.primary:hover {
-  background: var(--primary-hover);
+  background: var(--btn-primary-hover);
 }
 
 button.secondary {
-  background: var(--mist);
-  color: var(--ink);
-  border: 1px solid var(--slate);
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  box-shadow: none;
 }
 
 button.secondary:hover {
-  background: var(--cloud);
-  border-color: var(--accent);
+  background: rgba(0, 217, 255, 0.1);
+  box-shadow: var(--shadow-glow-cyan);
 }
 
 button.danger {
-  background: transparent;
-  border: 1px solid var(--cranberry);
-  color: var(--cranberry);
-  box-shadow: none;
+  background: var(--btn-danger-bg);        /* Magenta */
+  color: var(--btn-danger-text);
+  box-shadow: var(--btn-danger-shadow);    /* Magenta glow */
 }
 
 button.danger:hover {
-  background: var(--cranberry-tint);
-  transform: none;
+  background: var(--accent-hover);
+  box-shadow: var(--btn-danger-shadow), 0 0 30px var(--accent-glow);
 }
 
 button:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+  filter: grayscale(1);
 }
 
-/* Typography */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 16px;
-  background: var(--gradient-brand);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+/* ========================================
+   Small Text & Muted
+   ======================================== */
 
 .small {
-  font-size: 13px;
+  font-size: var(--fs-small);              /* 14px */
   color: var(--text-secondary);
 }
 
@@ -256,89 +394,115 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--muted);
 }
 
-/* Modern Badges */
+/* ========================================
+   Badges - Neon Status Pills
+   ======================================== */
+
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--badge-text);
-  background: var(--badge);
+  gap: var(--space-2);                     /* 8px */
+  padding: var(--space-1) var(--space-3);  /* 4px 12px */
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-full);       /* Full pill */
+  font-size: var(--fs-small);              /* 14px */
+  font-weight: var(--fw-semibold);         /* 600 */
+  color: var(--primary);
+  background: var(--badge);                /* Subtle cyan bg */
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
+  box-shadow: var(--shadow-glow-cyan);
 }
 
 .badge.ok {
-  border-color: var(--success-color);
-  color: var(--success-color);
+  border-color: var(--success);
+  color: var(--success);
   background: var(--success-light);
+  box-shadow: var(--shadow-glow-green);
 }
 
 .badge.open {
-  border-color: var(--warning-color);
-  color: var(--warning-color);
+  border-color: var(--warning);
+  color: var(--warning);
   background: var(--warning-light);
+  box-shadow: var(--shadow-glow-orange);
 }
 
-/* Notice boxes */
+/* ========================================
+   Notice Boxes
+   ======================================== */
+
 .notice {
-  background: var(--success-light);
-  border: 1px solid var(--success-color);
-  color: var(--success-color);
-  padding: 16px;
+  background: var(--toast-success-bg);
+  border: 1px solid var(--toast-success-border);
+  color: var(--toast-success-text);
+  padding: var(--space-4);
   border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-glow-green);
 }
 
-/* Map styling */
+/* ========================================
+   Maps
+   ======================================== */
+
 .map {
   height: 240px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--smoke);
   border-radius: var(--radius-sm);
   overflow: hidden;
+  box-shadow: var(--shadow-md);
 }
 
 .map.red {
-  outline: 2px dashed var(--error-color);
+  outline: 2px dashed var(--danger);
+  box-shadow: var(--shadow-glow-magenta);
 }
 
-/* Album/Gallery Grid */
+/* ========================================
+   Album/Gallery Grid
+   ======================================== */
+
 .album-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .album-card img {
   width: 100%;
   height: auto;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  border: 1px solid var(--smoke);
   transition: var(--transition);
 }
 
 .album-card img:hover {
-  transform: scale(1.05);
-  box-shadow: var(--shadow-lg);
+  transform: scale(1.03);
+  box-shadow: var(--shadow-lg), var(--shadow-glow-cyan);
+  border-color: var(--primary);
 }
 
-/* Mode badge */
+/* ========================================
+   Mode Badge
+   ======================================== */
+
 .mode-badge {
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--primary);
   background: var(--badge);
-  color: var(--badge-text);
-  font-size: 12px;
-  font-weight: 700;
+  color: var(--primary);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-bold);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
+  box-shadow: var(--shadow-glow-cyan);
 }
 
-/* Host-only visibility guard */
+/* ========================================
+   Host-Only Visibility
+   ======================================== */
+
 [data-host-only] {
   display: none !important;
 }
@@ -347,27 +511,49 @@ h1, h2, h3, h4, h5, h6 {
   display: block !important;
 }
 
-/* Mode-specific badge colors */
+/* ========================================
+   Mode-Specific Badge Colors
+   ======================================== */
+
 body.host-mode [data-mode-badge] {
   background: var(--success-light);
-  color: var(--success-color);
-  border-color: var(--success-color);
+  color: var(--success);
+  border-color: var(--success);
+  box-shadow: var(--shadow-glow-green);
 }
 
 body.guest-mode [data-mode-badge] {
-  background: var(--brand-light);
-  color: var(--brand);
-  border-color: var(--brand);
+  background: var(--badge);
+  color: var(--primary);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-glow-cyan);
 }
 
-/* Scrollbar styling */
+/* ========================================
+   Scrollbar - Cyber Styling
+   ======================================== */
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+  background: var(--hull);
+  border-left: 1px solid var(--smoke);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 5px;
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
 }
 
 ::-webkit-scrollbar-thumb {
