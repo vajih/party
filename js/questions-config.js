@@ -347,25 +347,6 @@ export const QUESTION_BATCHES = [
         category: 'culture'
       }
     ]
-  },
-  {
-    id: 'batch_4',
-    title: "Who's the Baby?",
-    description: 'Upload your cutest baby photo for the guessing game',
-    emoji: '👶',
-    estimatedTime: '1 min',
-    questions: [
-      {
-        id: 'baby_photo',
-        order: 20,
-        kind: 'photo_upload',
-        prompt: 'Upload your baby photo',
-        placeholder: 'Choose a photo from your device',
-        required: true,
-        category: 'photo',
-        instructions: 'Pick a clear photo of you as a baby or toddler. This will be used in a fun guessing game at the party!'
-      }
-    ]
   }
 ];
 

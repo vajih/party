@@ -403,18 +403,79 @@ export async function renderHostGamesListFromSelect(){
   if (!games?.length) { list.innerHTML = '<p class="small">No games yet.</p>'; return; }
 
   list.innerHTML = games.map(g => `
-    <div class="item" data-id="${g.id}">
+    <div class="item" data-id="${g.id}" data-type="${g.type}">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
         <div>
           <div><strong>${escapeHtml(g.title || defaultGameTitle(g.type))}</strong></div>
           <div class="muted">Type: ${escapeHtml(g.type)} • Status: ${escapeHtml(g.status)}</div>
         </div>
         <div style="display:flex;gap:8px;">
+          ${g.type === 'about_you' ? '<button class="link previewQuestionsBtn">Preview Questions</button>' : ''}
+          ${g.type === 'favorite_song' ? '<button class="link viewSongsBtn">View Songs</button>' : ''}
+          ${g.type === 'baby_photo' ? '<button class="link viewPhotosBtn">View Photos</button>' : ''}
+          <button class="link toggleStatusBtn">${g.status === 'open' ? 'Close' : 'Open'}</button>
           <button class="link renameBtn">Rename</button>
           <button class="link danger delBtn">Delete</button>
         </div>
       </div>
     </div>`).join('');
+
+  // Preview Questions button (for About You games only)
+  qsa('.previewQuestionsBtn', list).forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const row = btn.closest('.item');
+      const gameType = row?.getAttribute('data-type');
+      
+      if (gameType === 'about_you') {
+        // Import the questions config
+        try {
+          const { QUESTION_BATCHES } = await import('../../../js/questions-config.js');
+          showQuestionsPreviewModal(QUESTION_BATCHES);
+        } catch (error) {
+          console.error('[previewQuestions] Error loading questions:', error);
+          alert('Failed to load questions configuration');
+        }
+      }
+    });
+  });
+
+  // View Songs button (for Favorite Song games)
+  qsa('.viewSongsBtn', list).forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const row = btn.closest('.item');
+      const gameId = row?.getAttribute('data-id');
+      
+      if (gameId) {
+        await showSongsModal(gameId);
+      }
+    });
+  });
+
+  // View Photos button (for Baby Photo games)
+  qsa('.viewPhotosBtn', list).forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const row = btn.closest('.item');
+      const gameId = row?.getAttribute('data-id');
+      
+      if (gameId) {
+        await showPhotosModal(gameId);
+      }
+    });
+  });
+
+  qsa('.toggleStatusBtn', list).forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const row = btn.closest('.item');
+      const id = row?.getAttribute('data-id');
+      const game = games.find(g => g.id === id);
+      if (!game) return;
+      
+      const newStatus = game.status === 'open' ? 'closed' : 'open';
+      const { error } = await supabase.from('games').update({ status: newStatus }).eq('id', id);
+      if (error) { console.error('[toggleStatus] error', error); return alert(error.message); }
+      await renderHostGamesListFromSelect();
+    });
+  });
 
   qsa('.renameBtn', list).forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -462,6 +523,7 @@ async function renderModQueue(user){
     `)
     .in('party_id', ids)
     .eq('moderation_status','pending')
+    .neq('games.type', 'about_you')  // Exclude About You from moderation
     .order('created_at', { ascending: true });
 
   if (error) { modList.innerHTML = `<p>Error: ${escapeHtml(error.message)}</p>`; return; }
@@ -1178,3 +1240,263 @@ async function renderAboutYouReport(user) {
   exportBtn?.addEventListener('click', exportToCSV);
 }
 
+/* ---------- Questions Preview Modal ---------- */
+function showQuestionsPreviewModal(questionBatches) {
+  // Create modal HTML
+  const batchesHtml = questionBatches.map((batch, batchIndex) => {
+    const questionsHtml = batch.questions.map((q, qIndex) => {
+      let questionType = '';
+      if (q.kind === 'short_text') questionType = 'Text input';
+      else if (q.kind === 'either_or') questionType = 'Either/Or choice';
+      else if (q.kind === 'single_choice') questionType = 'Multiple choice';
+      else if (q.kind === 'dropdown') questionType = 'Dropdown';
+      else questionType = q.kind;
+
+      let optionsHtml = '';
+      if (q.options) {
+        optionsHtml = `<ul style="margin:4px 0 0 20px; font-size:13px; color:#6b7280;">
+          ${q.options.map(opt => `<li>${escapeHtml(opt.label || opt.id)}</li>`).join('')}
+        </ul>`;
+      }
+
+      return `
+        <div style="padding:12px; border-left:3px solid #e5e7eb; margin-bottom:12px; background:#f9fafb;">
+          <div style="display:flex; justify-content:space-between; align-items:start;">
+            <div style="flex:1;">
+              <strong>${qIndex + 1}. ${escapeHtml(q.prompt)}</strong>
+              ${q.required ? '<span style="color:#ef4444; margin-left:4px;">*</span>' : ''}
+              <div style="font-size:13px; color:#6b7280; margin-top:4px;">
+                Type: ${questionType}
+              </div>
+              ${optionsHtml}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div style="margin-bottom:24px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+          <span style="font-size:24px;">${batch.emoji}</span>
+          <div>
+            <h4 style="margin:0; font-size:16px;">${escapeHtml(batch.title)}</h4>
+            <div style="font-size:13px; color:#6b7280;">${escapeHtml(batch.description)} • ${batch.questions.length} questions</div>
+          </div>
+        </div>
+        ${questionsHtml}
+      </div>
+    `;
+  }).join('');
+
+  const modalHtml = `
+    <div class="modal-overlay" id="questionsPreviewModal" style="z-index:9999;">
+      <div class="modal" style="max-width:700px; max-height:80vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; position:sticky; top:0; background:white; padding-bottom:12px; border-bottom:1px solid #e5e7eb;">
+          <h3 style="margin:0;">About You Questions Preview</h3>
+          <button class="modal-close" id="closeQuestionsPreview" style="background:none; border:none; font-size:24px; cursor:pointer; color:#6b7280;">×</button>
+        </div>
+        <div style="color:#6b7280; margin-bottom:20px; font-size:14px;">
+          This is what your guests will see when they answer About You questions. Questions marked with * are required.
+        </div>
+        ${batchesHtml}
+        <div style="margin-top:20px; padding-top:20px; border-top:1px solid #e5e7eb;">
+          <button class="primary" id="closeQuestionsPreviewBtn">Close Preview</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Insert modal into DOM
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+  // Add event listeners
+  const modal = document.getElementById('questionsPreviewModal');
+  const closeBtn = document.getElementById('closeQuestionsPreview');
+  const closeBtn2 = document.getElementById('closeQuestionsPreviewBtn');
+
+  function closeModal() {
+    modal.remove();
+  }
+
+  closeBtn?.addEventListener('click', closeModal);
+  closeBtn2?.addEventListener('click', closeModal);
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+}
+
+/* ---------- Songs View Modal ---------- */
+async function showSongsModal(gameId) {
+  // Fetch submissions for this game
+  const { data: submissions, error } = await supabase
+    .from('submissions')
+    .select('id, display_name, content, created_at')
+    .eq('game_id', gameId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('[showSongsModal] Error fetching songs:', error);
+    alert('Failed to load songs');
+    return;
+  }
+
+  // Fetch votes for this game
+  const { data: votes } = await supabase
+    .from('votes')
+    .select('submission_id')
+    .eq('game_id', gameId);
+
+  const voteCounts = {};
+  (votes || []).forEach(v => {
+    voteCounts[v.submission_id] = (voteCounts[v.submission_id] || 0) + 1;
+  });
+
+  const songsHtml = submissions.length > 0 ? submissions.map((sub, index) => {
+    const content = sub.content || {};
+    const title = content.title || 'Untitled';
+    const artist = content.artist || 'Unknown Artist';
+    const voteCount = voteCounts[sub.id] || 0;
+    const submittedBy = sub.display_name || 'Anonymous';
+    const date = new Date(sub.created_at).toLocaleDateString();
+
+    return `
+      <div style="padding:16px; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:start;">
+          <div style="flex:1;">
+            <div style="font-size:16px; font-weight:600; margin-bottom:4px;">
+              ${index + 1}. ${escapeHtml(title)}
+            </div>
+            <div style="font-size:14px; color:#6b7280; margin-bottom:8px;">
+              by ${escapeHtml(artist)}
+            </div>
+            <div style="font-size:13px; color:#9ca3af;">
+              Submitted by <strong>${escapeHtml(submittedBy)}</strong> on ${date}
+            </div>
+          </div>
+          <div style="text-align:center; min-width:60px;">
+            <div style="font-size:24px;">${voteCount > 0 ? '❤️' : '🤍'}</div>
+            <div style="font-size:13px; color:#6b7280;">${voteCount} ${voteCount === 1 ? 'vote' : 'votes'}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('') : '<p style="text-align:center; color:#9ca3af; padding:40px;">No songs submitted yet.</p>';
+
+  const modalHtml = `
+    <div class="modal-overlay" id="songsViewModal" style="z-index:9999;">
+      <div class="modal" style="max-width:700px; max-height:80vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; position:sticky; top:0; background:white; padding-bottom:12px; border-bottom:1px solid #e5e7eb;">
+          <h3 style="margin:0;">Submitted Songs (${submissions.length})</h3>
+          <button class="modal-close" id="closeSongsView" style="background:none; border:none; font-size:24px; cursor:pointer; color:#6b7280;">×</button>
+        </div>
+        <div style="color:#6b7280; margin-bottom:20px; font-size:14px;">
+          All songs submitted by your guests, sorted by most recent first.
+        </div>
+        ${songsHtml}
+        <div style="margin-top:20px; padding-top:20px; border-top:1px solid #e5e7eb;">
+          <button class="primary" id="closeSongsViewBtn">Close</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Insert modal into DOM
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+  // Add event listeners
+  const modal = document.getElementById('songsViewModal');
+  const closeBtn = document.getElementById('closeSongsView');
+  const closeBtn2 = document.getElementById('closeSongsViewBtn');
+
+  function closeModal() {
+    modal.remove();
+  }
+
+  closeBtn?.addEventListener('click', closeModal);
+  closeBtn2?.addEventListener('click', closeModal);
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+}
+
+/* ---------- Photos Gallery Modal ---------- */
+/* ADD THIS TO THE END OF src/features/host/dashboard.js */
+
+async function showPhotosModal(gameId) {
+  // Fetch photo submissions for this game
+  const { data: submissions, error } = await supabase
+    .from('submissions')
+    .select('id, display_name, content, created_at')
+    .eq('game_id', gameId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('[showPhotosModal] Error fetching photos:', error);
+    alert('Failed to load photos');
+    return;
+  }
+
+  const photosHtml = submissions.length > 0 ? submissions.map((sub) => {
+    const content = sub.content || {};
+    const photoUrl = content.photo_url;
+    const photoInfo = content.photo_info || '';
+    const submittedBy = sub.display_name || 'Anonymous';
+    const date = new Date(sub.created_at).toLocaleDateString();
+
+    if (!photoUrl) return ''; // Skip if no photo
+
+    return `
+      <div style="border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; background:white;">
+        <div style="aspect-ratio:1; overflow:hidden; background:#f3f4f6; display:flex; align-items:center; justify-content:center;">
+          <img src="${escapeHtml(photoUrl)}" 
+               alt="Baby photo from ${escapeHtml(submittedBy)}" 
+               style="width:100%; height:100%; object-fit:cover;" />
+        </div>
+        <div style="padding:12px;">
+          <div style="font-weight:600; margin-bottom:4px;">${escapeHtml(submittedBy)}</div>
+          ${photoInfo ? `<div style="font-size:13px; color:#6b7280; margin-bottom:4px;">${escapeHtml(photoInfo)}</div>` : ''}
+          <div style="font-size:12px; color:#9ca3af;">${date}</div>
+        </div>
+      </div>
+    `;
+  }).filter(Boolean).join('') : '<p style="text-align:center; color:#9ca3af; padding:40px; grid-column:1/-1;">No photos submitted yet.</p>';
+
+  const modalHtml = `
+    <div class="modal-overlay" id="photosViewModal" style="z-index:9999;">
+      <div class="modal" style="max-width:900px; max-height:85vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; position:sticky; top:0; background:white; padding-bottom:12px; border-bottom:1px solid #e5e7eb; z-index:10;">
+          <h3 style="margin:0;">Baby Photo Gallery (${submissions.filter(s => s.content?.photo_url).length})</h3>
+          <button class="modal-close" id="closePhotosView" style="background:none; border:none; font-size:24px; cursor:pointer; color:#6b7280;">×</button>
+        </div>
+        <div style="color:#6b7280; margin-bottom:20px; font-size:14px;">
+          All baby photos submitted by your guests. Can you guess who's who?
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:16px;">
+          ${photosHtml}
+        </div>
+        <div style="margin-top:20px; padding-top:20px; border-top:1px solid #e5e7eb;">
+          <button class="primary" id="closePhotosViewBtn">Close</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Insert modal into DOM
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+  // Add event listeners
+  const modal = document.getElementById('photosViewModal');
+  const closeBtn = document.getElementById('closePhotosView');
+  const closeBtn2 = document.getElementById('closePhotosViewBtn');
+
+  function closeModal() {
+    modal.remove();
+  }
+
+  closeBtn?.addEventListener('click', closeModal);
+  closeBtn2?.addEventListener('click', closeModal);
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+}

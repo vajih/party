@@ -1325,8 +1325,8 @@ function rootFallback(isGuest=false){
 
 /* -------- Progress Tracker for Guests -------- */
 async function getGuestProgressSteps(games, partyId, userId) {
-  // Define the recommended order - removed baby_photo since it's now part of about_you
-  const recommendedOrder = ['about_you', 'favorite_song'];
+  // Define the recommended order
+  const recommendedOrder = ['about_you', 'baby_photo', 'favorite_song'];
   
   // Check which games user has completed
   const { data: submissions } = await supabase
@@ -1351,8 +1351,7 @@ async function getGuestProgressSteps(games, partyId, userId) {
     const allBatchesComplete = 
       batchProgress.batch_1 === 'complete' && 
       batchProgress.batch_2 === 'complete' && 
-      batchProgress.batch_3 === 'complete' &&
-      batchProgress.batch_4 === 'complete';
+      batchProgress.batch_3 === 'complete';
     
     if (allBatchesComplete) {
       completedGameIds.add(aboutYouGame.id);
@@ -1397,7 +1396,8 @@ async function getGuestProgressSteps(games, partyId, userId) {
 
 function getStepDescription(type) {
   const descriptions = {
-    'about_you': 'Complete your profile (4 batches including baby photo)',
+    'about_you': 'Answer fun questions in 3 easy sections to help everyone get to know you a bit better',
+    'baby_photo': 'Upload your baby photo for the guessing game',
     'favorite_song': 'Share your favorite song and vote'
   };
   return descriptions[type] || 'Complete this activity';
