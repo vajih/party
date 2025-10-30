@@ -734,7 +734,7 @@ async function route(userFromEvent) {
               console.error('[favorite_song] Submission error:', error);
               alert(`Error: ${error.message}`);
             } else {
-              alert('Thank you! Your song has been submitted for review.');
+              alert('🎉 Thanks for sharing! Your song is added to our playlist. Don\'t forget to vote for other songs you love! 🎵');
               form.reset();
               // refresh list after successful submission
               renderFavoriteSongs().catch(()=>{});
@@ -916,10 +916,7 @@ async function route(userFromEvent) {
                     <div class="status-content">
                       <div class="status-title">Photo Submitted Successfully! 🎉</div>
                       <div class="status-message">
-                        Your baby photo has been sent to the host for review. 
-                        You'll see it in the gallery once it's approved!
-                        <br><br>
-                        <strong>Note:</strong> You can only submit one photo per party.
+                        Thank you for sharing your photo! Let's continue with the next activity.
                       </div>
                       <div class="status-actions">
                         <button class="link primary" onclick="
@@ -931,14 +928,6 @@ async function route(userFromEvent) {
                           }
                         ">
                           Continue to Next Activity →
-                        </button>
-                        <button class="link" onclick="
-                          const gallery = document.querySelector('.submissions-gallery');
-                          if (gallery) {
-                            gallery.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                          }
-                        ">
-                          View Gallery
                         </button>
                       </div>
                     </div>

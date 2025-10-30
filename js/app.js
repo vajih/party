@@ -728,7 +728,11 @@ function buildTabsUI(){
     btn.tabIndex = -1;
 
     const mine = submissionsByGame.get(g.id);
-    const doneBadge = mine ? `<span class="badge ok">Done</span>` : `<span class="badge open">Open</span>`;
+    // For favorite_song (Song Requests), always show "Add More" to encourage multiple submissions
+    const isSongRequest = g.type === 'favorite_song';
+    const doneBadge = isSongRequest 
+      ? `<span class="badge open">Add More</span>`
+      : (mine ? `<span class="badge ok">Added</span>` : `<span class="badge open">Add</span>`);
     const statusBadge = (isHostForCurrentParty && g.status === 'closed')
       ? `<span class="badge open">Closed</span>` : '';
 
@@ -1076,9 +1080,13 @@ function renderChecklist(root){
   if (!tbody) return;
   tbody.innerHTML = (games || []).map(g => {
     const mine = submissionsByGame.get(g.id);
+    // For favorite_song (Song Requests), always show "Add More" to encourage multiple submissions
+    const isSongRequest = g.type === 'favorite_song';
     const statusHostBadge = (isHostForCurrentParty && g.status === 'closed')
       ? '<span class="badge open">Closed</span>'
-      : (mine ? '<span class="badge ok">Done</span>' : '<span class="badge open">Open</span>');
+      : (isSongRequest 
+          ? '<span class="badge open">Add More</span>'
+          : (mine ? '<span class="badge ok">Added</span>' : '<span class="badge open">Add</span>'));
     return `
       <tr>
         <td>${escapeHTML(g.title || defaultGameTitle(g.type))}</td>

@@ -817,3 +817,16 @@
     width: 100%;
   }
 }
+
+/* ========================================
+   Centered Submit Buttons
+   ======================================== */
+
+.game-panel[data-game-type="about_you"] button[type="submit"],
+.game-panel[data-game-type="about_you"] .btn.primary {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}

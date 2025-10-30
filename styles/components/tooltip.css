@@ -82,6 +82,18 @@
   align-items: flex-start;
   gap: 12px;
   animation: slideDown 0.3s ease-out;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .info-banner {
+    padding: 10px 12px;
+    gap: 8px;
+    margin-left: -4px;
+    margin-right: -4px;
+    border-radius: 6px;
+  }
 }
 
 @keyframes slideDown {
@@ -111,8 +123,17 @@
   flex-shrink: 0;
 }
 
+@media (max-width: 768px) {
+  .info-banner .icon {
+    font-size: 20px;
+  }
+}
+
 .info-banner .content {
   flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .info-banner .title {
@@ -124,10 +145,25 @@
   letter-spacing: 0.5px;
 }
 
+@media (max-width: 768px) {
+  .info-banner .title {
+    font-size: 12px;
+    letter-spacing: 0.3px;
+  }
+}
+
 .info-banner .description {
   color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.5;
+  word-break: break-word;
+}
+
+@media (max-width: 768px) {
+  .info-banner .description {
+    font-size: 12px;
+    line-height: 1.4;
+  }
 }
 
 .info-banner.success {
@@ -219,6 +255,9 @@
   align-items: center;
   gap: 10px;
   margin-top: 8px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .quick-tip::before {

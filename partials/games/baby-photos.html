@@ -17,6 +17,17 @@
 
   <form class="game-form">
     <div class="form-group">
+      <label for="photoUpload">
+        Choose Photo
+        <span class="tooltip">
+          <span class="help-icon">?</span>
+          <span class="tooltip-text">Click here to select a baby photo from your phone, tablet, or computer. Most image formats (JPG, PNG, etc.) are supported.</span>
+        </span>
+      </label>
+      <input type="file" id="photoUpload" name="photo" accept="image/*" required>
+    </div>
+    
+    <div class="form-group">
       <label for="photoInfo">
         Photo Info 
         <span class="small muted">(optional)</span>
@@ -27,18 +38,6 @@
       </label>
       <input type="text" id="photoInfo" name="photo_info" placeholder="e.g., Age 6 months, Lahore 1975">
     </div>
-    
-    <div class="form-group">
-      <label for="photoUpload">
-        Choose Photo
-        <span class="tooltip">
-          <span class="help-icon">?</span>
-          <span class="tooltip-text">Click here to select a baby photo from your phone, tablet, or computer. Most image formats (JPG, PNG, etc.) are supported.</span>
-        </span>
-      </label>
-      <input type="file" id="photoUpload" name="photo" accept="image/*" required>
-      <div class="quick-tip">Tap the button above to find a photo on your device</div>
-    </div>
 
     <div class="preview-container" hidden>
       <img id="photoPreview" alt="Preview">
@@ -48,11 +47,11 @@
     <button type="submit" class="submit-btn">Submit Photo</button>
   </form>
 
-  <div class="submissions-gallery">
+  <!-- Gallery hidden until after party -->
+  <!-- <div class="submissions-gallery">
     <h4>Gallery</h4>
     <div class="gallery-grid" id="babyPhotoGallery">
-      <!-- Photos will be inserted here -->
       <p class="placeholder">No approved photos yet. Be the first to share!</p>
     </div>
-  </div>
+  </div> -->
 </div>

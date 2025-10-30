@@ -38,6 +38,15 @@
   padding: 32px;
 }
 
+@media (max-width: 768px) {
+  .game-panel {
+    padding: 16px 12px;
+    border-radius: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
 .game-panel h3 {
   font-size: 28px;
   margin-bottom: 12px;
@@ -62,6 +71,8 @@
 .game-form .field {
   display: grid;
   gap: 8px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .game-form label {
@@ -88,6 +99,25 @@
   text-align: center;
   cursor: pointer;
   transition: var(--transition);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .game-form input[type="file"] {
+    padding: 16px 12px;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .game-form input[type="file"]::file-selector-button {
+    padding: 8px 12px;
+    font-size: 13px;
+    margin-right: 8px;
+  }
 }
 
 .game-form input[type="file"]:hover {
@@ -113,6 +143,11 @@
   margin-top: 16px;
   padding: 16px;
   font-size: 16px;
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Game Tabs */
