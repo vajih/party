@@ -255,6 +255,23 @@
   font-size: 1.125rem;
 }
 
+/* Override general game-form label styling for About You */
+.game-panel[data-game-type="about_you"] label {
+  text-transform: none;
+  color: var(--text-primary, #1f2937);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+/* Override general game-form label styling for Baby Photo */
+.game-panel label[for="photoInfo"] {
+  text-transform: none;
+  color: var(--text-primary, #1f2937);
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
 /* Required indicator for basic info form labels */
 .game-panel[data-game-type="about_you"] label .required {
   color: #ef4444;

@@ -278,8 +278,8 @@ export const QUESTION_BATCHES = [
         order: 12,
         kind: 'short_text',
         prompt: 'Favorite city for travel',
-        placeholder: 'e.g., Istanbul, Paris, Tokyo',
-        required: false,
+        placeholder: 'e.g., KL, Budapest, Tokyo',
+        required: true,
         category: 'travel'
       },
       {

@@ -408,6 +408,9 @@ async function handleBatchSubmit(e) {
   let completionMessage = `✓ ${getBatch(currentState.currentBatch).title} complete!`;
   if (nextBatch) {
     completionMessage += ` Now let's do ${nextBatch.title}.`;
+  } else {
+    // Last batch completed - guide them to next activity (Baby Photo)
+    completionMessage = `📸 ${getBatch(currentState.currentBatch).title} complete! Let's get your baby photo uploaded next.`;
   }
   
   alert(completionMessage);

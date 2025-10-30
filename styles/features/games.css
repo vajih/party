@@ -72,6 +72,15 @@
   color: var(--text-secondary);
 }
 
+/* Override for baby photo form labels - use normal case and black color */
+.game-panel h3:has(+ .instructions) ~ .game-form label,
+[data-game-type="baby_photo"] .game-form label {
+  text-transform: none;
+  color: var(--text-primary, #1f2937);
+  font-size: 1rem;
+  letter-spacing: normal;
+}
+
 .game-form input[type="file"] {
   border: 2px dashed var(--border);
   background: var(--bg-secondary);
