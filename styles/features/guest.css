@@ -1,5 +1,238 @@
 .guest-mode .mode-badge{background:#ede9fe;color:#4f46e5}
 
+/* ========================================
+   Party Header Redesign - Compact Two-Line Layout
+   Clean, professional header with all info in 2 lines
+   ======================================== */
+
+.party-header-redesign {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem;
+}
+
+.party-header-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ━━━ Line 1: Party Title + Countdown ━━━ */
+.party-line-one {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.party-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.party-title-group .party-emoji {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.party-title-group .party-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  font-family: var(--display);
+  color: var(--cyan);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.countdown-compact {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--void-light) 0%, var(--void) 100%);
+  border: 1px solid var(--cyan-alpha-20);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 8px var(--cyan-alpha-10);
+}
+
+.countdown-compact .countdown-time {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--magenta);
+  font-family: var(--mono);
+  white-space: nowrap;
+}
+
+.countdown-compact .countdown-now {
+  color: var(--matrix-green);
+  font-size: 1.125rem;
+}
+
+/* ━━━ Line 2: Date/Time + Party Code ━━━ */
+.party-line-two {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.party-meta-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  color: var(--cyan-muted);
+}
+
+.party-meta-info .party-date {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.party-meta-info .party-time {
+  font-weight: 400;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+
+.party-meta-info .info-icon-btn {
+  background: none;
+  border: none;
+  color: var(--cyan);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.party-meta-info .info-icon-btn:hover {
+  background: var(--cyan-alpha-10);
+  transform: scale(1.05);
+}
+
+.party-meta-info .info-icon-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.party-code-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  background: linear-gradient(135deg, var(--void-light) 0%, var(--void) 100%);
+  border: 1px solid var(--cyan-alpha-20);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 8px var(--cyan-alpha-10);
+  flex-shrink: 0;
+}
+
+.party-code-compact .code-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cyan-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.party-code-compact .code-value {
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.party-code-compact .copy-icon-btn {
+  background: none;
+  border: none;
+  color: var(--cyan);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.party-code-compact .copy-icon-btn:hover {
+  background: var(--cyan-alpha-10);
+  transform: scale(1.1);
+}
+
+.party-code-compact .copy-icon-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ━━━ Responsive Design ━━━ */
+@media (max-width: 968px) {
+  .party-line-one {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .countdown-compact {
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .party-header-redesign {
+    padding: 1rem;
+  }
+  
+  .party-title-group .party-emoji {
+    font-size: 1.5rem;
+  }
+  
+  .party-title-group .party-title {
+    font-size: 1.5rem;
+  }
+  
+  .party-line-two {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .party-meta-info {
+    font-size: 0.875rem;
+  }
+  
+  .countdown-compact .countdown-time {
+    font-size: 1.125rem;
+  }
+  
+  .party-code-compact {
+    justify-content: center;
+  }
+}
+
+/* ========================================
+   Legacy styles (keeping for compatibility)
+   ======================================== */
+
+/* ========================================
+   Legacy styles (keeping for backwards compatibility)
+   ======================================== */
+
 /* Party Header Info (inline in global header) */
 .header-party-info {
   display: flex;

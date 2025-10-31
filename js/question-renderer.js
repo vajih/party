@@ -22,6 +22,7 @@ function renderEitherOrQuestion(question, currentAnswer = null) {
   const { id, prompt, options, required, flags = {}, sensitive, helpText } = question;
   const allowBoth = flags.allow_both ?? false;
   const allowNeither = flags.allow_neither ?? false;
+  const allowDontKnow = flags.allow_dont_know ?? false;
   
   // Parse current answer
   let selectedOptions = [];
@@ -67,7 +68,7 @@ function renderEitherOrQuestion(question, currentAnswer = null) {
         </button>
       </div>
 
-      ${allowBoth || allowNeither ? `
+      ${allowBoth || allowNeither || allowDontKnow ? `
         <div class="modifier-buttons">
           ${allowBoth ? `
             <button 
@@ -83,6 +84,14 @@ function renderEitherOrQuestion(question, currentAnswer = null) {
               class="modifier-btn neither-btn ${selectedOptions.includes('NEITHER') ? 'active' : ''}"
               data-modifier="NEITHER">
               Neither 🤷
+            </button>
+          ` : ''}
+          ${allowDontKnow ? `
+            <button 
+              type="button" 
+              class="modifier-btn dont-know-btn ${selectedOptions.includes('DONT_KNOW') ? 'active' : ''}"
+              data-modifier="DONT_KNOW">
+              What's the diff? 🤔
             </button>
           ` : ''}
         </div>

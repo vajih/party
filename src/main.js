@@ -1028,36 +1028,88 @@ function updateHeaderPartyInfo(party) {
   
   console.log('[updateHeaderPartyInfo] party:', party);
   console.log('[updateHeaderPartyInfo] party.date:', party.date);
-  console.log('[updateHeaderPartyInfo] fmtDate result:', fmtDate(party.date));
+  
+  // Format date nicely
+  let formattedDate = 'TBA';
+  let formattedTime = '';
+  if (party.date) {
+    const partyDate = new Date(party.date);
+    // Format: "Thursday, Nov 14"
+    const dateOptions = { weekday: 'long', month: 'short', day: 'numeric' };
+    formattedDate = partyDate.toLocaleDateString('en-US', dateOptions);
+    
+    // Format time: "7:00 PM"
+    const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+    formattedTime = partyDate.toLocaleTimeString('en-US', timeOptions);
+  }
   
   const hasDetails = party.description || party.venue;
   
   headerInfo.innerHTML = `
-    <div class="party-header-line1">
-      <span class="party-name">${escapeHtml(party.title)}</span>
-      <span class="party-separator">•</span>
-      <span class="party-date-inline">${fmtDate(party.date)}</span>
-      ${hasDetails ? `
-        <button class="party-info-btn" title="View party details" aria-label="View party details">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="currentColor"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M8 2C4.5 2 1.7 4.7 1 8c.7 3.3 3.5 6 7 6s6.3-2.7 7-6c-.7-3.3-3.5-6-7-6zm0 10a4 4 0 110-8 4 4 0 010 8z" fill="currentColor"/>
-          </svg>
-        </button>
-      ` : ''}
-    </div>
-    <div class="party-countdown-inline" data-date="${party.date}">
-      <span class="countdown-loading-inline">...</span>
+    <div class="party-header-redesign">
+      <div class="party-header-compact">
+        <div class="party-line-one">
+          <div class="party-title-group">
+            <span class="party-emoji">${party.emoji || '🎉'}</span>
+            <h1 class="party-title">${escapeHtml(party.title)}</h1>
+          </div>
+          <div class="countdown-compact">
+            <span class="countdown-time">Loading...</span>
+          </div>
+        </div>
+        
+        <div class="party-line-two">
+          <div class="party-meta-info">
+            <span class="party-date">${formattedDate}</span>
+            <span class="party-time">${formattedTime}</span>
+            ${hasDetails ? `
+              <button class="info-icon-btn" title="View Details">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+            ` : ''}
+          </div>
+          
+          <div class="party-code-compact">
+            <span class="code-label">Code:</span>
+            <span class="code-value">${escapeHtml(party.slug)}</span>
+            <button class="copy-icon-btn" title="Copy code">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   `;
   
-  console.log('[updateHeaderPartyInfo] HTML set, headerInfo.innerHTML:', headerInfo.innerHTML);
+  console.log('[updateHeaderPartyInfo] HTML set');
   
-  // Wire up info button to show modal with details
+  // Wire up copy button
+  const copyBtn = headerInfo.querySelector('.copy-icon-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      const code = headerInfo.querySelector('.code-value').textContent;
+      try {
+        await navigator.clipboard.writeText(code);
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHTML;
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy code:', err);
+      }
+    });
+  }
+  
+  // Wire up details button
   if (hasDetails) {
-    const infoBtn = headerInfo.querySelector('.party-info-btn');
-    if (infoBtn) {
-      infoBtn.addEventListener('click', () => {
+    const detailsBtn = headerInfo.querySelector('.info-icon-btn');
+    if (detailsBtn) {
+      detailsBtn.addEventListener('click', () => {
         showPartyDetailsModal(party);
       });
     }
@@ -1103,8 +1155,11 @@ function showPartyDetailsModal(party) {
 function initHeaderCountdown(eventDate) {
   if (!eventDate) return;
   
-  const countdownEl = document.querySelector('.party-countdown-inline');
+  const countdownEl = document.querySelector('.countdown-compact');
   if (!countdownEl) return;
+  
+  const timeEl = countdownEl.querySelector('.countdown-time');
+  if (!timeEl) return;
   
   const targetDate = new Date(eventDate).getTime();
   
@@ -1113,7 +1168,7 @@ function initHeaderCountdown(eventDate) {
     const distance = targetDate - now;
     
     if (distance < 0) {
-      countdownEl.innerHTML = `<span class="countdown-complete-inline">🎉 Now!</span>`;
+      timeEl.innerHTML = `<span class="countdown-now">Party Time! 🎉</span>`;
       return;
     }
     
@@ -1121,23 +1176,29 @@ function initHeaderCountdown(eventDate) {
     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     
+    // Format with proper grammar
     let text = '';
     if (days > 0) {
-      text = `${days}d ${hours}h`;
+      const dayText = days === 1 ? 'day' : 'days';
+      const hourText = hours === 1 ? 'hour' : 'hours';
+      text = `${days} ${dayText} ${hours} ${hourText}`;
     } else if (hours > 0) {
-      text = `${hours}h ${minutes}m`;
+      const hourText = hours === 1 ? 'hour' : 'hours';
+      const minText = minutes === 1 ? 'min' : 'mins';
+      text = `${hours} ${hourText} ${minutes} ${minText}`;
     } else {
-      text = `${minutes}m`;
+      const minText = minutes === 1 ? 'minute' : 'minutes';
+      text = `${minutes} ${minText}`;
     }
     
-    countdownEl.innerHTML = `<span class="countdown-value-inline">${text}</span>`;
+    timeEl.textContent = text;
   }
   
-  // Update immediately and then every minute (no need for seconds in header)
+  // Update immediately and then every minute
   updateCountdown();
   const intervalId = setInterval(updateCountdown, 60000);
   
-  // Store interval ID
+  // Store interval ID for cleanup
   countdownEl.dataset.intervalId = intervalId;
 }
 

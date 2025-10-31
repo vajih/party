@@ -1,13 +1,13 @@
 /**
  * About You Questions Configuration
- * 20 questions organized into 3 batches for progressive completion
+ * 21 questions organized into 3 batches for progressive completion
  */
 
 export const QUESTION_BATCHES = [
   {
     id: 'batch_1',
     title: 'Fun Favorites',
-    description: 'Quick questions about Pakistani food, music, and culture',
+    description: 'Pakistani food, music & culture',
     emoji: '🎉',
     estimatedTime: '2 min',
     questions: [
@@ -30,38 +30,7 @@ export const QUESTION_BATCHES = [
           { id: 'B', label: 'Biryani' }
         ],
         required: true,
-        flags: { allow_both: true, allow_neither: true },
-        category: 'food'
-      },
-      {
-        id: 'food_nihari_haleem',
-        order: 2,
-        kind: 'either_or',
-        prompt: 'Nihari vs Haleem',
-        options: [
-          { id: 'A', label: 'Nihari' },
-          { id: 'B', label: 'Haleem' }
-        ],
-        required: true,
-        flags: { allow_both: true, allow_neither: true },
-        category: 'food'
-      },
-      {
-        id: 'food_mango_supremacy',
-        order: 3,
-        kind: 'single_choice',
-        prompt: 'Mango supremacy (top variety)',
-        options: [
-          { id: 'chaunsa', label: 'Chaunsa' },
-          { id: 'anwar_ratol', label: 'Anwar Ratol' },
-          { id: 'sindhri', label: 'Sindhri' },
-          { id: 'langra', label: 'Langra' },
-          { id: 'alphonso', label: 'Alphonso' },
-          { id: 'whatever_ripe', label: '"Whatever\'s ripe!"' },
-          { id: 'other', label: 'Other', write_in: true }
-        ],
-        required: true,
-        write_in_placeholder: 'Which mango variety were you thinking?',
+        flags: { allow_both: true, allow_neither: true, allow_dont_know: true },
         category: 'food'
       },
       {
@@ -84,10 +53,10 @@ export const QUESTION_BATCHES = [
         category: 'food'
       },
       {
-        id: 'food_houston_halal',
+        id: 'food_desi_restaurant',
         order: 5,
         kind: 'single_choice',
-        prompt: 'Houston-area bonus: best late-night halal fix',
+        prompt: "When you're craving desi food, where do you go?",
         options: [
           { id: 'agas', label: "Aga's" },
           { id: 'bismillah', label: 'Bismillah' },
@@ -101,41 +70,29 @@ export const QUESTION_BATCHES = [
         category: 'food'
       },
       {
-        id: 'food_midnight_snack',
-        order: 6,
+        id: 'breakfast_nashta',
+        order: 5,
         kind: 'single_choice',
-        prompt: 'Midnight "guilty-pleasure" desi snack',
+        prompt: 'My most desired nashta is...',
         options: [
-          { id: 'bun_kebab', label: 'Bun Kebab' },
-          { id: 'fry_unda_paratha', label: 'Fry unda - Paratha Roll' },
-          { id: 'chai_biscuits', label: 'Chai & Biscuits' },
-          { id: 'pakora', label: 'Pakora' },
-          { id: 'leftover_biryani', label: 'Leftover Biryani' },
+          { id: 'paratha_chai', label: 'Paratha + Chai' },
+          { id: 'halwa_puri', label: 'Halwa Puri' },
+          { id: 'nihari_naan', label: 'Nihari + Naan' },
+          { id: 'aloo_poori', label: 'Aloo Poori' },
+          { id: 'anda_paratha', label: 'Anda Paratha' },
+          { id: 'cereal', label: 'Cereal (boring!)' },
           { id: 'other', label: 'Other', write_in: true }
         ],
         required: true,
-        write_in_placeholder: 'What midnight snack were you thinking?',
+        write_in_placeholder: 'What nashta did you have in mind?',
         category: 'food'
-      },
-      {
-        id: 'drink_chai_coffee',
-        order: 7,
-        kind: 'either_or',
-        prompt: 'Morning: Chai or Coffee',
-        options: [
-          { id: 'A', label: 'Chai' },
-          { id: 'B', label: 'Coffee' }
-        ],
-        required: true,
-        flags: { allow_both: true, allow_neither: true },
-        category: 'drink'
       }
     ]
   },
   {
     id: 'batch_2',
     title: 'Know Yourself',
-    description: 'Personality traits and preferences',
+    description: 'Personality & preferences',
     emoji: '🧠',
     estimatedTime: '2 min',
     questions: [
@@ -163,128 +120,133 @@ export const QUESTION_BATCHES = [
         category: 'personality'
       },
       {
-        id: 'remedy_desi_mom',
+        id: 'free_saturday',
+        order: 11,
+        kind: 'single_choice',
+        prompt: 'You have a free Saturday (araam ka din). What sounds perfect?',
+        options: [
+          { id: 'solo_time', label: 'Solo time at home (ghar pe chill)' },
+          { id: 'chai_friends', label: 'Chai with 1-2 close friends' },
+          { id: 'group_hangout', label: 'Group hangout with the whole jamaat' },
+          { id: 'big_party', label: 'Big party or shaadi-style event' },
+          { id: 'spouse_mood', label: "Depends on my spouse's mizaaj (mood)" },
+          { id: 'other', label: 'Other', write_in: true }
+        ],
+        required: true,
+        write_in_placeholder: 'What sounds perfect to you?',
+        category: 'personality'
+      },
+      {
+        id: 'araam_mode',
+        order: 12,
+        kind: 'single_choice',
+        prompt: 'Ultimate araam mode?',
+        options: [
+          { id: 'pajamas_netflix', label: 'Pajamas + Netflix' },
+          { id: 'daytime_nap', label: 'Daytime nap' },
+          { id: 'chai_dawn', label: 'Chai and Dawn' },
+          { id: 'no_plans', label: 'No plans weekend' },
+          { id: 'phone_silent', label: 'Phone on silent' },
+          { id: 'reading_book', label: 'Reading a book' },
+          { id: 'other', label: 'Other', write_in: true }
+        ],
+        required: true,
+        write_in_placeholder: 'What araam mode were you thinking?',
+        category: 'lifestyle'
+      },
+      {
+        id: 'decision_style',
         order: 13,
         kind: 'single_choice',
-        prompt: 'A classic desi mom cure-all',
+        prompt: 'When making big decisions, you trust your...',
         options: [
-          { id: 'haldi_doodh', label: 'Haldi Doodh' },
-          { id: 'ajwain', label: 'Ajwain' },
-          { id: 'adrak_honey', label: 'Adrak and Honey' },
-          { id: 'johar_joshanda', label: 'Johar Joshanda' },
-          { id: 'vicks_steam', label: 'Vicks & Steam Inhalation' },
+          { id: 'dil', label: 'Dil (heart/gut feeling)' },
+          { id: 'dimagh', label: 'Dimagh (logic and planning)' },
+          { id: 'parents', label: 'What ammi/abbu said' },
+          { id: 'mix', label: 'Mix of dil and dimagh' },
+          { id: 'overthink', label: "I overthink until everyone's tired 😅" },
           { id: 'other', label: 'Other', write_in: true }
         ],
         required: true,
-        write_in_placeholder: 'What remedy were you thinking?',
-        category: 'nostalgia'
+        write_in_placeholder: 'How do you make decisions?',
+        category: 'personality'
       },
       {
-        id: 'smuggled_pakistan',
+        id: 'communication_style',
         order: 14,
         kind: 'single_choice',
-        prompt: 'What gets "smuggled" from Pakistan in suitcases',
+        prompt: 'When something bothers you, you usually...',
         options: [
-          { id: 'achar', label: 'Achar' },
-          { id: 'desi_joray', label: 'Desi Joray' },
-          { id: 'nimko_snacks', label: 'Nimko/Snacks' },
-          { id: 'seeds', label: 'Seeds' },
-          { id: 'mithai', label: 'Mithai' },
+          { id: 'direct', label: 'Seedha baat karte hain (say it directly)' },
+          { id: 'hints', label: 'Drop hints aur intezaar (wait for them to notice)' },
+          { id: 'vent_others', label: 'Doosron se vent (complain to others first)' },
+          { id: 'avoid', label: 'Avoid - chup rehte hain' },
+          { id: 'whatsapp_paragraph', label: 'Write a full paragraph WhatsApp message' },
           { id: 'other', label: 'Other', write_in: true }
         ],
         required: true,
-        write_in_placeholder: 'What do you bring back?',
-        category: 'nostalgia'
+        write_in_placeholder: 'How do you communicate?',
+        category: 'personality'
       },
       {
-        id: 'auntie_analyze',
+        id: 'left_on_read',
         order: 15,
         kind: 'single_choice',
-        prompt: 'What aunties most love to analyze',
+        prompt: 'When a close friend leaves you on read, you...',
         options: [
-          { id: 'outfits', label: 'Outfits' },
-          { id: 'weight', label: 'Weight' },
-          { id: 'who_brought_what', label: 'Who Brought What Dish' },
-          { id: 'jewelry', label: 'Jewelry/Diamonds' },
-          { id: 'home_decor', label: 'Home Décor' },
+          { id: 'dont_notice', label: "Don't even notice (too busy living life)" },
+          { id: 'dont_care', label: "Notice but don't care (they're probably busy)" },
+          { id: 'follow_up', label: 'Send a follow-up "Hello?? 👀"' },
+          { id: 'overthink', label: 'Overthink everything (kya galti ho gayi?)' },
+          { id: 'double_text', label: 'Double/triple text until they respond' },
+          { id: 'mental_notes', label: 'Take mental notes for later' },
+          { id: 'wait', label: 'Wait for them to reach out first' },
           { id: 'other', label: 'Other', write_in: true }
         ],
         required: true,
-        write_in_placeholder: 'What else do aunties analyze?',
-        category: 'nostalgia'
-      },
-      {
-        id: 'desi_dad_line',
-        order: 16,
-        kind: 'single_choice',
-        prompt: 'A line every desi dad has said',
-        options: [
-          { id: 'money_trees', label: '"Money Doesn\'t Grow on Trees"' },
-          { id: 'lights_off', label: '"Lights Off Karo"' },
-          { id: 'back_in_my_day', label: '"Back in My Day…"' },
-          { id: 'petrol', label: '"Petrol Kahan Se Aata Hai?"' },
-          { id: 'ask_mother', label: '"Ask Your Mother"' },
-          { id: 'other', label: 'Other', write_in: true }
-        ],
-        required: true,
-        write_in_placeholder: 'What other classic dad line?',
-        category: 'nostalgia'
-      },
-      {
-        id: 'relative_weight_comment',
-        order: 17,
-        kind: 'single_choice',
-        prompt: 'Relative\'s go-to comment after you gain 5 lbs',
-        options: [
-          { id: 'healthy_lag_rahe', label: '"Healthy Lag Rahe Ho"' },
-          { id: 'diet_karo', label: '"Diet Kar Lo"' },
-          { id: 'mashallah', label: '"Mashallah!"' },
-          { id: 'gym_kab', label: '"Gym Kab Jaoge?"' },
-          { id: 'kaam_mat_karo', label: '"Itna Kaam Mat Karo"' },
-          { id: 'other', label: 'Other', write_in: true }
-        ],
-        required: true,
-        write_in_placeholder: 'What else do they say?',
-        category: 'nostalgia'
-      },
-      {
-        id: 'mehndi_drama',
-        order: 18,
-        kind: 'single_choice',
-        prompt: 'Typical mehndi drama topic',
-        options: [
-          { id: 'who_performs_first', label: 'Who Performs First' },
-          { id: 'matching_outfits', label: 'Matching Outfits Clash' },
-          { id: 'dj_volume', label: 'DJ Volume' },
-          { id: 'stage_lineup', label: 'Stage lineup' },
-          { id: 'stage_photos', label: 'Stage Photos' },
-          { id: 'other', label: 'Other', write_in: true }
-        ],
-        required: true,
-        write_in_placeholder: 'What other mehndi drama?',
-        category: 'nostalgia'
+        write_in_placeholder: 'How do you react?',
+        category: 'personality'
       }
     ]
   },
   {
     id: 'batch_3',
     title: 'Deeper Reflections',
-    description: 'Values, travel, and personal preferences',
+    description: 'Values, travel & more',
     emoji: '💭',
-    estimatedTime: '2 min',
+    estimatedTime: '3 min',
     questions: [
       {
         id: 'fav_city_travel',
         order: 12,
         kind: 'short_text',
         prompt: 'Favorite city for travel',
-        placeholder: 'e.g., KL, Budapest, Tokyo',
+        placeholder: 'e.g., Istanbul, Paris, Tokyo',
         required: true,
         category: 'travel'
       },
       {
+        id: 'travel_vibe',
+        order: 13,
+        kind: 'single_choice',
+        prompt: "What's your travel vibe?",
+        options: [
+          { id: 'luxury_resort', label: 'Luxury resort' },
+          { id: 'budget_backpacker', label: 'Budget backpacker' },
+          { id: 'cultural_explorer', label: 'Cultural explorer' },
+          { id: 'beach_bum', label: 'Beach bum' },
+          { id: 'city_hopper', label: 'City hopper' },
+          { id: 'road_tripper', label: 'Road tripper' },
+          { id: 'staycation', label: 'Staycation lover' },
+          { id: 'other', label: 'Other', write_in: true }
+        ],
+        required: true,
+        write_in_placeholder: 'What travel vibe were you thinking?',
+        category: 'travel'
+      },
+      {
         id: 'tsa_luggage',
-        order: 10,
+        order: 14,
         kind: 'single_choice',
         prompt: 'What TSA side-eyes in your luggage',
         options: [
@@ -300,37 +262,93 @@ export const QUESTION_BATCHES = [
         category: 'travel'
       },
       {
-        id: 'reunion_brag',
-        order: 18,
+        id: 'smuggled_pakistan',
+        order: 15,
         kind: 'single_choice',
-        prompt: "Auntie's RSVP minutes before the event",
+        prompt: 'What gets "smuggled" from Pakistan in suitcases',
         options: [
-          { id: 'five_mins', label: '"Five Minutes Away"' },
-          { id: 'on_road', label: '"On the Road"' },
-          { id: 'leaving_now', label: '"Leaving Now"' },
-          { id: 'send_address', label: '"Send Address Again?"' },
+          { id: 'achar', label: 'Achar' },
+          { id: 'desi_joray', label: 'Desi Joray' },
+          { id: 'nimko_snacks', label: 'Nimko/Snacks' },
+          { id: 'seeds', label: 'Seeds' },
+          { id: 'mithai', label: 'Mithai' },
           { id: 'other', label: 'Other', write_in: true }
         ],
         required: true,
-        write_in_placeholder: 'What else does auntie say?',
+        write_in_placeholder: 'What do you bring back?',
         category: 'nostalgia'
       },
       {
-        id: 'couple_photo_prep',
-        order: 19,
+        id: 'desi_party_personality',
+        order: 20,
         kind: 'single_choice',
-        prompt: 'What people do before posting couple photos',
+        prompt: 'Your desi party personality?',
         options: [
-          { id: 'crop_someone', label: 'Crop someone out' },
-          { id: 'check_partner', label: 'Check with partner' },
-          { id: 'filter_smooth', label: 'Filter + smooth' },
-          { id: 'caption_consult', label: 'Caption consult with friend' },
-          { id: 'hide_ring', label: 'Hide ring hand' },
+          { id: 'first_last', label: 'First to arrive, last to leave' },
+          { id: 'fashionably_late', label: 'Fashionably late (always)' },
+          { id: 'khana_only', label: 'Shows up for khana only' },
+          { id: 'photographer', label: 'The photographer/Insta story maker' },
+          { id: 'corner_hiding', label: 'Corner mein hiding with one friend' },
+          { id: 'dance_floor', label: 'Dance floor pe jab koi nahi dekh raha' },
           { id: 'other', label: 'Other', write_in: true }
         ],
         required: true,
-        write_in_placeholder: 'What else do they do?',
-        category: 'values'
+        write_in_placeholder: 'What party personality were you thinking?',
+        category: 'social'
+      },
+      {
+        id: 'celebrity_crush_teen',
+        order: 19,
+        kind: 'short_text',
+        prompt: 'When I was a teenager my celebrity crush was?',
+        placeholder: 'e.g., Shah Rukh Khan, Zendaya',
+        required: true,
+        category: 'entertainment'
+      },
+      {
+        id: 'tv_obsession',
+        order: 21,
+        kind: 'short_text',
+        prompt: 'Current TV obsession?',
+        placeholder: 'e.g., The Bear, Succession',
+        required: true,
+        category: 'entertainment'
+      },
+      {
+        id: 'reading_vibe',
+        order: 22,
+        kind: 'single_choice',
+        prompt: 'Current reading vibe?',
+        options: [
+          { id: 'book_title', label: 'Book title: ___ (write-in)', write_in: true },
+          { id: 'audiobooks', label: 'Audiobooks are my thing' },
+          { id: 'social_media', label: 'Social media is my library' },
+          { id: 'tiktok', label: "I don't read, I just TikTok" },
+          { id: 'netflix_subtitles', label: 'Subtitles on Netflix' },
+          { id: 'other', label: 'Other', write_in: true }
+        ],
+        required: true,
+        write_in_placeholder: 'What are you reading?',
+        category: 'entertainment'
+      },
+      {
+        id: 'music_vibe',
+        order: 22,
+        kind: 'single_choice',
+        prompt: 'Your music vibe?',
+        options: [
+          { id: 'desi_bangers', label: 'Desi bangers' },
+          { id: 'nineties_nostalgia', label: '90s nostalgia' },
+          { id: 'pop_hits', label: 'Pop hits' },
+          { id: 'rnb_hiphop', label: 'R&B/Hip-Hop' },
+          { id: 'rock_alternative', label: 'Rock/Alternative' },
+          { id: 'classical_ghazals', label: 'Classical/Ghazals' },
+          { id: 'trending', label: "Whatever's trending" },
+          { id: 'other', label: 'Other', write_in: true }
+        ],
+        required: true,
+        write_in_placeholder: 'What music vibe were you thinking?',
+        category: 'entertainment'
       },
       {
         id: 'culture_marriage_love_arranged',
@@ -341,9 +359,8 @@ export const QUESTION_BATCHES = [
           { id: 'A', label: 'Love marriage' },
           { id: 'B', label: 'Arranged marriage' }
         ],
-        required: false,
+        required: true,
         flags: { allow_both: true, allow_neither: true },
-        aggregate_only: true,
         category: 'culture'
       }
     ]
