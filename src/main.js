@@ -1,3 +1,27 @@
+// About You: Modal for Pulao vs. Biryani explanation
+function wireDiffModal() {
+  const diffLink = document.getElementById('whatsTheDiffLink');
+  if (diffLink) {
+    diffLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Record as 'don't know diff' answer
+      document.dispatchEvent(new CustomEvent('dont-know-diff-clicked'));
+      diffLink.textContent = "Recorded as 'Don't know the diff'";
+      diffLink.style.pointerEvents = 'none';
+      diffLink.style.color = '#888';
+    });
+  }
+}
+
+// Call wireDiffModal after About You fragment is loaded
+window.addEventListener('DOMContentLoaded', () => {
+  wireDiffModal();
+});
+document.addEventListener('fragment-loaded', (e) => {
+  if (e.detail && e.detail.fragment === 'about_you') {
+    wireDiffModal();
+  }
+});
 import { supabase } from './services/supabaseClient.js';
 import { initHostDashboard } from './features/host/dashboard.js';
 import { toast } from './ui/toast.js';
@@ -254,6 +278,10 @@ async function route(userFromEvent) {
     }
     
     await loadFragment('#game-content', p);
+    // Attach modal event listeners for 'What's the diff?'
+    if (p === './partials/games/about_you.html') {
+      setTimeout(() => { wireDiffModal(); }, 0);
+    }
     
     // For about_you games, initialize the extended question experience
     if (type === 'about_you') {
@@ -1039,51 +1067,32 @@ function updateHeaderPartyInfo(party) {
     formattedDate = partyDate.toLocaleDateString('en-US', dateOptions);
     
     // Format time: "7:00 PM"
-    const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+    const timeOptions = { hour: 'numeric', second:'2-digit', minute: '2-digit', hour12: true };
     formattedTime = partyDate.toLocaleTimeString('en-US', timeOptions);
   }
   
   const hasDetails = party.description || party.venue;
   
+  const userEmail = window?.supabase?.auth?.user()?.email || '';
+  const roleBadgeText = document.getElementById('roleBadge')?.textContent || '';
   headerInfo.innerHTML = `
     <div class="party-header-redesign">
       <div class="party-header-compact">
-        <div class="party-line-one">
-          <div class="party-title-group">
-            <span class="party-emoji">${party.emoji || '🎉'}</span>
-            <h1 class="party-title">${escapeHtml(party.title)}</h1>
-          </div>
-          <div class="countdown-compact">
-            <span class="countdown-time">Loading...</span>
-          </div>
-        </div>
-        
-        <div class="party-line-two">
-          <div class="party-meta-info">
-            <span class="party-date">${formattedDate}</span>
-            <span class="party-time">${formattedTime}</span>
-            ${hasDetails ? `
-              <button class="info-icon-btn" title="View Details">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </button>
-            ` : ''}
-          </div>
-          
-          <div class="party-code-compact">
-            <span class="code-label">Code:</span>
-            <span class="code-value">${escapeHtml(party.slug)}</span>
-            <button class="copy-icon-btn" title="Copy code">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-            </button>
-          </div>
+        <div class="party-title-group" style="display: flex; align-items: center; gap: 8px;">
+          <span class="party-emoji" style="font-size: 1.1rem;">${party.emoji || '🎉'}</span>
+          <h1 class="party-title" style="font-size: 1rem; font-weight: 700; margin: 0; padding: 0; letter-spacing: 0.5px;">${escapeHtml(party.title)}</h1>
         </div>
       </div>
     </div>
   `;
+  // Set inline user email
+  const userEmailInline = document.getElementById('userEmailInline');
+  if (userEmailInline && userEmail) {
+    userEmailInline.textContent = userEmail;
+    userEmailInline.style.display = 'inline-block';
+  } else if (userEmailInline) {
+    userEmailInline.style.display = 'none';
+  }
   
   console.log('[updateHeaderPartyInfo] HTML set');
   

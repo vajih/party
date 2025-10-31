@@ -1,14 +1,13 @@
 <header class="site-header">
   <h1 class="brand">
-    <img src="/assets/img/logo.svg" alt="" style="height:20px;vertical-align:-4px;margin-right:6px;">
-    <span id="headerPartyInfo" class="header-party-info"></span>
-    <span data-mode-badge class="badge" style="margin-left:8px;"></span>
+  <span id="headerPartyInfo" class="header-party-info"></span>
+  <span id="userEmailInline" class="user-email-inline" style="font-size:0.85em; color:#888; margin-left:10px;"></span>
   </h1>
 
   <!-- Role badge: shows Host or Guest and is clickable for a quick hint (centered) -->
   <div class="header-center">
-    <span id="userEmailDisplay" class="user-email-display" style="display: none;"></span>
-    <button id="roleBadge" class="role-badge" aria-pressed="false" title="Guest">G</button>
+    <span id="userEmailDisplay" class="user-email-display" style="display:none;"></span>
+    <button id="roleBadge" class="role-badge" aria-pressed="false" title="Guest" style="margin-left:2px;">G</button>
   </div>
 
   <!-- Hidden on party pages -->
