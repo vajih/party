@@ -406,36 +406,41 @@ async function handleBatchSubmit(e) {
   const currentBatchIndex = QUESTION_BATCHES.findIndex(b => b.id === currentState.currentBatch);
   const nextBatch = QUESTION_BATCHES[currentBatchIndex + 1];
   
-  let completionMessage = `✓ ${getBatch(currentState.currentBatch).title} complete!`;
-  if (nextBatch) {
-    completionMessage += ` Now let's do ${nextBatch.title}.`;
+  // Check if all batches complete
+  const allComplete = QUESTION_BATCHES.every(batch => batchProgress[batch.id] === 'complete');
+  
+  let completionMessage = '';
+  
+  if (allComplete) {
+    // All batches complete - combined message
+    completionMessage = `🎉 Congratulations! You've completed all About You questions.\n\n📸 Let's get your baby photo uploaded next.`;
+  } else if (nextBatch) {
+    // More batches to go
+    completionMessage = `✓ ${getBatch(currentState.currentBatch).title} complete! Now let's do ${nextBatch.title}.`;
   } else {
-    // Last batch completed - guide them to next activity (Baby Photo)
+    // Last batch completed
     completionMessage = `📸 ${getBatch(currentState.currentBatch).title} complete! Let's get your baby photo uploaded next.`;
   }
   
   alert(completionMessage);
   
-  // Reload profile and show batch selector
+  // Reload profile and show batch selector (or main screen if all complete)
   await loadProfileData();
   showBatchSelector();
   
-  // Scroll to top of the page to show next batch
+  // Scroll to top of the page
   window.scrollTo({ top: 0, behavior: 'smooth' });
   
-  // Check if all batches complete
-  const allComplete = QUESTION_BATCHES.every(batch => batchProgress[batch.id] === 'complete');
+  // If all complete, navigate to baby photo game
   if (allComplete) {
     // Dispatch event to refresh progress tracker
     window.dispatchEvent(new Event('submission-updated'));
     
-    alert('🎉 Congratulations! You\'ve completed your full profile!');
-    
-    // Navigate to Favorite Song game after a short delay to allow progress tracker to refresh
+    // Navigate to Baby Photo game after a short delay
     setTimeout(() => {
-      const favoriteSongStep = document.querySelector('.progress-step[data-game-id="favorite_song"]');
-      if (favoriteSongStep) {
-        favoriteSongStep.click();
+      const babyPhotoStep = document.querySelector('.progress-step[data-game-id="baby_photos"]');
+      if (babyPhotoStep) {
+        babyPhotoStep.click();
       }
     }, 800);
   }

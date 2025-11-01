@@ -106,10 +106,18 @@ function renderEitherOrQuestion(question, currentAnswer = null) {
  * Render a single_choice question (radio buttons or cards)
  */
 function renderSingleChoiceQuestion(question, currentAnswer = null) {
-  const { id, prompt, options, required } = question;
+  const { id, prompt, options, required, write_in_placeholder } = question;
   
-  const hasWriteIn = options.some(opt => opt.write_in);
-  const writeInValue = currentAnswer && currentAnswer.startsWith('X:') ? currentAnswer.substring(2) : '';
+  const placeholder = write_in_placeholder || 'type here...';
+  
+  // Extract write-in value if it exists
+  let writeInValue = '';
+  let selectedWriteInOption = null;
+  if (currentAnswer && currentAnswer.startsWith('X:')) {
+    writeInValue = currentAnswer.substring(2);
+    // Try to determine which write-in option was selected based on the format
+    selectedWriteInOption = options.find(opt => opt.write_in && writeInValue.toLowerCase().startsWith(opt.id));
+  }
   
   return `
     <div class="question-card single-choice" data-question-id="${id}">
@@ -121,29 +129,36 @@ function renderSingleChoiceQuestion(question, currentAnswer = null) {
       </div>
       
       <div class="single-choice-options">
-        ${options.map(option => `
-          <button 
-            type="button" 
-            class="choice-btn ${currentAnswer === option.id ? 'selected' : ''}"
-            data-option="${option.id}"
-            ${option.write_in ? 'data-write-in="true"' : ''}>
-            <span class="radio-indicator"></span>
-            <span class="choice-label">${escapeHtml(option.label)}</span>
-            <span class="check-icon">✓</span>
-          </button>
-        `).join('')}
+        ${options.map(option => {
+          const isSelected = currentAnswer === option.id || (option.write_in && selectedWriteInOption?.id === option.id);
+          const showWriteIn = option.write_in && isSelected;
+          
+          return `
+            <div class="choice-option-wrapper">
+              <button 
+                type="button" 
+                class="choice-btn ${isSelected ? 'selected' : ''}"
+                data-option="${option.id}"
+                ${option.write_in ? 'data-write-in="true"' : ''}>
+                <span class="radio-indicator"></span>
+                <span class="choice-label">${escapeHtml(option.label)}</span>
+                <span class="check-icon">✓</span>
+              </button>
+              ${option.write_in ? `
+                <div class="write-in-container" data-option="${option.id}" style="${showWriteIn ? '' : 'display: none;'}">
+                  <input 
+                    type="text" 
+                    class="write-in-input" 
+                    placeholder="${escapeHtml(placeholder)}"
+                    value="${showWriteIn ? escapeHtml(writeInValue.replace(option.id + ':', '').trim()) : ''}"
+                    maxlength="100"
+                    data-prefix="${option.id}:">
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('')}
       </div>
-
-      ${hasWriteIn ? `
-        <div class="write-in-container" style="${currentAnswer && currentAnswer.startsWith('X:') ? '' : 'display: none;'}">
-          <input 
-            type="text" 
-            class="write-in-input" 
-            placeholder="Who were you thinking...?"
-            value="${escapeHtml(writeInValue)}"
-            maxlength="50">
-        </div>
-      ` : ''}
       
       <input type="hidden" name="${id}" value="${escapeHtml(currentAnswer || '')}">
     </div>
@@ -348,37 +363,55 @@ function bindSingleChoiceHandlers(container) {
   cards.forEach(card => {
     const hiddenInput = qs('input[type="hidden"]', card);
     const choiceButtons = qsa('.choice-btn', card);
-    const writeInContainer = qs('.write-in-container', card);
-    const writeInInput = qs('.write-in-input', card);
+    const writeInContainers = qsa('.write-in-container', card);
     
     choiceButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        // Deselect all
+        // Deselect all buttons
         choiceButtons.forEach(b => b.classList.remove('selected'));
         
-        // Select clicked
+        // Hide all write-in containers
+        writeInContainers.forEach(wic => wic.style.display = 'none');
+        
+        // Select clicked button
         btn.classList.add('selected');
         
         const optionId = btn.dataset.option;
         const isWriteIn = btn.dataset.writeIn === 'true';
         
-        if (isWriteIn && writeInContainer) {
-          writeInContainer.style.display = 'block';
-          writeInInput?.focus();
-          hiddenInput.value = `X:${writeInInput?.value || ''}`;
+        if (isWriteIn) {
+          // Find the write-in container for this specific option
+          const writeInContainer = Array.from(writeInContainers).find(
+            wic => wic.dataset.option === optionId
+          );
+          const writeInInput = writeInContainer?.querySelector('.write-in-input');
+          
+          if (writeInContainer) {
+            writeInContainer.style.display = 'block';
+            writeInInput?.focus();
+            
+            // Get the prefix (e.g., "book_title:")
+            const prefix = writeInInput?.dataset.prefix || '';
+            const currentValue = writeInInput?.value || '';
+            hiddenInput.value = `X:${prefix}${currentValue}`;
+          }
         } else {
-          if (writeInContainer) writeInContainer.style.display = 'none';
           hiddenInput.value = optionId;
         }
       });
     });
     
-    // Handle write-in input changes
-    if (writeInInput) {
-      writeInInput.addEventListener('input', () => {
-        hiddenInput.value = `X:${writeInInput.value}`;
-      });
-    }
+    // Handle write-in input changes for each write-in container
+    writeInContainers.forEach(writeInContainer => {
+      const writeInInput = qs('.write-in-input', writeInContainer);
+      
+      if (writeInInput) {
+        writeInInput.addEventListener('input', () => {
+          const prefix = writeInInput.dataset.prefix || '';
+          hiddenInput.value = `X:${prefix}${writeInInput.value}`;
+        });
+      }
+    });
   });
 }
 
