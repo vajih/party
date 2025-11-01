@@ -1102,20 +1102,29 @@ function updateHeaderPartyInfo(party) {
     formattedDate = partyDate.toLocaleDateString('en-US', dateOptions);
     
     // Format time: "7:00 PM"
-    const timeOptions = { hour: 'numeric', second:'2-digit', minute: '2-digit', hour12: true };
+    const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
     formattedTime = partyDate.toLocaleTimeString('en-US', timeOptions);
   }
   
   const hasDetails = party.description || party.venue;
+  
+  // Build date/time display string
+  let dateTimeDisplay = '';
+  if (party.date) {
+    dateTimeDisplay = `<div style="font-size: 0.65rem; color: #888; margin-top: 2px; font-weight: 400;">${formattedDate} • ${formattedTime}</div>`;
+  }
   
   const userEmail = window?.supabase?.auth?.user()?.email || '';
   const roleBadgeText = document.getElementById('roleBadge')?.textContent || '';
   headerInfo.innerHTML = `
     <div class="party-header-redesign">
       <div class="party-header-compact">
-        <div class="party-title-group" style="display: flex; align-items: center; gap: 8px;">
-          <span class="party-emoji" style="font-size: 1.1rem;">${party.emoji || '🎉'}</span>
-          <h1 class="party-title" style="font-size: 1rem; font-weight: 700; margin: 0; padding: 0; letter-spacing: 0.5px;">${escapeHtml(party.title)}</h1>
+        <div class="party-title-group" style="display: flex; flex-direction: column; gap: 0;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="party-emoji" style="font-size: 1.1rem;">${party.emoji || '🎉'}</span>
+            <h1 class="party-title" style="font-size: 1rem; font-weight: 700; margin: 0; padding: 0; letter-spacing: 0.5px;">${escapeHtml(party.title)}</h1>
+          </div>
+          ${dateTimeDisplay}
         </div>
       </div>
     </div>
