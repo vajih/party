@@ -1,13 +1,22 @@
 {
-  "name": "Party App",
-  "short_name": "PartyApp",
+  "name": "Dilwale Friends Giving 2025",
+  "short_name": "Dilwale Party",
   "start_url": "/index.html",
   "display": "standalone",
-  "icons": [
-    {
+  "icons": [{
       "src": "./favicon.ico",
       "type": "image/x-icon",
-      "sizes": "48x48"
+      "sizes": "16x16 32x32 48x48"
+    },
+    {
+      "src": "./android-chrome-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "./android-chrome-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ],
   "theme_color": "#22c55e",
