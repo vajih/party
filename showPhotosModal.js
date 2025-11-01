@@ -19,7 +19,9 @@ async function showPhotosModal(gameId) {
     const content = sub.content || {};
     const photoUrl = content.photo_url;
     const photoInfo = content.photo_info || '';
-    const submittedBy = sub.display_name || 'Anonymous';
+    const submittedBy = content.submitted_by_name || sub.display_name || 'Anonymous';
+    const submittedEmail = content.submitted_by_email || '';
+    const submittedWhatsapp = content.submitted_by_whatsapp || '';
     const date = new Date(sub.created_at).toLocaleDateString();
 
     if (!photoUrl) return ''; // Skip if no photo
@@ -32,9 +34,15 @@ async function showPhotosModal(gameId) {
                style="width:100%; height:100%; object-fit:cover;" />
         </div>
         <div style="padding:12px;">
-          <div style="font-weight:600; margin-bottom:4px;">${escapeHtml(submittedBy)}</div>
-          ${photoInfo ? `<div style="font-size:13px; color:#6b7280; margin-bottom:4px;">${escapeHtml(photoInfo)}</div>` : ''}
+          <div style="font-weight:600; margin-bottom:2px;">
+            ${escapeHtml(submittedBy)}<br>
+            <span style="font-size:13px; color:#6b7280;">${escapeHtml(submittedEmail) || '<span style=\"color:#aaa;\">N/A</span>'}</span>
+          </div>
+          ${photoInfo ? `<div style=\"font-size:13px; color:#6b7280; margin-bottom:4px;\">${escapeHtml(photoInfo)}</div>` : ''}
           <div style="font-size:12px; color:#9ca3af;">${date}</div>
+          <div style="margin-top:8px; font-size:13px; color:#444;">
+            <strong>WhatsApp:</strong> ${escapeHtml(submittedWhatsapp) || '<span style=\"color:#aaa;\">N/A</span>'}
+          </div>
         </div>
       </div>
     `;

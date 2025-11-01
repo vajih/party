@@ -275,7 +275,8 @@ async function handleBasicInfoSubmit(e) {
   e.preventDefault();
   
   const displayName = qs('#display_name').value.trim();
-  const whatsappNumber = qs('#whatsapp_number').value.trim();
+  const whatsappNumberField = qs('#whatsapp_number');
+  const whatsappNumber = whatsappNumberField ? whatsappNumberField.value.trim() : '';
   
   if (!displayName) {
     alert('Please enter your display name');

@@ -748,13 +748,33 @@ async function route(userFromEvent) {
               return;
             }
             
+            // Fetch user's display name from profile
+            let display_name = '';
+            try {
+              const { data: profileData } = await supabase
+                .from('party_profiles')
+                .select('display_name')
+                .eq('party_id', game.party_id)
+                .eq('user_id', sessionData.session.user.id)
+                .single();
+              display_name = profileData?.display_name || (sessionData.session.user.email || sessionData.session.user.user_metadata?.name || 'Anonymous');
+            } catch {
+              display_name = sessionData.session.user.email || sessionData.session.user.user_metadata?.name || 'Anonymous';
+            }
+            
             // Submit to database
             const { error } = await supabase.from('submissions').insert({
               game_id: game.id,
               party_id: game.party_id,
               user_id: sessionData.session.user.id,
-              content: { title, artist, link },
-              display_name: null,
+              content: { 
+                title, 
+                artist, 
+                link,
+                submitted_by_name: display_name,
+                submitted_by_email: sessionData.session.user.email
+              },
+              display_name: display_name,
               moderation_status: 'pending'
             });
             
@@ -914,6 +934,20 @@ async function route(userFromEvent) {
                 .getPublicUrl(fileName);
 
               // Save submission to database
+              // Fetch user profile for WhatsApp number and display name
+              let whatsapp_number = '';
+              let display_name = '';
+              try {
+                const { data: profileData } = await supabase
+                  .from('party_profiles')
+                  .select('display_name, whatsapp_number')
+                  .eq('party_id', game.party_id)
+                  .eq('user_id', user.id)
+                  .single();
+                whatsapp_number = profileData?.whatsapp_number || '';
+                display_name = profileData?.display_name || (user.email || user.user_metadata?.name || 'Anonymous');
+              } catch {}
+
               const { error: dbError } = await supabase.from('submissions').insert({
                 game_id: game.id,
                 party_id: game.party_id,
@@ -922,10 +956,11 @@ async function route(userFromEvent) {
                   photo_url: publicUrl, 
                   file_path: fileName,
                   photo_info: photoInfo,
-                  submitted_by_name: user.email || user.user_metadata?.name || 'Anonymous',
-                  submitted_by_email: user.email
+                  submitted_by_name: display_name,
+                  submitted_by_email: user.email,
+                  submitted_by_whatsapp: whatsapp_number
                 },
-                display_name: photoInfo || null,
+                display_name: display_name,
                 moderation_status: 'pending'
               });
 
@@ -1582,8 +1617,8 @@ async function showWelcomeModalIfNeeded(party, user) {
             </div>
             
             <blockquote class="invitation-quote">
-              "Let the beauty of what you love be what you do."
-              <cite>— Rumi</cite>
+              "Without a friend, the road is empty and the journey endless."
+              <cite>— Attar of Nishapur</cite>
             </blockquote>
             
             <p class="invitation-note">

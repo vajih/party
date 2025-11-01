@@ -49,7 +49,7 @@ export const QUESTION_BATCHES = [
           { id: 'other', label: 'Other', write_in: true }
         ],
         required: true,
-        write_in_placeholder: 'What comfort food did you have in mind?',
+        write_in_placeholder: 'What were you thinking?',
         category: 'food'
       },
       {
@@ -66,7 +66,7 @@ export const QUESTION_BATCHES = [
           { id: 'other', label: 'Other', write_in: true }
         ],
         required: true,
-        write_in_placeholder: 'Which spot were you thinking?',
+        write_in_placeholder: 'Where were you thinking?',
         category: 'food'
       },
       {
@@ -78,7 +78,7 @@ export const QUESTION_BATCHES = [
           { id: 'paratha_chai', label: 'Paratha + Chai' },
           { id: 'halwa_puri', label: 'Halwa Puri' },
           { id: 'nihari_naan', label: 'Nihari + Naan' },
-          { id: 'aloo_poori', label: 'Aloo Poori' },
+          { id: 'omelette', label: 'Omelette' },
           { id: 'anda_paratha', label: 'Anda Paratha' },
           { id: 'cereal', label: 'Cereal (boring!)' },
           { id: 'other', label: 'Other', write_in: true }
@@ -133,7 +133,7 @@ export const QUESTION_BATCHES = [
           { id: 'other', label: 'Other', write_in: true }
         ],
         required: true,
-        write_in_placeholder: 'What sounds perfect to you?',
+        write_in_placeholder: 'What were you thinking?',
         category: 'personality'
       },
       {
@@ -242,23 +242,6 @@ export const QUESTION_BATCHES = [
         ],
         required: true,
         write_in_placeholder: 'What travel vibe were you thinking?',
-        category: 'travel'
-      },
-      {
-        id: 'tsa_luggage',
-        order: 14,
-        kind: 'single_choice',
-        prompt: 'What TSA side-eyes in your luggage',
-        options: [
-          { id: 'tea_bags', label: 'Everyday & Tapal Tea Bags' },
-          { id: 'spice_packets', label: 'Spice Packets Galore' },
-          { id: 'supari', label: 'Shahi Supari Roll' },
-          { id: 'henna', label: 'Henna Cones' },
-          { id: 'achar', label: 'Achar Jar' },
-          { id: 'other', label: 'Other', write_in: true }
-        ],
-        required: true,
-        write_in_placeholder: 'What else raises TSA eyebrows?',
         category: 'travel'
       },
       {

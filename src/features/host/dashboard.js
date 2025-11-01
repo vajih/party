@@ -536,11 +536,19 @@ async function renderModQueue(user){
     // Handle baby_photo submissions with image preview
     if (type === 'baby_photo' && content.photo_url) {
       const photoInfo = content.photo_info ? `<div class="small" style="margin-top:4px;"><strong>Photo Info:</strong> ${escapeHtml(content.photo_info)}</div>` : '';
+      const submittedBy = content.submitted_by_name || row.display_name || 'Anonymous';
+      const submittedEmail = content.submitted_by_email || '';
+      const submittedWhatsapp = content.submitted_by_whatsapp || '';
       return `<div style="margin-top:8px;">
         <img src="${escapeHtml(content.photo_url)}" 
              alt="Baby photo submission" 
              style="max-width:200px;max-height:200px;border-radius:8px;border:1px solid #e5e7eb;object-fit:cover;" />
         ${photoInfo}
+        <div class="small" style="margin-top:8px;">
+          <strong>Name:</strong> ${escapeHtml(submittedBy)}<br>
+          <strong>Email:</strong> ${escapeHtml(submittedEmail) || '<span style=\"color:#aaa;\">N/A</span>'}<br>
+          <strong>WhatsApp:</strong> ${escapeHtml(submittedWhatsapp) || '<span style=\"color:#aaa;\">N/A</span>'}
+        </div>
       </div>`;
     }
     
@@ -1357,7 +1365,7 @@ async function showSongsModal(gameId) {
     const title = content.title || 'Untitled';
     const artist = content.artist || 'Unknown Artist';
     const voteCount = voteCounts[sub.id] || 0;
-    const submittedBy = sub.display_name || 'Anonymous';
+    const submittedBy = content.submitted_by_name || sub.display_name || 'Anonymous';
     const date = new Date(sub.created_at).toLocaleDateString();
 
     return `
@@ -1441,7 +1449,9 @@ async function showPhotosModal(gameId) {
     const content = sub.content || {};
     const photoUrl = content.photo_url;
     const photoInfo = content.photo_info || '';
-    const submittedBy = sub.display_name || 'Anonymous';
+    const submittedBy = content.submitted_by_name || sub.display_name || 'Anonymous';
+    const submittedEmail = content.submitted_by_email || '';
+    const submittedWhatsapp = content.submitted_by_whatsapp || '';
     const date = new Date(sub.created_at).toLocaleDateString();
 
     if (!photoUrl) return ''; // Skip if no photo
@@ -1454,9 +1464,15 @@ async function showPhotosModal(gameId) {
                style="width:100%; height:100%; object-fit:cover;" />
         </div>
         <div style="padding:12px;">
-          <div style="font-weight:600; margin-bottom:4px;">${escapeHtml(submittedBy)}</div>
+          <div style="font-weight:600; margin-bottom:2px;">
+            ${escapeHtml(submittedBy)}<br>
+            <span style="font-size:13px; color:#6b7280;">${escapeHtml(submittedEmail) || '<span style="color:#aaa;">N/A</span>'}</span>
+          </div>
           ${photoInfo ? `<div style="font-size:13px; color:#6b7280; margin-bottom:4px;">${escapeHtml(photoInfo)}</div>` : ''}
           <div style="font-size:12px; color:#9ca3af;">${date}</div>
+          <div style="margin-top:8px; font-size:13px; color:#444;">
+            <strong>WhatsApp:</strong> ${escapeHtml(submittedWhatsapp) || '<span style="color:#aaa;">N/A</span>'}
+          </div>
         </div>
       </div>
     `;
