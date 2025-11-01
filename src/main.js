@@ -398,6 +398,7 @@ async function route(userFromEvent) {
             const formData = new FormData(form);
             const displayName = formData.get('display_name');
             const birthCity = (formData.get('birth_city') || '').trim();
+            const favCityTravel = (formData.get('fav_city_travel') || '').trim();
             
             if (!displayName) {
               alert('Please enter a display name.');
@@ -448,10 +449,27 @@ async function route(userFromEvent) {
                 if (geoResult) {
                   birthLat = geoResult.lat;
                   birthLng = geoResult.lng;
-                  console.log('[about_you] Geocoded city:', birthCity, '→', geoResult);
+                  console.log('[about_you] Geocoded birth city:', birthCity, '→', geoResult);
                 }
               } catch (geoError) {
-                console.warn('[about_you] Geocoding failed:', geoError);
+                console.warn('[about_you] Birth city geocoding failed:', geoError);
+                // Continue anyway - city name is still saved
+              }
+            }
+            
+            // Geocode favorite travel destination
+            let favDestLat = null;
+            let favDestLng = null;
+            if (favCityTravel) {
+              try {
+                const geoResult = await geocodeCity(favCityTravel);
+                if (geoResult) {
+                  favDestLat = geoResult.lat;
+                  favDestLng = geoResult.lng;
+                  console.log('[about_you] Geocoded travel destination:', favCityTravel, '→', geoResult);
+                }
+              } catch (geoError) {
+                console.warn('[about_you] Travel destination geocoding failed:', geoError);
                 // Continue anyway - city name is still saved
               }
             }
@@ -474,7 +492,10 @@ async function route(userFromEvent) {
                 display_name: displayName,
                 birth_city: birthCity,
                 birth_lat: birthLat,
-                birth_lng: birthLng
+                birth_lng: birthLng,
+                fav_dest_city: favCityTravel,
+                fav_dest_lat: favDestLat,
+                fav_dest_lng: favDestLng
               };
               
               const { error: profileError } = await supabase

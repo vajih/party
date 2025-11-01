@@ -665,7 +665,7 @@ async function renderAboutYouReport(user) {
     // Query all profiles for this party with batch_progress and extended_answers
     const { data: profiles, error } = await supabase
       .from('party_profiles')
-      .select('party_id, user_id, display_name, batch_progress, extended_answers')
+      .select('party_id, user_id, display_name, batch_progress, extended_answers, birth_city, birth_lat, birth_lng, fav_dest_city, fav_dest_lat, fav_dest_lng')
       .eq('party_id', partyId)
       .order('display_name');
 
@@ -891,20 +891,32 @@ async function renderAboutYouReport(user) {
 
   // Initialize birth city map
   function initBirthCityMap(profiles) {
+    console.log('[initBirthCityMap] Called with profiles:', profiles);
+    
     const mapContainer = document.getElementById('birthCityMap');
-    if (!mapContainer) return;
-
-    // Check if Leaflet is loaded
-    if (typeof L === 'undefined') {
-      console.error('Leaflet not loaded');
+    if (!mapContainer) {
+      console.error('[initBirthCityMap] Map container not found');
       return;
     }
 
-    // Clear any existing map
+    // Check if Leaflet is loaded
+    if (typeof L === 'undefined') {
+      console.error('[initBirthCityMap] Leaflet not loaded');
+      return;
+    }
+
+    // Don't clear the container - Leaflet needs it to exist
+    // Just check if map already exists and remove it
+    if (mapContainer._leaflet_id) {
+      mapContainer._leaflet_id = null;
+    }
     mapContainer.innerHTML = '';
     
-    // Create map
-    const map = L.map('birthCityMap').setView([30, 0], 2);
+    // Create map - use the container ID
+    const map = L.map('birthCityMap', {
+      center: [30, 0],
+      zoom: 2
+    });
     
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -912,15 +924,201 @@ async function renderAboutYouReport(user) {
       maxZoom: 18
     }).addTo(map);
 
-    // Add markers for birth cities
-    const bounds = [];
+    // Group profiles by city to count users per city
+    const cityGroups = {};
     profiles.forEach(p => {
+      console.log('[initBirthCityMap] Profile:', {
+        display_name: p.display_name,
+        birth_city: p.birth_city,
+        birth_lat: p.birth_lat,
+        birth_lng: p.birth_lng
+      });
+      
       if (p.birth_lat && p.birth_lng && p.birth_city) {
-        const marker = L.marker([p.birth_lat, p.birth_lng]).addTo(map);
-        marker.bindPopup(`<strong>${escapeHtml(p.display_name || 'Guest')}</strong><br/>${escapeHtml(p.birth_city)}`);
-        bounds.push([p.birth_lat, p.birth_lng]);
+        const cityKey = `${p.birth_city}-${p.birth_lat}-${p.birth_lng}`;
+        if (!cityGroups[cityKey]) {
+          cityGroups[cityKey] = {
+            city: p.birth_city,
+            lat: p.birth_lat,
+            lng: p.birth_lng,
+            guests: []
+          };
+        }
+        cityGroups[cityKey].guests.push(p.display_name || 'Guest');
       }
     });
+
+    const cityData = Object.values(cityGroups);
+    console.log('[initBirthCityMap] City data:', cityData);
+    
+    if (cityData.length === 0) {
+      console.warn('[initBirthCityMap] No cities with coordinates found');
+      return;
+    }
+
+    // Find max count for scaling
+    const maxCount = Math.max(...cityData.map(c => c.guests.length));
+    console.log('[initBirthCityMap] Max count:', maxCount);
+    
+    // Add circle markers with proportional sizing
+    const bounds = [];
+    cityData.forEach(city => {
+      const count = city.guests.length;
+      
+      // Scale radius based on count (8-30px range)
+      const radius = 8 + (count / maxCount) * 22;
+      
+      console.log('[initBirthCityMap] Adding circle:', {
+        city: city.city,
+        lat: city.lat,
+        lng: city.lng,
+        count: count,
+        radius: radius
+      });
+      
+      // Create circle marker
+      const circle = L.circleMarker([city.lat, city.lng], {
+        radius: radius,
+        fillColor: '#8b5cf6',
+        color: '#fff',
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.7
+      }).addTo(map);
+      
+      // Create popup with guest list
+      const guestList = city.guests.map(name => `• ${escapeHtml(name)}`).join('<br/>');
+      const plural = count === 1 ? 'guest' : 'guests';
+      circle.bindPopup(`
+        <div style="min-width: 150px;">
+          <strong style="font-size: 1.1em; color: #1f2937;">${escapeHtml(city.city)}</strong>
+          <div style="color: #6b7280; font-size: 0.9em; margin: 4px 0 8px 0;">${count} ${plural}</div>
+          <div style="font-size: 0.85em; line-height: 1.5; color: #4b5563;">${guestList}</div>
+        </div>
+      `);
+      
+      bounds.push([city.lat, city.lng]);
+    });
+
+    console.log('[initBirthCityMap] Total circles added:', cityData.length);
+
+    // Fit map to show all markers
+    if (bounds.length > 0) {
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }
+
+  // Initialize favorite travel destination map
+  function initTravelDestMap(profiles) {
+    console.log('[initTravelDestMap] Called with profiles:', profiles);
+    
+    const mapContainer = document.getElementById('travelDestMap');
+    if (!mapContainer) {
+      console.error('[initTravelDestMap] Map container not found');
+      return;
+    }
+
+    // Check if Leaflet is loaded
+    if (typeof L === 'undefined') {
+      console.error('[initTravelDestMap] Leaflet not loaded');
+      return;
+    }
+
+    // Handle existing map
+    if (mapContainer._leaflet_id) {
+      mapContainer._leaflet_id = null;
+    }
+    mapContainer.innerHTML = '';
+    
+    // Create map
+    const map = L.map('travelDestMap', {
+      center: [30, 0],
+      zoom: 2
+    });
+    
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 18
+    }).addTo(map);
+
+    // Group profiles by destination city to count users per city
+    const cityGroups = {};
+    profiles.forEach(p => {
+      console.log('[initTravelDestMap] Profile:', {
+        display_name: p.display_name,
+        fav_dest_city: p.fav_dest_city,
+        fav_dest_lat: p.fav_dest_lat,
+        fav_dest_lng: p.fav_dest_lng
+      });
+      
+      if (p.fav_dest_lat && p.fav_dest_lng && p.fav_dest_city) {
+        const cityKey = `${p.fav_dest_city}-${p.fav_dest_lat}-${p.fav_dest_lng}`;
+        if (!cityGroups[cityKey]) {
+          cityGroups[cityKey] = {
+            city: p.fav_dest_city,
+            lat: p.fav_dest_lat,
+            lng: p.fav_dest_lng,
+            guests: []
+          };
+        }
+        cityGroups[cityKey].guests.push(p.display_name || 'Guest');
+      }
+    });
+
+    const cityData = Object.values(cityGroups);
+    console.log('[initTravelDestMap] City data:', cityData);
+    
+    if (cityData.length === 0) {
+      console.warn('[initTravelDestMap] No destination cities with coordinates found');
+      return;
+    }
+
+    // Find max count for scaling
+    const maxCount = Math.max(...cityData.map(c => c.guests.length));
+    console.log('[initTravelDestMap] Max count:', maxCount);
+    
+    // Add circle markers with proportional sizing
+    const bounds = [];
+    cityData.forEach(city => {
+      const count = city.guests.length;
+      
+      // Scale radius based on count (8-30px range)
+      const radius = 8 + (count / maxCount) * 22;
+      
+      console.log('[initTravelDestMap] Adding circle:', {
+        city: city.city,
+        lat: city.lat,
+        lng: city.lng,
+        count: count,
+        radius: radius
+      });
+      
+      // Create circle marker with different color (teal/cyan for travel)
+      const circle = L.circleMarker([city.lat, city.lng], {
+        radius: radius,
+        fillColor: '#06b6d4',  // Cyan color for travel
+        color: '#fff',
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.7
+      }).addTo(map);
+      
+      // Create popup with guest list
+      const guestList = city.guests.map(name => `• ${escapeHtml(name)}`).join('<br/>');
+      const plural = count === 1 ? 'guest' : 'guests';
+      circle.bindPopup(`
+        <div style="min-width: 150px;">
+          <strong style="font-size: 1.1em; color: #1f2937;">✈️ ${escapeHtml(city.city)}</strong>
+          <div style="color: #6b7280; font-size: 0.9em; margin: 4px 0 8px 0;">${count} ${plural} want to visit</div>
+          <div style="font-size: 0.85em; line-height: 1.5; color: #4b5563;">${guestList}</div>
+        </div>
+      `);
+      
+      bounds.push([city.lat, city.lng]);
+    });
+
+    console.log('[initTravelDestMap] Total circles added:', cityData.length);
 
     // Fit map to show all markers
     if (bounds.length > 0) {
@@ -939,6 +1137,8 @@ async function renderAboutYouReport(user) {
             .map(p => (p.extended_answers || {})[q.id])
             .filter(a => a !== undefined && a !== null && a !== '');
 
+          console.log(`[renderAggregateView] Question: ${q.id}, kind: ${q.kind}, answers:`, answers);
+
           if (answers.length === 0) {
             return `
               <div class="aggregate-question-block">
@@ -952,8 +1152,15 @@ async function renderAboutYouReport(user) {
           
           // Special handling for birth_city - show map
           if (q.id === 'birth_city') {
+            console.log('[renderAggregateView] Processing birth_city question');
+            console.log('[renderAggregateView] Answers:', answers);
+            console.log('[renderAggregateView] Profiles:', profiles);
+            
             const cities = answers.filter(a => a);
+            console.log('[renderAggregateView] Filtered cities:', cities);
+            
             if (cities.length > 0) {
+              console.log('[renderAggregateView] Creating map container and scheduling init');
               resultsHtml = `
                 <div class="report-map-container" id="birthCityMap"></div>
                 <p style="color: #6b7280; font-size: 0.875rem; margin-top: 12px; text-align: center;">
@@ -962,11 +1169,42 @@ async function renderAboutYouReport(user) {
               `;
               
               // Initialize map after DOM is ready
-              setTimeout(() => initBirthCityMap(profiles), 100);
+              setTimeout(() => {
+                console.log('[renderAggregateView] setTimeout executing, calling initBirthCityMap');
+                initBirthCityMap(profiles);
+              }, 100);
             } else {
+              console.log('[renderAggregateView] No cities found, showing no data message');
               resultsHtml = '<div class="report-no-map-data"><i class="fas fa-map-marked-alt" style="margin-right: 8px;"></i> No birth cities with coordinates available</div>';
             }
           } 
+          // Special handling for fav_city_travel - show travel destination map
+          else if (q.id === 'fav_city_travel') {
+            console.log('[renderAggregateView] Processing fav_city_travel question');
+            console.log('[renderAggregateView] Travel answers:', answers);
+            
+            const cities = answers.filter(a => a);
+            console.log('[renderAggregateView] Filtered travel cities:', cities);
+            
+            if (cities.length > 0) {
+              console.log('[renderAggregateView] Creating travel map container and scheduling init');
+              resultsHtml = `
+                <div class="report-map-container" id="travelDestMap"></div>
+                <p style="color: #6b7280; font-size: 0.875rem; margin-top: 12px; text-align: center;">
+                  ${cities.length} ${cities.length === 1 ? 'destination' : 'destinations'} marked
+                </p>
+              `;
+              
+              // Initialize map after DOM is ready
+              setTimeout(() => {
+                console.log('[renderAggregateView] setTimeout executing, calling initTravelDestMap');
+                initTravelDestMap(profiles);
+              }, 100);
+            } else {
+              console.log('[renderAggregateView] No travel destinations found, showing no data message');
+              resultsHtml = '<div class="report-no-map-data"><i class="fas fa-plane-departure" style="margin-right: 8px;"></i> No travel destinations with coordinates available</div>';
+            }
+          }
           else if (q.kind === 'either_or') {
             const counts = {};
             answers.forEach(a => {
@@ -999,7 +1237,90 @@ async function renderAboutYouReport(user) {
                 `;
               }).join('');
 
-          } else if (q.kind === 'single_choice') {
+          } 
+          else if (q.kind === 'dropdown') {
+            console.log('[renderAggregateView] Processing dropdown question:', q.id);
+            
+            // Special handling for dropdown questions like zodiac sign
+            const counts = {};
+            answers.forEach(a => {
+              const key = typeof a === 'string' ? a.toLowerCase() : a;
+              counts[key] = (counts[key] || 0) + 1;
+            });
+
+            console.log('[renderAggregateView] Dropdown counts:', counts);
+            const total = answers.length;
+            
+            // For zodiac_sign, show a visual histogram
+            if (q.id === 'zodiac_sign') {
+              console.log('[renderAggregateView] Rendering zodiac histogram');
+              
+              // Define zodiac order and emojis
+              const zodiacOrder = [
+                { id: 'aries', label: 'Aries', emoji: '♈' },
+                { id: 'taurus', label: 'Taurus', emoji: '♉' },
+                { id: 'gemini', label: 'Gemini', emoji: '♊' },
+                { id: 'cancer', label: 'Cancer', emoji: '♋' },
+                { id: 'leo', label: 'Leo', emoji: '♌' },
+                { id: 'virgo', label: 'Virgo', emoji: '♍' },
+                { id: 'libra', label: 'Libra', emoji: '♎' },
+                { id: 'scorpio', label: 'Scorpio', emoji: '♏' },
+                { id: 'sagittarius', label: 'Sagittarius', emoji: '♐' },
+                { id: 'capricorn', label: 'Capricorn', emoji: '♑' },
+                { id: 'aquarius', label: 'Aquarius', emoji: '♒' },
+                { id: 'pisces', label: 'Pisces', emoji: '♓' },
+                { id: 'idk', label: "I don't know", emoji: '❓' }
+              ];
+
+              resultsHtml = zodiacOrder
+                .map(zodiac => {
+                  // Check both lowercase id and capitalized label
+                  const count = counts[zodiac.id] || counts[zodiac.label] || 0;
+                  const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                  
+                  // Only show signs that have at least one response
+                  if (count === 0) return '';
+                  
+                  console.log(`[renderAggregateView] Zodiac ${zodiac.label}: count=${count}, percentage=${percentage}%`);
+                  
+                  return `
+                    <li class="aggregate-result-item">
+                      <span class="aggregate-result-label">
+                        <span style="font-size: 1.2em; margin-right: 6px;">${zodiac.emoji}</span>
+                        ${escapeHtml(zodiac.label)}
+                      </span>
+                      <div class="aggregate-result-bar">
+                        <div class="aggregate-result-fill" style="width: ${percentage}%; background: linear-gradient(90deg, #8b5cf6, #6366f1);">
+                          ${percentage}%
+                        </div>
+                      </div>
+                      <span class="aggregate-result-count">${count} ${count === 1 ? 'guest' : 'guests'}</span>
+                    </li>
+                  `;
+                })
+                .filter(Boolean)
+                .join('');
+                
+              console.log('[renderAggregateView] Zodiac resultsHtml length:', resultsHtml.length);
+            } else {
+              // Default dropdown rendering (alphabetical by label)
+              resultsHtml = Object.entries(counts)
+                .sort(([, a], [, b]) => b - a)
+                .map(([option, count]) => {
+                  const percentage = Math.round((count / total) * 100);
+                  return `
+                    <li class="aggregate-result-item">
+                      <span class="aggregate-result-label">${escapeHtml(option)}</span>
+                      <div class="aggregate-result-bar">
+                        <div class="aggregate-result-fill" style="width: ${percentage}%">${percentage}%</div>
+                      </div>
+                      <span class="aggregate-result-count">${count} ${count === 1 ? 'guest' : 'guests'}</span>
+                    </li>
+                  `;
+                }).join('');
+            }
+          }
+          else if (q.kind === 'single_choice') {
             const counts = {};
             answers.forEach(a => {
               counts[a] = (counts[a] || 0) + 1;
