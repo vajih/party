@@ -108,8 +108,8 @@
   </div>
   
   <script type="module">
-    // Import Supabase client from config
-    import { supabase } from './config/env.local.js';
+    // Import Supabase client from the correct location
+    import { supabase } from '../src/services/supabaseClient.js';
     
     window.supabase = supabase;
     

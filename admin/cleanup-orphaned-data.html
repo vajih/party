@@ -186,7 +186,8 @@
   </div>
   
   <script type="module">
-    import { supabase } from '../config/env.local.js';
+    // Import supabase from the correct location
+    import { supabase } from '../src/services/supabaseClient.js';
     
     window.supabase = supabase;
     window.orphanedData = null;
