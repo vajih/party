@@ -1,20 +1,6 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <script>
-(function () {
-  // If there's no ?party=... in the URL, send them to your default party
-  var url = new URL(window.location.href);
-  if (!url.searchParams.has('party')) {
-    var target = url.origin + "/?party=friendsgiving2025-1ty7";
-    // Avoid loops: only redirect if we're not already there
-    if (window.location.href !== target) {
-      window.location.replace(target);
-    }
-  }
-})();
-</script>
-<noscript>
   <!-- Fallback for users without JS -->
   <meta http-equiv="refresh" content="0; url=/?party=friendsgiving2025-1ty7">
 </noscript>
