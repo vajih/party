@@ -12,15 +12,22 @@
       const hostname = window.location.hostname;
       const pathname = window.location.pathname;
       const search = window.location.search;
+      const hash = window.location.hash;
       
       // Check if on main custom domain
       const isMainDomain = hostname === 'dilwalehouston.com' || hostname === 'www.dilwalehouston.com';
       const isRootPath = pathname === '/' || pathname === '/party/' || pathname === '/party/index.html';
       const hasNoPartyParam = !search.includes('party=');
+      const hasNoHash = !hash || hash === '' || hash === '#' || hash === '#/';
       
-      // Redirect guests to party page immediately using URL parameter (not hash)
-      if (isMainDomain && isRootPath && hasNoPartyParam) {
-        window.location.replace('/?party=friendsgiving2025-1ty7');
+      // Redirect guests to party page - use href to force full page reload
+      if (isMainDomain && isRootPath && hasNoPartyParam && hasNoHash) {
+        // Stop all scripts from running
+        window.stop();
+        // Force navigation to party page
+        window.location.href = '/?party=friendsgiving2025-1ty7';
+        // Throw to prevent any more code execution
+        throw new Error('Redirecting to party page');
       }
     })();
   </script>
