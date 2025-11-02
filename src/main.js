@@ -13,38 +13,6 @@ function wireDiffModal() {
   }
 }
 
-// Domain-based routing: Auto-redirect guests on main domain to party
-// This runs immediately when the script loads
-(function checkDomainAndRedirect() {
-  const hostname = window.location.hostname;
-  const pathname = window.location.pathname;
-  const hash = window.location.hash;
-  
-  console.log('[routing] Checking domain:', hostname, 'path:', pathname, 'hash:', hash);
-  
-  // Only redirect if on main domain (not admin subdomain) and not already on a specific page
-  const isMainDomain = hostname === 'dilwalehouston.com' || hostname === 'www.dilwalehouston.com';
-  const isAdminSubdomain = hostname === 'admin.dilwalehouston.com';
-  const isRootPath = pathname === '/' || pathname === '/party/' || pathname === '/party/index.html';
-  const hasNoHash = !hash || hash === '#/' || hash === '#';
-  
-  if (isMainDomain && isRootPath && hasNoHash) {
-    // Guest domain - redirect to party
-    console.log('[routing] Main domain detected, redirecting to party page');
-    window.location.replace('/#/party/friendsgiving2025-1ty7');
-    return; // Stop further execution
-  }
-  
-  if (isAdminSubdomain) {
-    console.log('[routing] Admin subdomain detected, full app access enabled');
-    // Admin gets full app - no redirect needed
-  }
-  
-  if (!isMainDomain && !isAdminSubdomain) {
-    console.log('[routing] Development or other domain, no redirect');
-  }
-})();
-
 // Call wireDiffModal after About You fragment is loaded
 window.addEventListener('DOMContentLoaded', () => {
   wireDiffModal();
