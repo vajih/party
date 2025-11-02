@@ -11,16 +11,16 @@
     (function() {
       const hostname = window.location.hostname;
       const pathname = window.location.pathname;
-      const hash = window.location.hash;
+      const search = window.location.search;
       
       // Check if on main custom domain
       const isMainDomain = hostname === 'dilwalehouston.com' || hostname === 'www.dilwalehouston.com';
       const isRootPath = pathname === '/' || pathname === '/party/' || pathname === '/party/index.html';
-      const hasNoHash = !hash || hash === '#/' || hash === '#';
+      const hasNoPartyParam = !search.includes('party=');
       
-      // Redirect guests to party page immediately
-      if (isMainDomain && isRootPath && hasNoHash) {
-        window.location.replace('/#/party/friendsgiving2025-1ty7');
+      // Redirect guests to party page immediately using URL parameter (not hash)
+      if (isMainDomain && isRootPath && hasNoPartyParam) {
+        window.location.replace('/?party=friendsgiving2025-1ty7');
       }
     })();
   </script>
