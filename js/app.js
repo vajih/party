@@ -1359,8 +1359,8 @@ async function submitEntry(game, formEl){
           songsWrap.querySelector('[data-slot="songsMine"]'));
       }
       alert('Song submitted! Host will review before it goes live.');
-      // Reload page so Song Requests button turns green
-      window.location.reload();
+      console.log('About to reload page after song submission...');
+      location.reload();
     } else if (['baby_photo','teen_photo','wedding_photo'].includes(game.type)) {
       const albumWrap = byId(`panel-${game.id}`)?.querySelector('[data-slot="albumWrap"]');
       if (albumWrap) await renderAlbum(game, albumWrap.querySelector('[data-slot="albumGrid"]'));
