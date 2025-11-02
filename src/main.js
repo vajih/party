@@ -803,7 +803,7 @@ async function route(userFromEvent) {
               console.error('[favorite_song] Submission error:', error);
               alert(`Error: ${error.message}`);
             } else {
-              alert('🎉 DONE! Thanks for sharing! \n\n Your song is added to our playlist.\n\nFeel free to add more songs and don\'t forget to VOTE for other songs you love! 🎵');
+              alert('🎉 You are DONE! See you at the party. \n\n Thanks for sharing! \n\n Your song is added to our playlist.\n\nFeel free to add more songs and don\'t forget to VOTE for other songs you love! 🎵');
               form.reset();
               // refresh list after successful submission
               renderFavoriteSongs().catch(()=>{});

@@ -1272,7 +1272,7 @@ async function submitEntry(game, formEl){
 
       const { data: existing } = await supabase
         .from('submissions')
-        .select('id, content')
+        .select('id, content, user_id')
         .eq('party_id', currentParty.id)
         .eq('game_id', game.id);
 
@@ -1282,8 +1282,11 @@ async function submitEntry(game, formEl){
         return normSongKey(c.title, c.artist) === key;
       });
       if (dup) return alert('That song is already in the list!');
+      
+      // Check if this user has any existing songs
+      const userHasExistingSongs = (existing||[]).some(r => r.user_id === user?.id);
 
-      payload = { title, artist, link };
+      payload = { title, artist, link, _isFirstSong: !userHasExistingSongs };
     } else if (game.type === 'two_facts') {
       const fact1 = (fd.get('fact1') || '').toString().trim();
       const fact2 = (fd.get('fact2') || '').toString().trim();
@@ -1358,9 +1361,13 @@ async function submitEntry(game, formEl){
           songsWrap.querySelector('[data-slot="songsAll"]'),
           songsWrap.querySelector('[data-slot="songsMine"]'));
       }
-      alert('Song submitted! Host will review before it goes live.');
-      console.log('About to reload page after song submission...');
-      location.reload();
+      
+      // Only show dialog and reload for first song submission
+      if (payload._isFirstSong) {
+        alert('Song submitted! Host will review before it goes live.');
+        location.reload();
+      }
+      // For subsequent songs, just silently update the list (no dialog, no reload)
     } else if (['baby_photo','teen_photo','wedding_photo'].includes(game.type)) {
       const albumWrap = byId(`panel-${game.id}`)?.querySelector('[data-slot="albumWrap"]');
       if (albumWrap) await renderAlbum(game, albumWrap.querySelector('[data-slot="albumGrid"]'));
