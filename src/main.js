@@ -770,7 +770,7 @@ async function route(userFromEvent) {
             }
             
             // Check if user already has any songs (for first-time dialog logic)
-            const { data: existingSongs } = await supabase
+            const { data: existingSongs, error: checkError } = await supabase
               .from('submissions')
               .select('id')
               .eq('game_id', game.id)
@@ -778,7 +778,12 @@ async function route(userFromEvent) {
               .eq('user_id', sessionData.session.user.id)
               .limit(1);
             
+            if (checkError) {
+              console.warn('[favorite_song] Error checking existing songs:', checkError);
+            }
+            
             const isFirstSong = !existingSongs || existingSongs.length === 0;
+            console.log('[favorite_song] isFirstSong:', isFirstSong, 'existingSongs:', existingSongs);
             
             // Fetch user's display name from profile
             let display_name = '';
@@ -814,12 +819,16 @@ async function route(userFromEvent) {
               console.error('[favorite_song] Submission error:', error);
               alert(`Error: ${error.message}`);
             } else {
+              console.log('[favorite_song] Song submitted successfully. isFirstSong:', isFirstSong);
+              
               // Only show dialog and reload on first song submission
               if (isFirstSong) {
                 alert('🎉 You are DONE! See you at the party. \n\n Thanks for sharing! \n\n Your song is added to our playlist.\n\nFeel free to add more songs and don\'t forget to VOTE for other songs you love! 🎵');
+                console.log('[favorite_song] First song - reloading page...');
                 location.reload();
               } else {
                 // For subsequent songs, just silently refresh the list
+                console.log('[favorite_song] Subsequent song - silently refreshing list...');
                 form.reset();
                 renderFavoriteSongs().catch(()=>{});
               }
