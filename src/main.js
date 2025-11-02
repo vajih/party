@@ -769,6 +769,17 @@ async function route(userFromEvent) {
               return;
             }
             
+            // Check if user already has any songs (for first-time dialog logic)
+            const { data: existingSongs } = await supabase
+              .from('submissions')
+              .select('id')
+              .eq('game_id', game.id)
+              .eq('party_id', game.party_id)
+              .eq('user_id', sessionData.session.user.id)
+              .limit(1);
+            
+            const isFirstSong = !existingSongs || existingSongs.length === 0;
+            
             // Fetch user's display name from profile
             let display_name = '';
             try {
@@ -803,10 +814,15 @@ async function route(userFromEvent) {
               console.error('[favorite_song] Submission error:', error);
               alert(`Error: ${error.message}`);
             } else {
-              alert('🎉 You are DONE! See you at the party. \n\n Thanks for sharing! \n\n Your song is added to our playlist.\n\nFeel free to add more songs and don\'t forget to VOTE for other songs you love! 🎵');
-              form.reset();
-              // refresh list after successful submission
-              renderFavoriteSongs().catch(()=>{});
+              // Only show dialog and reload on first song submission
+              if (isFirstSong) {
+                alert('🎉 You are DONE! See you at the party. \n\n Thanks for sharing! \n\n Your song is added to our playlist.\n\nFeel free to add more songs and don\'t forget to VOTE for other songs you love! 🎵');
+                location.reload();
+              } else {
+                // For subsequent songs, just silently refresh the list
+                form.reset();
+                renderFavoriteSongs().catch(()=>{});
+              }
             }
           });
         }
