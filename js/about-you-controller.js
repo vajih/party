@@ -413,13 +413,13 @@ async function handleBatchSubmit(e) {
   
   if (allComplete) {
     // All batches complete - combined message
-    completionMessage = `🎉 Congratulations! You've completed all About You questions.\n\n📸 Let's get your baby photo uploaded next.`;
+    completionMessage = `🎉 Congratulations! You've completed all About You questions.\n\n📸 Let's get your baby-young photo uploaded next.`;
   } else if (nextBatch) {
     // More batches to go
     completionMessage = `✓ ${getBatch(currentState.currentBatch).title} complete! Now let's do ${nextBatch.title}.`;
   } else {
     // Last batch completed
-    completionMessage = `📸 ${getBatch(currentState.currentBatch).title} complete! Let's get your baby photo uploaded next.`;
+    completionMessage = `📸 ${getBatch(currentState.currentBatch).title} complete! Let's get your baby-young you photo uploaded next.`;
   }
   
   alert(completionMessage);
