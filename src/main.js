@@ -13,6 +13,30 @@ function wireDiffModal() {
   }
 }
 
+// Domain-based routing: Auto-redirect guests on main domain to party
+(function() {
+  const hostname = window.location.hostname;
+  const pathname = window.location.pathname;
+  const hash = window.location.hash;
+  
+  // Only redirect if on main domain (not admin subdomain) and not already on a specific page
+  const isMainDomain = hostname === 'dilwalehouston.com' || hostname === 'www.dilwalehouston.com';
+  const isAdminSubdomain = hostname === 'admin.dilwalehouston.com';
+  const isRootPath = pathname === '/' || pathname === '/party/' || pathname === '/party/index.html';
+  const hasNoHash = !hash || hash === '#/' || hash === '#';
+  
+  if (isMainDomain && isRootPath && hasNoHash) {
+    // Guest domain - redirect to party
+    console.log('[routing] Main domain detected, redirecting to party');
+    window.location.href = '/#/party/friendsgiving2025-1ty7';
+  }
+  
+  if (isAdminSubdomain) {
+    console.log('[routing] Admin subdomain detected, full app access');
+    // Admin gets full app - no redirect needed
+  }
+})();
+
 // Call wireDiffModal after About You fragment is loaded
 window.addEventListener('DOMContentLoaded', () => {
   wireDiffModal();
