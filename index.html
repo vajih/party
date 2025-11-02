@@ -22,14 +22,16 @@
       
       const isRootPath = pathname === '/' || pathname === '/party/' || pathname === '/party/index.html';
       const hasNoPartyParam = !search.includes('party=');
-      const hasNoHash = !hash || hash === '' || hash === '#' || hash === '#/';
       
-      // Check if user has an active session (they're logged in)
-      // If they have a Supabase session, they might be a host - don't redirect
-      const hasSupabaseSession = document.cookie.includes('sb-') && document.cookie.includes('access-token');
+      // Check for admin/host mode parameter
+      const hasAdminParam = search.includes('admin=') || search.includes('host=');
       
-      // Only redirect if: on root path, no party param, no hash, and NOT logged in
-      if (isRootPath && hasNoPartyParam && hasNoHash && !hasSupabaseSession) {
+      // Don't redirect if there's ANY hash at all (including #/)
+      // This allows accessing the full app via hash routing
+      const hasAnyHash = hash && hash !== '';
+      
+      // Only redirect if: on root path, no party param, no hash, and no admin param
+      if (isRootPath && hasNoPartyParam && !hasAnyHash && !hasAdminParam) {
         // Redirect to party page
         window.location.replace('/?party=friendsgiving2025-1ty7');
       }
