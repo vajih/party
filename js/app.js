@@ -840,9 +840,9 @@ function buildTabsUI(){
         else el.readOnly = true;
       });
     } else {
-      formEl.addEventListener('submit', (e)=>{
+      formEl.addEventListener('submit', async (e)=>{
         e.preventDefault();
-        submitEntry(g, formEl);
+        await submitEntry(g, formEl);
       });
     }
 
