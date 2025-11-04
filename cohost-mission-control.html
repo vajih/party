@@ -1121,7 +1121,10 @@
                 a.display_name.localeCompare(b.display_name)
             );
             
-            container.innerHTML = sortedProfiles.map(profile => {
+            // Update the title with count
+            document.querySelector('#guest-list-view .detail-title').textContent = `All Guests (${sortedProfiles.length})`;
+            
+            container.innerHTML = sortedProfiles.map((profile, index) => {
                 const answerCount = profile.extended_answers ? Object.keys(profile.extended_answers).length : 0;
                 const isComplete = answerCount > 15;
                 
@@ -1130,7 +1133,7 @@
                 
                 return `
                     <div class="guest-card">
-                        <div class="guest-name">${profile.display_name}</div>
+                        <div class="guest-name">${index + 1}. ${profile.display_name}</div>
                         <div class="guest-meta">
                             <span>📍 ${profile.birth_city || 'Birth city not shared'}</span>
                             <span>♈ ${zodiac}</span>
@@ -1178,9 +1181,10 @@
         function showBirthCities() {
             const container = document.getElementById('birth-cities-content');
             
-            // Count users per city and collect coordinates
+            // Count users per city and collect coordinates AND names
             const cityCounts = {};
             const cityCoords = {};
+            const cityPeople = {}; // NEW: Store people's names per city
             
             globalProfiles.forEach(profile => {
                 if (profile.birth_city) {
@@ -1193,6 +1197,12 @@
                             lng: profile.birth_lng
                         };
                     }
+                    
+                    // Store people's names for this city
+                    if (!cityPeople[profile.birth_city]) {
+                        cityPeople[profile.birth_city] = [];
+                    }
+                    cityPeople[profile.birth_city].push(profile.display_name);
                 }
             });
             
@@ -1261,10 +1271,14 @@
                         }).addTo(map);
                         
                         const plural = count === 1 ? 'guest' : 'guests';
+                        const people = cityPeople[city] || [];
+                        const namesList = people.join(', ');
+                        
                         circle.bindPopup(`
-                            <div style="text-align: center; padding: 5px;">
+                            <div style="text-align: center; padding: 8px;">
                                 <strong style="color: #2d3748; font-size: 16px;">${city}</strong><br>
-                                <span style="color: #718096;">${count} ${plural}</span>
+                                <span style="color: #718096; font-size: 14px;">${count} ${plural}</span><br>
+                                <span style="color: #4a5568; font-size: 12px; margin-top: 4px; display: inline-block;">${namesList}</span>
                             </div>
                         `);
                     });
