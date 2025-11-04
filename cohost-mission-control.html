@@ -733,6 +733,12 @@
                         <div class="stat-label">Unique cities</div>
                         <span class="click-hint">→</span>
                     </div>
+                    <div class="stat-box" onclick="showZodiacSigns()">
+                        <h3>Zodiac Signs</h3>
+                        <div class="stat-value" id="stat-zodiacs">0</div>
+                        <div class="stat-label">Astrological distribution</div>
+                        <span class="click-hint">→</span>
+                    </div>
                     <div class="stat-box" onclick="showIncompleteProfiles()">
                         <h3>Waiting to Complete</h3>
                         <div class="stat-value" id="stat-incomplete">0</div>
@@ -797,6 +803,16 @@
                         <button class="back-btn" onclick="closeDetailView('birth-cities-view')">← Back to Dashboard</button>
                     </div>
                     <div id="birth-cities-content"></div>
+                </div>
+            </div>
+
+            <div id="zodiac-signs-view" class="detail-view">
+                <div class="detail-container">
+                    <div class="detail-header">
+                        <div class="detail-title">Zodiac Signs</div>
+                        <button class="back-btn" onclick="closeDetailView('zodiac-signs-view')">← Back to Dashboard</button>
+                    </div>
+                    <div id="zodiac-signs-content"></div>
                 </div>
             </div>
 
@@ -1079,11 +1095,19 @@
             // Incomplete = all auth users minus fully complete users
             const incompleteCount = globalAllAuthUsers.filter(u => !fullyCompleteUserIds.has(u.id)).length;
 
+            // Count unique zodiac signs
+            const uniqueZodiacs = new Set(
+                profiles
+                    .map(p => (p.extended_answers && p.extended_answers.zodiac_sign) || p.zodiac_sign)
+                    .filter(z => z && z !== 'Not shared')
+            ).size;
+
             document.getElementById('stat-total').textContent = total;
             document.getElementById('stat-complete').textContent = complete;
             document.getElementById('stat-answers').textContent = totalAnswers;
             document.getElementById('stat-photos').textContent = globalPhotos.length;
             document.getElementById('stat-cities').textContent = uniqueCities;
+            document.getElementById('stat-zodiacs').textContent = uniqueZodiacs;
             document.getElementById('stat-incomplete').textContent = incompleteCount;
         }
 
@@ -1292,6 +1316,89 @@
             }
             
             document.getElementById('birth-cities-view').style.display = 'block';
+        }
+
+        // === SHOW ZODIAC SIGNS ===
+        function showZodiacSigns() {
+            const container = document.getElementById('zodiac-signs-content');
+            
+            // Zodiac sign emojis and order
+            const zodiacInfo = {
+                'Aries': { emoji: '♈', order: 1 },
+                'Taurus': { emoji: '♉', order: 2 },
+                'Gemini': { emoji: '♊', order: 3 },
+                'Cancer': { emoji: '♋', order: 4 },
+                'Leo': { emoji: '♌', order: 5 },
+                'Virgo': { emoji: '♍', order: 6 },
+                'Libra': { emoji: '♎', order: 7 },
+                'Scorpio': { emoji: '♏', order: 8 },
+                'Sagittarius': { emoji: '♐', order: 9 },
+                'Capricorn': { emoji: '♑', order: 10 },
+                'Aquarius': { emoji: '♒', order: 11 },
+                'Pisces': { emoji: '♓', order: 12 }
+            };
+            
+            // Count users per zodiac and collect names
+            const zodiacCounts = {};
+            const zodiacPeople = {};
+            
+            globalProfiles.forEach(profile => {
+                const zodiac = (profile.extended_answers && profile.extended_answers.zodiac_sign) || profile.zodiac_sign;
+                if (zodiac && zodiac !== 'Not shared') {
+                    zodiacCounts[zodiac] = (zodiacCounts[zodiac] || 0) + 1;
+                    if (!zodiacPeople[zodiac]) {
+                        zodiacPeople[zodiac] = [];
+                    }
+                    zodiacPeople[zodiac].push(profile.display_name);
+                }
+            });
+            
+            // Get all zodiac signs with counts (sorted by count descending)
+            const sortedZodiacs = Object.entries(zodiacCounts)
+                .sort((a, b) => b[1] - a[1]); // Sort by count, highest first
+            
+            const totalWithZodiac = Object.values(zodiacCounts).reduce((sum, count) => sum + count, 0);
+            
+            let html = `
+                <div style="margin-bottom: 20px; padding: 15px; background: #f7fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 14px; color: #718096;">
+                        <strong>${totalWithZodiac}</strong> guests have shared their zodiac sign
+                    </div>
+                </div>
+                <div style="display: grid; gap: 12px;">
+            `;
+            
+            sortedZodiacs.forEach(([zodiac, count]) => {
+                const info = zodiacInfo[zodiac];
+                const emoji = info ? info.emoji : '⭐';
+                const people = zodiacPeople[zodiac] || [];
+                const names = people.join(', ');
+                const percentage = ((count / totalWithZodiac) * 100).toFixed(1);
+                
+                html += `
+                    <div style="padding: 15px; background: white; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div style="font-size: 18px; font-weight: 600; color: #2d3748;">
+                                ${emoji} ${zodiac}
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span style="font-size: 16px; font-weight: 600; color: #667eea;">${count}</span>
+                                <span style="font-size: 12px; color: #a0aec0;">(${percentage}%)</span>
+                            </div>
+                        </div>
+                        <div style="height: 6px; background: #edf2f7; border-radius: 3px; overflow: hidden; margin-bottom: 8px;">
+                            <div style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); width: ${percentage}%;"></div>
+                        </div>
+                        <div style="font-size: 12px; color: #718096;">
+                            ${names}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+            document.getElementById('zodiac-signs-view').style.display = 'block';
         }
 
         function showCompletedProfiles() {
