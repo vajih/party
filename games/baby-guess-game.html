@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Guess the Baby — Party Game</title>
+  <style>
+    :root{
+      --bg:#0c0c0f;
+      --fg:#f4f4f7;
+      --muted:#9aa0a6;
+      --accent:#ffd166;
+      --accent2:#06d6a0;
+      --danger:#ef476f;
+      --shadow: rgba(0,0,0,.35);
+      /* Dilwale brand colors - extracted from logo */
+      --brand-red:#dc2626;
+      --brand-gold:#fbbf24;
+      --brand-orange:#f97316;
+    }
+    html,body{
+      height:100%;
+      margin:0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    .wrap{
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:20px;
+      padding:20px;
+    }
+    header,footer{ width:100%; max-width:1200px; }
+    header{
+      display:none; /* Hidden - using logo frame instead */
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      font-weight:700; letter-spacing:.3px;
+    }
+    .brand .dot{ width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); }
+    .brand small{ color:var(--muted); font-weight:500; letter-spacing:.1px;}
+    .controls{
+      display:flex; flex-wrap:wrap; gap:8px;
+    }
+    button, .chip{
+      background:#17171c; color:var(--fg); border:1px solid #2a2a31;
+      padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:600;
+      box-shadow: 0 6px 20px var(--shadow);
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    button:hover{ transform: translateY(-1px); border-color:#3a3a44; }
+    button:active{ transform: translateY(0); }
+    .chip{ font-size:.9rem; }
+    .chip.kbd{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .stage{
+      position:relative; width:100%; max-width:1200px; height:85vh;
+      flex:1 1 auto; display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(1200px 600px at 50% 30%, #16161b, #0e0e12 70%, #0b0b0e 90%);
+      border:4px solid transparent;
+      border-image: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold)) 1;
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow: 
+        0 24px 60px var(--shadow),
+        0 0 0 1px rgba(220, 38, 38, 0.3),
+        inset 0 0 40px rgba(220, 38, 38, 0.05);
+    }
+    .logo-frame{
+      position:absolute;
+      bottom:12px;
+      left:12px;
+      z-index:10;
+      opacity:0.4;
+      transition: opacity 0.3s ease;
+    }
+    .logo-frame:hover{
+      opacity:0.7;
+    }
+    .logo-frame img{
+      height:32px;
+      width:auto;
+      display:block;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+    }
+    .imgbox{
+      position:relative; width:100%; height:100%;
+      display:flex; align-items:center; justify-content:center;
+      padding:2vmin;
+    }
+    .imgbox img{
+      max-width:100%; max-height:100%;
+      object-fit:contain; border-radius:12px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      background: #111; /* in case of transparent PNGs */
+      opacity: 1;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .imgbox img.fade-out{
+      opacity: 0;
+    }
+    .watermark{
+      position:absolute; inset:auto 16px 16px auto; opacity:.25; font-weight:700; font-size:.9rem;
+      pointer-events:none; color:#fff;
+    }
+    .nameOverlay{
+      display:none !important; /* Hidden - name now shows in hint box */
+    }
+    .nameOverlay .pill{ width:10px; height:10px; border-radius:50%; background:var(--accent2); box-shadow:0 0 12px var(--accent2); }
+    .countdown{
+      display:none; /* Timer bar hidden */
+    }
+    .countdown .bar{
+      height:100%; width:0%;
+      background: linear-gradient(90deg, var(--accent), #ffd98a);
+      transition: width .1s linear;
+    }
+    .hint{
+      position:absolute; left:50%; bottom:5px; transform: translateX(-50%);
+      font-size:0.85rem; color:var(--fg);
+      background: linear-gradient(135deg, rgba(0,0,0,.85), rgba(0,0,0,.9));
+      backdrop-filter: blur(12px);
+      padding:8px 14px 10px; border-radius:10px; 
+      border:1.5px solid rgba(220, 38, 38, 0.3);
+      display:none; text-align:center; max-width:55%; line-height:1.4;
+      box-shadow: 0 6px 20px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.08), 0 0 15px rgba(220, 38, 38, 0.15);
+      opacity:0;
+      transition: opacity 0.6s ease-in;
+    }
+    .hint.show-box{ opacity:1; }
+    .hint-item{
+      opacity:0;
+      transition: opacity 0.8s ease-in;
+      display:block;
+      margin:3px 0;
+      font-size:0.9rem;
+    }
+    .hint-item.show{ opacity:1; }
+    .hint-item.name-reveal{
+      font-size: clamp(16px, 3.5vmin, 26px);
+      font-weight: 900;
+      letter-spacing: .6px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1.5px solid rgba(220, 38, 38, 0.3);
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .toast{
+      position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
+      background:#111216; border:1px solid #262632; padding:10px 12px; border-radius:10px; color:var(--fg);
+      box-shadow: 0 12px 30px var(--shadow);
+      opacity:0; pointer-events:none; transition:opacity .25s ease;
+      font-weight:600;
+    }
+    .toast.show{ opacity:1; }
+    footer{
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      color:var(--muted); font-size:.95rem;
+    }
+    .grow{ flex:1; }
+    .right{ text-align:right; }
+    .hidden{ display:none !important; }
+    .loading-overlay{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      background: rgba(12,12,15,0.95); z-index:100; flex-direction:column; gap:16px;
+    }
+    .spinner{
+      width:40px; height:40px; border:3px solid #2a2a31;
+      border-top-color:var(--accent); border-radius:50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+    @media (max-width: 640px){
+      .nameOverlay{ inset:auto 50% 12%; }
+      .hint{ display:none !important; }
+      header, footer{ gap:6px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="dot"></div>
+        <div>Guess the Baby <small>• Dinner Edition</small></div>
+      </div>
+      <div class="controls">
+        <button id="prevBtn" title="← Previous (Left Arrow)">⟵ Prev</button>
+        <button id="revealBtn" title="Space to toggle reveal">Reveal</button>
+        <button id="nextBtn" title="Next (Right Arrow)">Next ⟶</button>
+        <button id="shuffleBtn" title="Shuffle order (S)">Shuffle</button>
+        <button id="autoBtn" title="Toggle auto reveal (A)">Auto: On</button>
+        <span class="chip">⏱️ <span id="timerVal">6</span>s</span>
+        <span class="chip kbd" title="Shortcuts: T / Y">T− / Y+</span>
+      </div>
+    </header>
+
+    <div class="stage" id="stage">
+      <div class="logo-frame">
+        <img src="../assets/img/dilwale_logo.png" alt="Dilwale Logo" />
+      </div>
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div style="color:var(--muted); font-weight:600;">Loading photos from database...</div>
+      </div>
+      <div class="countdown"><div class="bar" id="bar"></div></div>
+      <div class="imgbox">
+        <img id="photo" alt="Baby photo" />
+        <div class="watermark" id="wm"></div>
+      </div>
+      <div class="nameOverlay" id="nameOverlay"><div class="pill"></div><span id="nameText">Name</span></div>
+      <div class="hint" id="hintBox">Hint</div>
+    </div>
+
+    <footer>
+      <div class="grow">Shortcuts: SPACE (reveal), ← → (prev/next), A (auto), S (shuffle), R (restart), T/Y (−/+ seconds)</div>
+      <div class="right" id="progress">1 / 1</div>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast">Shuffled</div>
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config/env.local.js"></script>
+
+  <script>
+    // ======== VERIFY CONFIG LOADED ========
+    if (typeof CONFIG === 'undefined') {
+      console.error('❌ CONFIG not loaded! Check if config/env.local.js exists');
+      document.getElementById('loadingOverlay').innerHTML = `
+        <div style="color:var(--danger); font-weight:600;">Configuration Error</div>
+        <div style="color:var(--muted); font-size:0.9rem;">config/env.local.js not found</div>
+        <div style="color:var(--muted); font-size:0.8rem; margin-top:8px;">Check console for details</div>
+      `;
+      throw new Error('CONFIG is undefined');
+    }
+    
+    console.log('✅ Config loaded');
+    
+    // ======== SUPABASE SETUP ========
+    const { createClient } = supabase;
+    const supabaseClient = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    
+    console.log('✅ Supabase client initialized');
+    
+    // ======== DYNAMIC DATA FROM DATABASE ========
+    let photosData = [];
+    let isLoading = true;
+    let hintTimeouts = []; // Track hint reveal timeouts
+
+    // ======== LOAD DATA FROM SUPABASE ========
+    async function loadGameData() {
+      try {
+        const PARTY_SLUG = 'friendsgiving2025-1ty7';
+        
+        console.log('🔍 Starting to load game data...');
+        
+        // Get party ID
+        console.log('📍 Fetching party:', PARTY_SLUG);
+        const { data: party, error: partyError } = await supabaseClient
+          .from('parties')
+          .select('id')
+          .eq('slug', PARTY_SLUG)
+          .single();
+        
+        if (partyError) {
+          console.error('❌ Party error:', partyError);
+          throw partyError;
+        }
+        if (!party) throw new Error('Party not found');
+        console.log('✅ Party found:', party.id);
+        
+        // Get baby photo game
+        console.log('🎮 Fetching baby photo game...');
+        const { data: game, error: gameError } = await supabaseClient
+          .from('games')
+          .select('id')
+          .eq('party_id', party.id)
+          .eq('type', 'baby_photo')
+          .single();
+        
+        if (gameError) {
+          console.error('❌ Game error:', gameError);
+          throw gameError;
+        }
+        if (!game) throw new Error('Baby photo game not found');
+        console.log('✅ Game found:', game.id);
+        
+        // Get all baby photo submissions
+        console.log('📸 Fetching submissions...');
+        const { data: submissions, error: subError } = await supabaseClient
+          .from('submissions')
+          .select('user_id, display_name, content, moderation_status')
+          .eq('game_id', game.id);
+          // Removed: .eq('moderation_status', 'approved') - to show ALL submissions
+        
+        if (subError) {
+          console.error('❌ Submissions error:', subError);
+          throw subError;
+        }
+        console.log(`✅ Found ${submissions?.length || 0} submissions`);
+        
+        // Log moderation statuses for debugging
+        if (submissions && submissions.length > 0) {
+          const statusCounts = {};
+          submissions.forEach(s => {
+            statusCounts[s.moderation_status] = (statusCounts[s.moderation_status] || 0) + 1;
+          });
+          console.log('📊 Moderation status breakdown:', statusCounts);
+        }
+        
+        // Get all profiles with extended answers
+        console.log('👤 Fetching profiles...');
+        const { data: profiles, error: profileError } = await supabaseClient
+          .from('party_profiles')
+          .select('user_id, display_name, birth_city, zodiac_sign, extended_answers')
+          .eq('party_id', party.id);
+        
+        if (profileError) {
+          console.error('❌ Profiles error:', profileError);
+          throw profileError;
+        }
+        console.log(`✅ Found ${profiles?.length || 0} profiles`);
+        
+        // Create a map of profiles by user_id
+        const profileMap = {};
+        profiles.forEach(p => {
+          profileMap[p.user_id] = p;
+        });
+        
+        // Build photosData array with hints
+        console.log('🔨 Building photos data...');
+        photosData = submissions.map(sub => {
+          const profile = profileMap[sub.user_id];
+          const photoUrl = sub.content?.photo_url || '';
+          const name = sub.display_name || 'Unknown';
+          
+          // Generate hints: birth_city + zodiac + random fact
+          const hints = generateHints(profile);
+          
+          return {
+            src: photoUrl,
+            name: name,
+            hints: hints, // Store as array for progressive reveal
+            userId: sub.user_id,
+            seen: false
+          };
+        }).filter(item => item.src); // Only include items with valid photo URLs
+        
+        console.log(`✅ Built ${photosData.length} photo entries`);
+        
+        isLoading = false;
+        
+        if (photosData.length === 0) {
+          document.getElementById('loadingOverlay').style.display = 'none';
+          showToast('No baby photos found!');
+          return;
+        }
+        
+        // Hide loading overlay
+        document.getElementById('loadingOverlay').style.display = 'none';
+        showToast(`Loaded ${photosData.length} photos!`);
+        
+        // Initialize game
+        initGame();
+        
+      } catch (error) {
+        console.error('Error loading game data:', error);
+        isLoading = false;
+        document.getElementById('loadingOverlay').innerHTML = `
+          <div style="color:var(--danger); font-weight:600;">Failed to load photos</div>
+          <div style="color:var(--muted); font-size:0.9rem;">Check console for details</div>
+        `;
+        showToast('Failed to load photos. Check console.');
+      }
+    }
+    
+    // ======== GENERATE HINTS FROM PROFILE DATA ========
+    function generateHints(profile) {
+      if (!profile) return ['Mystery guest'];
+      
+      const hints = [];
+      
+      // Always try to add birth city
+      const birthCity = profile.birth_city;
+      if (birthCity) {
+        hints.push(`📍 Born in ${birthCity}`);
+      }
+      
+      // Always try to add zodiac
+      const zodiac = (profile.extended_answers?.zodiac_sign) || profile.zodiac_sign;
+      if (zodiac && zodiac !== 'Not shared') {
+        hints.push(`${getZodiacEmoji(zodiac)} ${zodiac}`);
+      }
+      
+      // Add one random interesting fact from extended_answers
+      if (profile.extended_answers) {
+        const randomFact = pickRandomFact(profile.extended_answers);
+        if (randomFact) {
+          hints.push(randomFact);
+        }
+      }
+      
+      return hints.length > 0 ? hints : ['Mystery guest'];
+    }
+    
+    // ======== GET ZODIAC EMOJI ========
+    function getZodiacEmoji(zodiac) {
+      const zodiacEmojis = {
+        'Aries': '♈', 'Taurus': '♉', 'Gemini': '♊',
+        'Cancer': '♋', 'Leo': '♌', 'Virgo': '♍',
+        'Libra': '♎', 'Scorpio': '♏', 'Sagittarius': '♐',
+        'Capricorn': '♑', 'Aquarius': '♒', 'Pisces': '♓'
+      };
+      return zodiacEmojis[zodiac] || '⭐';
+    }
+    
+    // ======== PICK RANDOM INTERESTING FACT ========
+    function pickRandomFact(extendedAnswers) {
+      // Questions that make good hints (exclude zodiac_sign and birth_city as we already show those)
+      const interestingKeys = [
+        'favorite_movie', 'favorite_book', 'favorite_food', 
+        'hidden_talent', 'bucket_list', 'childhood_dream',
+        'favorite_vacation', 'guilty_pleasure', 'first_concert',
+        'favorite_song', 'pet_peeve', 'morning_ritual'
+      ];
+      
+      const availableFacts = [];
+      
+      for (const key of interestingKeys) {
+        if (extendedAnswers[key] && extendedAnswers[key].trim()) {
+          availableFacts.push({
+            key,
+            value: extendedAnswers[key]
+          });
+        }
+      }
+      
+      if (availableFacts.length === 0) return null;
+      
+      // Pick random fact
+      const randomIndex = Math.floor(Math.random() * availableFacts.length);
+      const fact = availableFacts[randomIndex];
+      
+      // Format the hint nicely
+      const labels = {
+        'favorite_movie': '🎬 Loves',
+        'favorite_book': '📚 Reads',
+        'favorite_food': '🍽️ Eats',
+        'hidden_talent': '✨ Talent',
+        'bucket_list': '🎯 Dreams of',
+        'childhood_dream': '👶 Dreamed of being',
+        'favorite_vacation': '✈️ Vacations in',
+        'guilty_pleasure': '😊 Guilty pleasure',
+        'first_concert': '🎸 First concert',
+        'favorite_song': '🎵 Jams to',
+        'pet_peeve': '😤 Dislikes',
+        'morning_ritual': '☕ Morning'
+      };
+      
+      const label = labels[fact.key] || '';
+      const value = fact.value.length > 40 ? fact.value.substring(0, 40) + '...' : fact.value;
+      
+      return `${label}: ${value}`;
+    }
+
+    // ======== GAME OPTIONS ========
+    let autoReveal = true;          // auto-reveal name after N seconds
+    let revealSeconds = 6;          // seconds until reveal (adjust live with T/Y)
+    let advanceAfterReveal = true;  // auto-advance to next photo after revealing name
+
+    // ======== RUNTIME ========
+    const imgEl = document.getElementById("photo");
+    const nameOverlay = document.getElementById("nameOverlay");
+    const nameText = document.getElementById("nameText");
+    const hintBox = document.getElementById("hintBox");
+    const bar = document.getElementById("bar");
+    const timerVal = document.getElementById("timerVal");
+    const progress = document.getElementById("progress");
+    const autoBtn = document.getElementById("autoBtn");
+    const toast = document.getElementById("toast");
+    const wm = document.getElementById("wm");
+
+    let order = [];
+    let idx = 0;
+    let revealed = false;
+    let t0 = 0;
+    let rafId = null;
+
+    function showToast(text){
+      toast.textContent = text;
+      toast.classList.add("show");
+      setTimeout(()=> toast.classList.remove("show"), 1200);
+    }
+
+    function shuffleArray(a){
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    
+    // ======== PRIORITIZE UNSEEN PHOTOS ========
+    function buildOrderWithUnseen() {
+      // Separate seen and unseen
+      const unseenIndices = [];
+      const seenIndices = [];
+      
+      photosData.forEach((item, index) => {
+        if (item.seen) {
+          seenIndices.push(index);
+        } else {
+          unseenIndices.push(index);
+        }
+      });
+      
+      // Shuffle both groups
+      shuffleArray(unseenIndices);
+      shuffleArray(seenIndices);
+      
+      // Unseen first, then seen
+      return [...unseenIndices, ...seenIndices];
+    }
+
+    function loadCurrent(){
+      if (photosData.length === 0) return;
+      
+      // Clear any existing hint timeouts
+      hintTimeouts.forEach(timeout => clearTimeout(timeout));
+      hintTimeouts = [];
+      
+      const item = photosData[order[idx]];
+      
+      // Fade in the new image
+      imgEl.classList.remove('fade-out');
+      imgEl.src = item.src;
+      imgEl.alt = `Baby photo of ${item.name}`;
+      nameText.textContent = item.name;
+      nameOverlay.style.display = "none";
+      
+      // Build progressive hints HTML with name as final reveal
+      const allHints = [...item.hints, item.name]; // Add name as last hint
+      const hintsHTML = allHints.map((hint, i) => {
+        const isName = (i === allHints.length - 1);
+        const className = isName ? 'hint-item name-reveal' : 'hint-item';
+        return `<span class="${className}" id="hint-${i}">${hint}</span>`;
+      }).join('');
+      hintBox.innerHTML = hintsHTML;
+      hintBox.style.display = "block";
+      hintBox.classList.remove('show-box'); // Reset box visibility
+      
+      // Show the hint box after 3 seconds
+      const boxTimeout = setTimeout(() => {
+        hintBox.classList.add('show-box');
+      }, 3000);
+      hintTimeouts.push(boxTimeout);
+      
+      // Progressive reveal of hints (starts at 5s total: 3s delay + 2s first hint)
+      allHints.forEach((hint, i) => {
+        const delay = 3000 + ((i + 1) * 2000); // 3s box delay + 2s per hint
+        const timeout = setTimeout(() => {
+          const hintEl = document.getElementById(`hint-${i}`);
+          if (hintEl) hintEl.classList.add('show');
+        }, delay);
+        hintTimeouts.push(timeout);
+      });
+      
+      revealed = false;
+      progress.textContent = `${idx+1} / ${photosData.length}`;
+      wm.textContent = `#${idx+1}`;
+      resetTimer();
+    }
+
+    function reveal(){
+      nameOverlay.style.display = "flex";
+      revealed = true;
+    }
+
+    function toggleReveal(){
+      if(revealed){ nameOverlay.style.display = "none"; revealed = false; resetTimer(); }
+      else{ reveal(); }
+    }
+
+    function prev(){
+      idx = (idx - 1 + photosData.length) % photosData.length;
+      loadCurrent();
+    }
+    
+    function next(){
+      // Mark current photo as seen
+      if (photosData.length > 0) {
+        photosData[order[idx]].seen = true;
+      }
+      
+      // Fade out current image
+      imgEl.classList.add('fade-out');
+      
+      // Wait for fade out, then load next photo
+      setTimeout(() => {
+        idx = (idx + 1) % photosData.length;
+        loadCurrent();
+        
+        // Check if all photos have been seen
+        const allSeen = photosData.every(item => item.seen);
+        if (allSeen && idx === 0) {
+          showToast('🎉 All photos viewed! Cycling again...');
+          // Reset all seen flags for next round
+          photosData.forEach(item => item.seen = false);
+        }
+      }, 500); // Wait for fade-out transition
+    }
+
+    function resetTimer(){
+      cancelAnimationFrame(rafId);
+      t0 = performance.now();
+      bar.style.width = "0%";
+      if(autoReveal && !revealed){
+        rafId = requestAnimationFrame(tick);
+      }
+    }
+
+    function tick(now){
+      const dur = revealSeconds * 1000;
+      const elapsed = now - t0;
+      const pct = Math.min(100, (elapsed / dur) * 100);
+      bar.style.width = pct + "%";
+      if(elapsed >= dur){
+        reveal();
+        if(advanceAfterReveal){
+          // Name appears at: 3s (box) + 8s (4th hint) = 11s total
+          // Countdown is 6s, so name appears 5s after countdown ends
+          // Wait 4s after name reveal = 5s + 4s = 9s after countdown
+          setTimeout(next, 9000); // 9 second pause: 5s for name to appear + 4s to read it
+        }
+      } else {
+        rafId = requestAnimationFrame(tick);
+      }
+    }
+
+    // Controls
+    document.getElementById("prevBtn").addEventListener("click", prev);
+    document.getElementById("nextBtn").addEventListener("click", next);
+    document.getElementById("revealBtn").addEventListener("click", toggleReveal);
+    document.getElementById("shuffleBtn").addEventListener("click", ()=>{
+      order = buildOrderWithUnseen();
+      idx = 0;
+      loadCurrent();
+      showToast("Shuffled (unseen first)");
+    });
+    document.getElementById("autoBtn").addEventListener("click", ()=>{
+      autoReveal = !autoReveal;
+      autoBtn.textContent = `Auto: ${autoReveal ? "On" : "Off"}`;
+      resetTimer();
+    });
+
+    // Keyboard shortcuts
+    window.addEventListener("keydown", (e)=>{
+      if(e.key === " "){ e.preventDefault(); toggleReveal(); }
+      else if(e.key === "ArrowRight"){ next(); }
+      else if(e.key === "ArrowLeft"){ prev(); }
+      else if(e.key.toLowerCase() === "a"){ autoReveal = !autoReveal; autoBtn.textContent = `Auto: ${autoReveal ? "On" : "Off"}`; resetTimer(); }
+      else if(e.key.toLowerCase() === "s"){ order = buildOrderWithUnseen(); idx=0; loadCurrent(); showToast("Shuffled (unseen first)"); }
+      else if(e.key.toLowerCase() === "r"){ 
+        // Reset all seen flags and rebuild order
+        photosData.forEach(item => item.seen = false);
+        order = buildOrderWithUnseen();
+        idx=0; 
+        loadCurrent(); 
+        showToast("Restarted"); 
+      }
+      else if(e.key.toLowerCase() === "t"){ revealSeconds = Math.max(2, revealSeconds-1); timerVal.textContent = revealSeconds; resetTimer(); showToast(`⏱️ ${revealSeconds}s`); }
+      else if(e.key.toLowerCase() === "y"){ revealSeconds = Math.min(20, revealSeconds+1); timerVal.textContent = revealSeconds; resetTimer(); showToast(`⏱️ ${revealSeconds}s`); }
+    });
+
+    // ======== INITIALIZE GAME ========
+    function initGame() {
+      order = buildOrderWithUnseen();
+      timerVal.textContent = revealSeconds;
+      loadCurrent();
+    }
+
+    // Handle missing images gracefully
+    imgEl.addEventListener("error", ()=>{
+      imgEl.removeAttribute("src");
+      imgEl.alt = "Image not found. Check your file path.";
+    });
+    
+    // ======== START LOADING DATA ========
+    showToast('Loading photos...');
+    
+    // Add a timeout to detect hanging requests
+    const loadTimeout = setTimeout(() => {
+      if (isLoading) {
+        console.error('⏰ Load timeout - still loading after 10 seconds');
+        document.getElementById('loadingOverlay').innerHTML = `
+          <div style="color:var(--danger); font-weight:600;">Loading Timeout</div>
+          <div style="color:var(--muted); font-size:0.9rem;">Check your network connection</div>
+          <button onclick="location.reload()" style="margin-top:12px; padding:8px 16px; background:var(--accent); color:var(--bg); border:none; border-radius:8px; cursor:pointer; font-weight:600;">
+            Retry
+          </button>
+        `;
+      }
+    }, 10000); // 10 second timeout
+    
+    loadGameData().finally(() => {
+      clearTimeout(loadTimeout);
+    });
+  </script>
+</body>
+</html>
