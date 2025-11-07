@@ -394,12 +394,18 @@
       const birthCity = profile.birth_city;
       if (birthCity) {
         hints.push(`📍 Born in ${birthCity}`);
+        console.log('✅ Added birth city hint');
+      } else {
+        console.log('⚠️ No birth city available');
       }
       
       // Always try to add zodiac
       const zodiac = (profile.extended_answers?.zodiac_sign) || profile.zodiac_sign;
       if (zodiac && zodiac !== 'Not shared') {
         hints.push(`${getZodiacEmoji(zodiac)} ${zodiac}`);
+        console.log('✅ Added zodiac hint');
+      } else {
+        console.log('⚠️ No zodiac available');
       }
       
       // Add one random interesting fact from extended_answers
@@ -407,9 +413,15 @@
         const randomFact = pickRandomFact(profile.extended_answers);
         if (randomFact) {
           hints.push(randomFact);
+          console.log('✅ Added random fact hint:', randomFact);
+        } else {
+          console.log('⚠️ pickRandomFact returned null/empty');
         }
+      } else {
+        console.log('⚠️ No extended_answers available');
       }
       
+      console.log('🎯 Total hints generated:', hints.length, hints);
       return hints.length > 0 ? hints : ['Mystery guest'];
     }
     
@@ -426,12 +438,15 @@
     
     // ======== PICK RANDOM INTERESTING FACT ========
     function pickRandomFact(extendedAnswers) {
-      // Questions that make good hints (exclude zodiac_sign and birth_city as we already show those)
+      console.log('🔍 Extended answers keys:', Object.keys(extendedAnswers || {}));
+      
+      // Questions that make good hints (using actual question IDs from your database)
       const interestingKeys = [
-        'favorite_movie', 'favorite_book', 'favorite_food', 
-        'hidden_talent', 'bucket_list', 'childhood_dream',
-        'favorite_vacation', 'guilty_pleasure', 'first_concert',
-        'favorite_song', 'pet_peeve', 'morning_ritual'
+        'food_comfort', 'food_desi_restaurant', 'breakfast_nashta',
+        'araam_mode', 'free_saturday', 'decision_style',
+        'communication_style', 'fav_city_travel', 'travel_vibe',
+        'tsa_luggage', 'desi_party_personality', 'celebrity_crush_teen',
+        'tv_obsession', 'reading_vibe', 'food_pulao_biryani'
       ];
       
       const availableFacts = [];
@@ -445,26 +460,31 @@
         }
       }
       
+      console.log('📋 Available facts found:', availableFacts.length, availableFacts);
+      
       if (availableFacts.length === 0) return null;
       
       // Pick random fact
       const randomIndex = Math.floor(Math.random() * availableFacts.length);
       const fact = availableFacts[randomIndex];
       
-      // Format the hint nicely
+      // Format the hint nicely with updated labels
       const labels = {
-        'favorite_movie': '🎬 Loves',
-        'favorite_book': '📚 Reads',
-        'favorite_food': '🍽️ Eats',
-        'hidden_talent': '✨ Talent',
-        'bucket_list': '🎯 Dreams of',
-        'childhood_dream': '👶 Dreamed of being',
-        'favorite_vacation': '✈️ Vacations in',
-        'guilty_pleasure': '😊 Guilty pleasure',
-        'first_concert': '🎸 First concert',
-        'favorite_song': '🎵 Jams to',
-        'pet_peeve': '😤 Dislikes',
-        'morning_ritual': '☕ Morning'
+        'food_comfort': '🍽️ Comfort food',
+        'food_desi_restaurant': '� Desi spot',
+        'breakfast_nashta': '☕ Nashta',
+        'araam_mode': '� Araam mode',
+        'free_saturday': '� Saturday vibe',
+        'decision_style': '🤔 Decisions',
+        'communication_style': '💬 When bothered',
+        'fav_city_travel': '✈️ Fav city',
+        'travel_vibe': '🌍 Travel style',
+        'tsa_luggage': '🧳 TSA finds',
+        'desi_party_personality': '🎉 Party type',
+        'celebrity_crush_teen': '⭐ Teen crush',
+        'tv_obsession': '📺 Watching',
+        'reading_vibe': '� Reading',
+        'food_pulao_biryani': '🍚 Team'
       };
       
       const label = labels[fact.key] || '';
@@ -550,6 +570,9 @@
       
       // Build progressive hints HTML with name as final reveal
       const allHints = [...item.hints, item.name]; // Add name as last hint
+      console.log('📝 All hints for', item.name, ':', allHints);
+      console.log('📊 Number of hints:', allHints.length);
+      
       const hintsHTML = allHints.map((hint, i) => {
         const isName = (i === allHints.length - 1);
         const className = isName ? 'hint-item name-reveal' : 'hint-item';
@@ -559,32 +582,34 @@
       hintBox.style.display = "block";
       hintBox.classList.remove('show-box'); // Reset box visibility
       
-      // Show the hint box after 10 seconds
+      // Show the hint box after 6 seconds
       const boxTimeout = setTimeout(() => {
         hintBox.classList.add('show-box');
-      }, 10000);
+      }, 6000);
       hintTimeouts.push(boxTimeout);
       
       // Progressive reveal of hints
-      // Box appears at 10s
-      // Hints appear 2s apart: birth_city at 12s, zodiac at 14s, random_fact at 16s
-      // Name appears 6s after zodiac (last regular hint before name)
+      // Box appears at 6s
+      // Hints appear 2s apart: birth_city at 8s, zodiac at 10s, random_fact at 12s
+      // Name appears 6s after the last regular hint (before name)
       allHints.forEach((hint, i) => {
         const isName = (i === allHints.length - 1);
         let delay;
         if (isName) {
-          // Name appears 6 seconds after the zodiac sign (previous hint)
-          // Zodiac is at index (allHints.length - 2)
-          // Zodiac appears at: 10000 + ((allHints.length - 1) * 2000)
-          // Name appears 6s after zodiac
-          const zodiacDelay = 10000 + (allHints.length * 2000);
-          delay = zodiacDelay + 6000;
+          // Name appears 6 seconds after the previous hint (last regular hint)
+          // Previous hint is at index (allHints.length - 2)
+          // Previous hint appears at: 6000 + ((i) * 2000) where i = allHints.length - 2
+          const previousHintIndex = allHints.length - 2;
+          const previousHintDelay = 6000 + ((previousHintIndex + 1) * 2000);
+          delay = previousHintDelay + 6000;
         } else {
           // Other hints appear 2 seconds apart starting 2s after box
-          delay = 10000 + ((i + 1) * 2000);
+          delay = 6000 + ((i + 1) * 2000);
         }
+        console.log(`⏰ Hint ${i} ("${hint.substring(0, 30)}...") will appear at ${delay}ms`);
         const timeout = setTimeout(() => {
           const hintEl = document.getElementById(`hint-${i}`);
+          console.log(`✨ Showing hint ${i}:`, hintEl ? 'Found element' : 'Element not found');
           if (hintEl) hintEl.classList.add('show');
         }, delay);
         hintTimeouts.push(timeout);
@@ -652,11 +677,11 @@
       if(elapsed >= dur){
         reveal();
         if(advanceAfterReveal){
-          // New timing with 4 hints total (city, zodiac, fact, name):
-          // Box at 10s, hints at 12s, 14s, 16s, name at 22s (16s + 6s after zodiac)
-          // Countdown is 6s, so name appears 16s after countdown ends (at 22s)
+          // New timing with box at 6s:
+          // Box at 6s, hints at 8s, 10s, 12s, name at 18s (12s + 6s after last hint)
+          // Countdown is 6s, so name appears 12s after countdown ends (at 18s)
           // Wait 10s after name reveal before advancing
-          setTimeout(next, 26000); // 26 second pause: 16s for name to appear + 10s to read it
+          setTimeout(next, 22000); // 22 second pause: 12s for name to appear + 10s to read it
         }
       } else {
         rafId = requestAnimationFrame(tick);
