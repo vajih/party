@@ -559,15 +559,30 @@
       hintBox.style.display = "block";
       hintBox.classList.remove('show-box'); // Reset box visibility
       
-      // Show the hint box after 3 seconds
+      // Show the hint box after 10 seconds
       const boxTimeout = setTimeout(() => {
         hintBox.classList.add('show-box');
-      }, 3000);
+      }, 10000);
       hintTimeouts.push(boxTimeout);
       
-      // Progressive reveal of hints (starts at 5s total: 3s delay + 2s first hint)
+      // Progressive reveal of hints
+      // Box appears at 10s
+      // Hints appear 2s apart: birth_city at 12s, zodiac at 14s, random_fact at 16s
+      // Name appears 6s after zodiac (last regular hint before name)
       allHints.forEach((hint, i) => {
-        const delay = 3000 + ((i + 1) * 2000); // 3s box delay + 2s per hint
+        const isName = (i === allHints.length - 1);
+        let delay;
+        if (isName) {
+          // Name appears 6 seconds after the zodiac sign (previous hint)
+          // Zodiac is at index (allHints.length - 2)
+          // Zodiac appears at: 10000 + ((allHints.length - 1) * 2000)
+          // Name appears 6s after zodiac
+          const zodiacDelay = 10000 + (allHints.length * 2000);
+          delay = zodiacDelay + 6000;
+        } else {
+          // Other hints appear 2 seconds apart starting 2s after box
+          delay = 10000 + ((i + 1) * 2000);
+        }
         const timeout = setTimeout(() => {
           const hintEl = document.getElementById(`hint-${i}`);
           if (hintEl) hintEl.classList.add('show');
@@ -637,10 +652,11 @@
       if(elapsed >= dur){
         reveal();
         if(advanceAfterReveal){
-          // Name appears at: 3s (box) + 8s (4th hint) = 11s total
-          // Countdown is 6s, so name appears 5s after countdown ends
-          // Wait 4s after name reveal = 5s + 4s = 9s after countdown
-          setTimeout(next, 9000); // 9 second pause: 5s for name to appear + 4s to read it
+          // New timing with 4 hints total (city, zodiac, fact, name):
+          // Box at 10s, hints at 12s, 14s, 16s, name at 22s (16s + 6s after zodiac)
+          // Countdown is 6s, so name appears 16s after countdown ends (at 22s)
+          // Wait 10s after name reveal before advancing
+          setTimeout(next, 26000); // 26 second pause: 16s for name to appear + 10s to read it
         }
       } else {
         rafId = requestAnimationFrame(tick);
