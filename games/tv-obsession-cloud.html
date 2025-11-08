@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TV Obsession Cloud — Party Game</title>
+  <style>
+    :root{
+      --bg:#0c0c0f;
+      --fg:#f4f4f7;
+      --muted:#9aa0a6;
+      --accent:#ffd166;
+      --accent2:#06d6a0;
+      --danger:#ef476f;
+      --shadow: rgba(0,0,0,.35);
+      /* Dilwale brand colors */
+      --brand-red:#dc2626;
+      --brand-gold:#fbbf24;
+      --brand-orange:#f97316;
+      /* Genre colors */
+      --drama-color:#dc2626;
+      --comedy-color:#fbbf24;
+      --thriller-color:#a78bfa;
+      --scifi-color:#60a5fa;
+      --reality-color:#fb923c;
+      --anime-color:#f472b6;
+      --documentary-color:#34d399;
+      --other-color:#9aa0a6;
+    }
+    html,body{
+      height:100%;
+      margin:0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    .wrap{
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:20px;
+      padding:20px;
+    }
+    .controls{
+      width:100%; max-width:1200px;
+      display:flex; align-items:center; justify-content:center;
+      gap:12px; flex-wrap:wrap;
+    }
+    button{
+      background:#17171c; color:var(--fg); border:1px solid #2a2a31;
+      padding:12px 20px; border-radius:10px; cursor:pointer; font-weight:600;
+      box-shadow: 0 6px 20px var(--shadow);
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    button:hover{ transform: translateY(-1px); border-color:#3a3a44; }
+    button:active{ transform: translateY(0); }
+    button.active{
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange));
+      border-color: var(--brand-gold);
+    }
+    .stage{
+      position:relative; width:100%; max-width:1200px; height:80vh;
+      flex:1 1 auto; display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(1200px 600px at 50% 30%, #16161b, #0e0e12 70%, #0b0b0e 90%);
+      border:4px solid transparent;
+      border-image: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold)) 1;
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow: 
+        0 24px 60px var(--shadow),
+        0 0 0 1px rgba(220, 38, 38, 0.3),
+        inset 0 0 40px rgba(220, 38, 38, 0.05);
+    }
+    .logo-frame{
+      position:absolute;
+      bottom:12px;
+      left:12px;
+      z-index:10;
+      opacity:0.4;
+      transition: opacity 0.3s ease;
+    }
+    .logo-frame:hover{
+      opacity:0.7;
+    }
+    .logo-frame img{
+      height:32px;
+      width:auto;
+      display:block;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+    }
+    .cloud-container{
+      width:100%; height:100%;
+      display:flex; align-items:center; justify-content:center;
+      padding:40px;
+      position:relative;
+    }
+    .word-cloud{
+      width:100%; height:100%;
+      display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+      gap:20px;
+      position:relative;
+    }
+    .show-word{
+      display:inline-block;
+      padding:8px 16px;
+      margin:4px;
+      cursor:pointer;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      font-weight:700;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      border-radius:8px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      backdrop-filter: blur(4px);
+    }
+    .show-word:hover{
+      transform: scale(1.15);
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .show-word.hidden{
+      opacity:0.2;
+      transform: scale(0.9);
+    }
+    .stats-overlay{
+      position:absolute;
+      top:20px;
+      right:20px;
+      background: linear-gradient(135deg, rgba(0,0,0,.85), rgba(0,0,0,.7));
+      backdrop-filter: blur(10px);
+      padding:16px 24px;
+      border-radius:12px;
+      border:2px solid rgba(220, 38, 38, 0.4);
+      box-shadow: 0 8px 24px rgba(0,0,0,.6);
+      text-align:right;
+    }
+    .stats-overlay h3{
+      margin:0 0 8px 0;
+      font-size:1rem;
+      color:var(--muted);
+      font-weight:600;
+    }
+    .stats-overlay .big-number{
+      font-size:2.5rem;
+      font-weight:900;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin:0;
+    }
+    .loading-overlay{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      background: rgba(12,12,15,0.95); z-index:100; flex-direction:column; gap:16px;
+    }
+    .spinner{
+      width:40px; height:40px; border:3px solid #2a2a31;
+      border-top-color:var(--brand-red); border-radius:50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+    .legend{
+      display:flex; gap:20px; align-items:center; justify-content:center;
+      font-size:0.9rem;
+      flex-wrap:wrap;
+    }
+    .legend-item{
+      display:flex; align-items:center; gap:8px;
+    }
+    .legend-dot{
+      width:12px; height:12px; border-radius:50%;
+    }
+    .tooltip{
+      position:fixed;
+      background: rgba(0,0,0,0.9);
+      color:var(--fg);
+      padding:8px 12px;
+      border-radius:6px;
+      font-size:0.85rem;
+      pointer-events:none;
+      z-index:1000;
+      opacity:0;
+      transition:opacity 0.2s ease;
+      border:1px solid rgba(255,255,255,0.2);
+      max-width:300px;
+    }
+    .tooltip.show{ opacity:1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="controls">
+      <button id="allBtn" class="active">All Shows</button>
+      <button id="dramaBtn">Drama</button>
+      <button id="comedyBtn">Comedy</button>
+      <button id="thrillerBtn">Thriller/Crime</button>
+      <button id="scifiBtn">Sci-Fi/Fantasy</button>
+      <button id="realityBtn">Reality</button>
+      <button id="animeBtn">Anime</button>
+      <button id="docBtn">Documentary</button>
+      <button id="otherBtn">Other</button>
+      <button id="refreshBtn">🔄 Refresh</button>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="logo-frame">
+        <img src="../assets/img/dilwale_logo.png" alt="Dilwale Logo" />
+      </div>
+      
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div style="color:var(--muted); font-weight:600;">Loading TV obsessions...</div>
+      </div>
+
+      <div class="stats-overlay">
+        <h3>Unique Shows</h3>
+        <p class="big-number" id="showCount">0</p>
+      </div>
+
+      <div class="cloud-container">
+        <div class="word-cloud" id="wordCloud"></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--drama-color);"></div>
+        <span>Drama</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--comedy-color);"></div>
+        <span>Comedy</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--thriller-color);"></div>
+        <span>Thriller/Crime</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--scifi-color);"></div>
+        <span>Sci-Fi/Fantasy</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--reality-color);"></div>
+        <span>Reality</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--anime-color);"></div>
+        <span>Anime</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--documentary-color);"></div>
+        <span>Documentary</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--other-color);"></div>
+        <span>Other</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="tooltip" class="tooltip"></div>
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config/env.local.js"></script>
+
+  <script>
+    // ======== VERIFY CONFIG LOADED ========
+    if (typeof CONFIG === 'undefined') {
+      console.error('❌ CONFIG not loaded! Check if config/env.local.js exists');
+      document.getElementById('loadingOverlay').innerHTML = `
+        <div style="color:var(--danger); font-weight:600;">Configuration Error</div>
+        <div style="color:var(--muted); font-size:0.9rem;">config/env.local.js not found</div>
+      `;
+      throw new Error('CONFIG is undefined');
+    }
+    
+    console.log('✅ Config loaded');
+    
+    // ======== SUPABASE SETUP ========
+    const { createClient } = supabase;
+    const supabaseClient = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    console.log('✅ Supabase client initialized');
+    
+    // ======== DATA STRUCTURES ========
+    let showData = [];
+    let currentFilter = 'all';
+    
+    // TV show normalization map - handle common variations/typos
+    const showNormalization = {
+      // Popular shows with common variations
+      'the bear': 'The Bear',
+      'bear': 'The Bear',
+      'succession': 'Succession',
+      'got': 'Game of Thrones',
+      'game of thrones': 'Game of Thrones',
+      'hotd': 'House of the Dragon',
+      'house of the dragon': 'House of the Dragon',
+      'breaking bad': 'Breaking Bad',
+      'better call saul': 'Better Call Saul',
+      'bcs': 'Better Call Saul',
+      'the office': 'The Office',
+      'office': 'The Office',
+      'friends': 'Friends',
+      'stranger things': 'Stranger Things',
+      'the last of us': 'The Last of Us',
+      'tlou': 'The Last of Us',
+      'the white lotus': 'The White Lotus',
+      'white lotus': 'The White Lotus',
+      'severance': 'Severance',
+      'ted lasso': 'Ted Lasso',
+      'the crown': 'The Crown',
+      'crown': 'The Crown',
+      'squid game': 'Squid Game',
+      'dark': 'Dark',
+      'ozark': 'Ozark',
+      'peaky blinders': 'Peaky Blinders',
+      'money heist': 'Money Heist',
+      'la casa de papel': 'Money Heist',
+      'narcos': 'Narcos',
+      'the boys': 'The Boys',
+      'boys': 'The Boys',
+      'westworld': 'Westworld',
+      'the mandalorian': 'The Mandalorian',
+      'mandalorian': 'The Mandalorian',
+      'mando': 'The Mandalorian',
+      'wandavision': 'WandaVision',
+      'loki': 'Loki',
+      'the witcher': 'The Witcher',
+      'witcher': 'The Witcher',
+      'bridgerton': 'Bridgerton',
+      'euphoria': 'Euphoria',
+      'yellowstone': 'Yellowstone',
+      'beef': 'Beef',
+      'shrinking': 'Shrinking',
+      'the morning show': 'The Morning Show',
+      'morning show': 'The Morning Show',
+      'slow horses': 'Slow Horses',
+      'silo': 'Silo',
+      'foundation': 'Foundation',
+      'for all mankind': 'For All Mankind',
+      'true detective': 'True Detective',
+      'the sopranos': 'The Sopranos',
+      'sopranos': 'The Sopranos',
+      'the wire': 'The Wire',
+      'wire': 'The Wire',
+      'mad men': 'Mad Men',
+      'suits': 'Suits',
+      'greys anatomy': "Grey's Anatomy",
+      "grey's anatomy": "Grey's Anatomy",
+      'anatomy': "Grey's Anatomy",
+      'shameless': 'Shameless',
+      'you': 'You',
+      'lost': 'Lost',
+      'twin peaks': 'Twin Peaks',
+      'fargo': 'Fargo',
+      'the handmaids tale': "The Handmaid's Tale",
+      "handmaids tale": "The Handmaid's Tale",
+      'schitts creek': "Schitt's Creek",
+      "schitt's creek": "Schitt's Creek",
+      'parks and rec': 'Parks and Recreation',
+      'parks and recreation': 'Parks and Recreation',
+      'brooklyn 99': 'Brooklyn Nine-Nine',
+      'brooklyn nine nine': 'Brooklyn Nine-Nine',
+      'b99': 'Brooklyn Nine-Nine',
+      'arrested development': 'Arrested Development',
+      'community': 'Community',
+      'veep': 'Veep',
+      'silicon valley': 'Silicon Valley',
+      'curb your enthusiasm': 'Curb Your Enthusiasm',
+      'curb': 'Curb Your Enthusiasm',
+      'the good place': 'The Good Place',
+      'good place': 'The Good Place',
+      'fleabag': 'Fleabag',
+      'atlanta': 'Atlanta',
+      'donald glover': 'Atlanta',
+      'barry': 'Barry',
+      'hacks': 'Hacks',
+      'only murders in the building': 'Only Murders in the Building',
+      'omitb': 'Only Murders in the Building',
+      'the marvelous mrs maisel': 'The Marvelous Mrs. Maisel',
+      'mrs maisel': 'The Marvelous Mrs. Maisel',
+      'maisel': 'The Marvelous Mrs. Maisel',
+      'naruto': 'Naruto',
+      'one piece': 'One Piece',
+      'attack on titan': 'Attack on Titan',
+      'aot': 'Attack on Titan',
+      'demon slayer': 'Demon Slayer',
+      'death note': 'Death Note',
+      'my hero academia': 'My Hero Academia',
+      'jujutsu kaisen': 'Jujutsu Kaisen',
+      'great british bake off': 'The Great British Bake Off',
+      'bake off': 'The Great British Bake Off',
+      'gbbo': 'The Great British Bake Off',
+      'masterchef': 'MasterChef',
+      'top chef': 'Top Chef',
+      'survivor': 'Survivor',
+      'the bachelor': 'The Bachelor',
+      'bachelor': 'The Bachelor',
+      'love island': 'Love Island',
+      'the great british baking show': 'The Great British Bake Off',
+      'baking show': 'The Great British Bake Off',
+      'planet earth': 'Planet Earth',
+      'our planet': 'Our Planet',
+      'blue planet': 'Blue Planet',
+      'cosmos': 'Cosmos',
+      'the last dance': 'The Last Dance',
+      'making a murderer': 'Making a Murderer',
+      'tiger king': 'Tiger King',
+    };
+    
+    // TV show genre mapping
+    const showGenre = {
+      // Drama
+      'succession': 'drama',
+      'the bear': 'drama',
+      'the crown': 'drama',
+      'ozark': 'drama',
+      'peaky blinders': 'drama',
+      'narcos': 'drama',
+      'the sopranos': 'drama',
+      'the wire': 'drama',
+      'mad men': 'drama',
+      'breaking bad': 'drama',
+      'better call saul': 'drama',
+      'the handmaids tale': 'drama',
+      "the handmaid's tale": 'drama',
+      'yellowstone': 'drama',
+      'suits': 'drama',
+      "grey's anatomy": 'drama',
+      'shameless': 'drama',
+      'beef': 'drama',
+      'the morning show': 'drama',
+      'euphoria': 'drama',
+      'bridgerton': 'drama',
+      'the white lotus': 'drama',
+      
+      // Comedy
+      'the office': 'comedy',
+      'friends': 'comedy',
+      'ted lasso': 'comedy',
+      "schitt's creek": 'comedy',
+      'parks and recreation': 'comedy',
+      'brooklyn nine-nine': 'comedy',
+      'arrested development': 'comedy',
+      'community': 'comedy',
+      'veep': 'comedy',
+      'silicon valley': 'comedy',
+      'curb your enthusiasm': 'comedy',
+      'the good place': 'comedy',
+      'fleabag': 'comedy',
+      'atlanta': 'comedy',
+      'barry': 'comedy',
+      'hacks': 'comedy',
+      'only murders in the building': 'comedy',
+      'the marvelous mrs. maisel': 'comedy',
+      'shrinking': 'comedy',
+      
+      // Thriller/Crime
+      'true detective': 'thriller',
+      'fargo': 'thriller',
+      'money heist': 'thriller',
+      'you': 'thriller',
+      'mindhunter': 'thriller',
+      'dark': 'thriller',
+      'severance': 'thriller',
+      'slow horses': 'thriller',
+      'twin peaks': 'thriller',
+      
+      // Sci-Fi/Fantasy
+      'game of thrones': 'scifi',
+      'house of the dragon': 'scifi',
+      'stranger things': 'scifi',
+      'the last of us': 'scifi',
+      'the boys': 'scifi',
+      'westworld': 'scifi',
+      'the mandalorian': 'scifi',
+      'wandavision': 'scifi',
+      'loki': 'scifi',
+      'the witcher': 'scifi',
+      'foundation': 'scifi',
+      'for all mankind': 'scifi',
+      'silo': 'scifi',
+      'lost': 'scifi',
+      
+      // Reality
+      'the great british bake off': 'reality',
+      'masterchef': 'reality',
+      'top chef': 'reality',
+      'survivor': 'reality',
+      'the bachelor': 'reality',
+      'love island': 'reality',
+      'queer eye': 'reality',
+      'selling sunset': 'reality',
+      
+      // Anime
+      'naruto': 'anime',
+      'one piece': 'anime',
+      'attack on titan': 'anime',
+      'demon slayer': 'anime',
+      'death note': 'anime',
+      'my hero academia': 'anime',
+      'jujutsu kaisen': 'anime',
+      'cowboy bebop': 'anime',
+      'fullmetal alchemist': 'anime',
+      
+      // Documentary
+      'planet earth': 'documentary',
+      'our planet': 'documentary',
+      'blue planet': 'documentary',
+      'cosmos': 'documentary',
+      'the last dance': 'documentary',
+      'making a murderer': 'documentary',
+      'tiger king': 'documentary',
+      '13th': 'documentary',
+      'chef table': 'documentary',
+      "chef's table": 'documentary',
+    };
+    
+    // ======== LOAD DATA FROM SUPABASE ========
+    async function loadShowData() {
+      try {
+        const PARTY_SLUG = 'friendsgiving2025-1ty7';
+        
+        console.log('🔍 Loading TV show data...');
+        
+        // Get party ID
+        const { data: party, error: partyError } = await supabaseClient
+          .from('parties')
+          .select('id')
+          .eq('slug', PARTY_SLUG)
+          .single();
+        
+        if (partyError) throw partyError;
+        console.log('✅ Party found:', party.id);
+        
+        // Get all profiles with extended_answers
+        const { data: profiles, error: profileError } = await supabaseClient
+          .from('party_profiles')
+          .select('user_id, display_name, extended_answers')
+          .eq('party_id', party.id);
+        
+        if (profileError) throw profileError;
+        console.log(`✅ Found ${profiles.length} profiles`);
+        
+        // Extract and count shows with normalization
+        const showCount = {};
+        
+        profiles.forEach(profile => {
+          let show = profile.extended_answers?.tv_obsession;
+          
+          // Check if this is a write-in custom entry (format: X:other:Custom Name)
+          if (show && show.startsWith('X:')) {
+            const parts = show.split(':');
+            if (parts.length >= 3) {
+              // Extract the custom show name after "X:other:"
+              show = parts.slice(2).join(':').trim();
+              console.log(`📝 Found custom show: "${show}"`);
+            }
+          }
+          
+          if (show && show.trim() && show.toLowerCase() !== 'not shared' && show.toLowerCase() !== 'other' && show.toLowerCase() !== 'n/a') {
+            // Apply smart normalization
+            const normalizedShow = normalizeShowName(show);
+            
+            if (!showCount[normalizedShow]) {
+              showCount[normalizedShow] = {
+                name: normalizedShow,
+                count: 0,
+                genre: detectGenre(normalizedShow),
+                guests: [],
+                originalInputs: [] // Track what people actually typed
+              };
+            }
+            showCount[normalizedShow].count++;
+            showCount[normalizedShow].guests.push(profile.display_name);
+            showCount[normalizedShow].originalInputs.push(show.trim());
+          }
+        });
+        
+        // Convert to array and sort by count
+        showData = Object.values(showCount).sort((a, b) => b.count - a.count);
+        
+        console.log(`✅ Found ${showData.length} unique shows`);
+        console.log('Top shows:', showData.slice(0, 5));
+        
+        document.getElementById('loadingOverlay').style.display = 'none';
+        document.getElementById('showCount').textContent = showData.length;
+        
+        renderWordCloud();
+        
+      } catch (error) {
+        console.error('Error loading show data:', error);
+        document.getElementById('loadingOverlay').innerHTML = `
+          <div style="color:var(--danger); font-weight:600;">Failed to load data</div>
+          <div style="color:var(--muted); font-size:0.9rem;">Check console for details</div>
+        `;
+      }
+    }
+    
+    // ======== NORMALIZE SHOW NAME ========
+    function normalizeShowName(rawName) {
+      if (!rawName) return '';
+      
+      // Step 1: Basic cleanup
+      let cleaned = rawName.trim();
+      
+      // Step 2: Remove common filler words and punctuation cleanup
+      cleaned = cleaned
+        .replace(/[!?.,;]/g, '') // Remove punctuation
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim();
+      
+      // Step 3: Check against normalization map (case-insensitive)
+      const lowerCleaned = cleaned.toLowerCase();
+      if (showNormalization[lowerCleaned]) {
+        console.log(`🔄 Normalized "${rawName}" → "${showNormalization[lowerCleaned]}"`);
+        return showNormalization[lowerCleaned];
+      }
+      
+      // Step 4: Title case for consistent formatting
+      const titleCased = cleaned
+        .split(' ')
+        .map(word => {
+          // Keep certain words lowercase unless at start
+          const lowerWord = word.toLowerCase();
+          if (['and', 'the', 'of', 'in', 'a', 'an', 'on', 'at', 'to', 'for', 'with'].includes(lowerWord)) {
+            return lowerWord;
+          }
+          // Title case regular words
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        })
+        .join(' ');
+      
+      // Capitalize first word
+      const finalTitle = titleCased.charAt(0).toUpperCase() + titleCased.slice(1);
+      
+      // Step 5: Check if title-cased version matches normalization map
+      const lowerTitled = finalTitle.toLowerCase();
+      if (showNormalization[lowerTitled]) {
+        console.log(`🔄 Normalized "${rawName}" → "${showNormalization[lowerTitled]}"`);
+        return showNormalization[lowerTitled];
+      }
+      
+      console.log(`✨ Using cleaned name: "${rawName}" → "${finalTitle}"`);
+      return finalTitle;
+    }
+    
+    // ======== DETECT GENRE FROM SHOW ========
+    function detectGenre(showName) {
+      const normalized = showName.toLowerCase().trim();
+      
+      // Check exact matches first
+      if (showGenre[normalized]) {
+        return showGenre[normalized];
+      }
+      
+      // Check partial matches
+      for (const [show, genre] of Object.entries(showGenre)) {
+        if (normalized.includes(show) || show.includes(normalized)) {
+          return genre;
+        }
+      }
+      
+      // Keyword-based detection
+      if (normalized.includes('anime') || normalized.includes('naruto') || normalized.includes('dragon ball')) {
+        return 'anime';
+      }
+      if (normalized.includes('bake') || normalized.includes('chef') || normalized.includes('survivor') || normalized.includes('bachelor')) {
+        return 'reality';
+      }
+      if (normalized.includes('planet') || normalized.includes('nature') || normalized.includes('documentary')) {
+        return 'documentary';
+      }
+      
+      return 'other';
+    }
+    
+    // ======== GET COLOR BY GENRE ========
+    function getGenreColor(genre) {
+      const colorMap = {
+        'drama': 'var(--drama-color)',
+        'comedy': 'var(--comedy-color)',
+        'thriller': 'var(--thriller-color)',
+        'scifi': 'var(--scifi-color)',
+        'reality': 'var(--reality-color)',
+        'anime': 'var(--anime-color)',
+        'documentary': 'var(--documentary-color)',
+        'other': 'var(--other-color)'
+      };
+      return colorMap[genre] || colorMap['other'];
+    }
+    
+    // ======== RENDER WORD CLOUD ========
+    function renderWordCloud() {
+      const container = document.getElementById('wordCloud');
+      container.innerHTML = '';
+      
+      // Filter data based on current filter
+      const filteredData = showData.filter(show => {
+        if (currentFilter === 'all') return true;
+        return show.genre === currentFilter;
+      });
+      
+      if (filteredData.length === 0) {
+        container.innerHTML = '<div style="color:var(--muted); font-size:1.5rem;">No shows found for this filter</div>';
+        return;
+      }
+      
+      // Calculate font sizes (min 1rem, max 5rem based on count)
+      const maxCount = Math.max(...filteredData.map(s => s.count));
+      const minCount = Math.min(...filteredData.map(s => s.count));
+      
+      filteredData.forEach(show => {
+        const word = document.createElement('div');
+        word.className = 'show-word';
+        word.textContent = show.name;
+        
+        // Calculate font size (logarithmic scale for better distribution)
+        const ratio = maxCount === minCount ? 1 : (Math.log(show.count) - Math.log(minCount)) / (Math.log(maxCount) - Math.log(minCount));
+        const fontSize = 1 + (ratio * 4); // 1rem to 5rem
+        word.style.fontSize = `${fontSize}rem`;
+        
+        // Apply color based on genre
+        word.style.color = getGenreColor(show.genre);
+        
+        // Add hover tooltip
+        word.addEventListener('mouseenter', (e) => showTooltip(e, show));
+        word.addEventListener('mouseleave', hideTooltip);
+        word.addEventListener('mousemove', moveTooltip);
+        
+        container.appendChild(word);
+      });
+      
+      // Shuffle positions for more organic look
+      const words = Array.from(container.children);
+      words.sort(() => Math.random() - 0.5);
+      words.forEach(word => container.appendChild(word));
+    }
+    
+    // ======== TOOLTIP FUNCTIONS ========
+    const tooltip = document.getElementById('tooltip');
+    
+    function showTooltip(e, show) {
+      const guestList = show.guests.join(', ');
+      
+      // Show original inputs if there were variations normalized
+      const uniqueInputs = [...new Set(show.originalInputs)];
+      const variationsText = uniqueInputs.length > 1 
+        ? `<br><small style="color:var(--muted); font-style:italic;">Variations: ${uniqueInputs.join(', ')}</small>`
+        : '';
+      
+      const genreName = {
+        'drama': 'Drama',
+        'comedy': 'Comedy',
+        'thriller': 'Thriller/Crime',
+        'scifi': 'Sci-Fi/Fantasy',
+        'reality': 'Reality',
+        'anime': 'Anime',
+        'documentary': 'Documentary',
+        'other': 'Other'
+      }[show.genre] || 'Other';
+      
+      tooltip.innerHTML = `
+        <strong>${show.name}</strong> <span style="color:${getGenreColor(show.genre)};">● ${genreName}</span><br>
+        ${show.count} ${show.count === 1 ? 'person' : 'people'}<br>
+        <small style="color:var(--muted);">${guestList}</small>
+        ${variationsText}
+      `;
+      tooltip.classList.add('show');
+      moveTooltip(e);
+    }
+    
+    function hideTooltip() {
+      tooltip.classList.remove('show');
+    }
+    
+    function moveTooltip(e) {
+      tooltip.style.left = (e.clientX + 15) + 'px';
+      tooltip.style.top = (e.clientY + 15) + 'px';
+    }
+    
+    // ======== FILTER CONTROLS ========
+    document.getElementById('allBtn').addEventListener('click', () => {
+      currentFilter = 'all';
+      updateActiveButton('allBtn');
+      renderWordCloud();
+    });
+    
+    document.getElementById('dramaBtn').addEventListener('click', () => {
+      currentFilter = 'drama';
+      updateActiveButton('dramaBtn');
+      renderWordCloud();
+    });
+    
+    document.getElementById('comedyBtn').addEventListener('click', () => {
+      currentFilter = 'comedy';
+      updateActiveButton('comedyBtn');
+      renderWordCloud();
+    });
+    
+    document.getElementById('thrillerBtn').addEventListener('click', () => {
+      currentFilter = 'thriller';
+      updateActiveButton('thrillerBtn');
+      renderWordCloud();
+    });
+    
+    document.getElementById('scifiBtn').addEventListener('click', () => {
+      currentFilter = 'scifi';
+      updateActiveButton('scifiBtn');
+      renderWordCloud();
+    });
+    
+    document.getElementById('realityBtn').addEventListener('click', () => {
+      currentFilter = 'reality';
+      updateActiveButton('realityBtn');
+      renderWordCloud();
+    });
+    
+    document.getElementById('animeBtn').addEventListener('click', () => {
+      currentFilter = 'anime';
+      updateActiveButton('animeBtn');
+      renderWordCloud();
+    });
+    
+    document.getElementById('docBtn').addEventListener('click', () => {
+      currentFilter = 'documentary';
+      updateActiveButton('docBtn');
+      renderWordCloud();
+    });
+    
+    document.getElementById('otherBtn').addEventListener('click', () => {
+      currentFilter = 'other';
+      updateActiveButton('otherBtn');
+      renderWordCloud();
+    });
+    
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      document.getElementById('loadingOverlay').style.display = 'flex';
+      loadShowData();
+    });
+    
+    function updateActiveButton(activeId) {
+      ['allBtn', 'dramaBtn', 'comedyBtn', 'thrillerBtn', 'scifiBtn', 'realityBtn', 'animeBtn', 'docBtn', 'otherBtn'].forEach(id => {
+        document.getElementById(id).classList.toggle('active', id === activeId);
+      });
+    }
+    
+    // ======== INITIALIZE ========
+    loadShowData();
+  </script>
+</body>
+</html>
