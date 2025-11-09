@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Family Feud: Complete Tournament — Party Game</title>
+  <link rel="icon" type="image/x-icon" href="../assets/img/dilawale-family-feud-favicon.ico" />
+  <style>
+    :root{
+      --bg:#0c0c0f;
+      --fg:#f4f4f7;
+      --muted:#9aa0a6;
+      --accent:#ffd166;
+      --danger:#ef476f;
+      --success:#06d6a0;
+      --shadow: rgba(0,0,0,.35);
+      /* Dilwale brand colors */
+      --brand-red:#dc2626;
+      --brand-gold:#fbbf24;
+      --brand-orange:#f97316;
+    }
+    
+    * { box-sizing: border-box; }
+    
+    html,body{
+      height:100%;
+      margin:0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      overflow: hidden;
+    }
+    
+    /* Splash Screen */
+    .splash-screen{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center, #1a1a22 0%, #0c0c0f 70%);
+      animation: splashFadeIn 0.5s ease-out;
+    }
+    
+    .splash-screen.fade-out{
+      animation: splashFadeOut 0.8s ease-out forwards;
+    }
+    
+    @keyframes splashFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes splashFadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    
+    .splash-image-container{
+      position: relative;
+      animation: splashImageScale 1s ease-out;
+    }
+    
+    @keyframes splashImageScale {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    .splash-image{
+      max-width: 90vw;
+      max-height: 80vh;
+      width: auto;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 20px 60px rgba(220, 38, 38, 0.4));
+    }
+    
+    .splash-timer{
+      position: absolute;
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    
+    .skip-button{
+      position: absolute;
+      bottom: 40px;
+      right: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--fg);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .skip-button:hover{
+      background: rgba(255, 255, 255, 0.2);
+      border-color: var(--brand-gold);
+      transform: translateY(-2px);
+    }
+    
+    /* Round Transition */
+    .round-transition{
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center, #1a1a22 0%, #0c0c0f 70%);
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    .round-transition.active{
+      display: flex;
+    }
+    
+    .round-number{
+      font-size: 4rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      animation: scaleIn 0.6s ease-out;
+    }
+    
+    .round-title{
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--fg);
+      text-align: center;
+      margin-bottom: 40px;
+      animation: scaleIn 0.6s ease-out 0.2s backwards;
+    }
+    
+    .round-question{
+      font-size: 1.8rem;
+      color: var(--muted);
+      text-align: center;
+      max-width: 800px;
+      animation: scaleIn 0.6s ease-out 0.4s backwards;
+    }
+    
+    @keyframes scaleIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    /* Winner Screen */
+    .winner-screen{
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center, #1a1a22 0%, #0c0c0f 70%);
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    .winner-screen.active{
+      display: flex;
+    }
+    
+    .winner-trophy{
+      font-size: 8rem;
+      margin-bottom: 20px;
+      animation: bounce 1s ease-out;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-30px); }
+    }
+    
+    .winner-title{
+      font-size: 4rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+    }
+    
+    .winner-team{
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--fg);
+      margin-bottom: 40px;
+    }
+    
+    .winner-score{
+      font-size: 2rem;
+      color: var(--muted);
+    }
+    
+    /* Audio Enable Prompt */
+    .audio-prompt{
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 10000;
+      cursor: pointer;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .audio-prompt.hidden{
+      display: none;
+    }
+    
+    .audio-prompt-content{
+      text-align: center;
+      padding: 40px;
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.3), rgba(249, 115, 22, 0.3));
+      border: 3px solid var(--brand-gold);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .audio-prompt-content h2{
+      font-size: 2rem;
+      margin: 0 0 20px 0;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .audio-prompt-content p{
+      font-size: 1.2rem;
+      color: var(--fg);
+      margin: 0;
+    }
+    
+    .audio-prompt-icon{
+      font-size: 4rem;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .game-container{
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      padding:20px;
+      gap:20px;
+    }
+    
+    /* Header Section */
+    .header{
+      text-align:center;
+      padding:20px;
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(249, 115, 22, 0.2));
+      border-radius:16px;
+      border:2px solid var(--brand-red);
+      position: relative;
+    }
+    
+    .round-indicator{
+      position: absolute;
+      top: 12px;
+      right: 20px;
+      background: rgba(0,0,0,0.5);
+      color: var(--brand-gold);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: 2px solid var(--brand-gold);
+    }
+    
+    .round-selector{
+      position: absolute;
+      top: 12px;
+      left: 20px;
+      display: flex;
+      gap: 8px;
+    }
+    
+    .round-btn{
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid #2a2a31;
+      background: #17171c;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .round-btn:hover{
+      border-color: var(--brand-gold);
+      transform: scale(1.1);
+    }
+    
+    .round-btn.active{
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange));
+      border-color: var(--brand-gold);
+      color: white;
+    }
+    
+    .game-title{
+      font-size:2.5rem;
+      font-weight:900;
+      margin:0 0 12px 0;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .question{
+      font-size:1.5rem;
+      font-weight:600;
+      color:var(--fg);
+      margin:0;
+    }
+    
+    .survey-count{
+      font-size:1rem;
+      color:var(--muted);
+      margin:8px 0 0 0;
+    }
+    
+    /* Main Board */
+    .board{
+      flex:1;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+      padding:20px;
+      background: radial-gradient(1200px 600px at 50% 30%, #16161b, #0e0e12 70%, #0b0b0e 90%);
+      border:4px solid transparent;
+      border-image: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold)) 1;
+      border-radius:20px;
+      box-shadow: 
+        0 24px 60px var(--shadow),
+        0 0 0 1px rgba(220, 38, 38, 0.3),
+        inset 0 0 40px rgba(220, 38, 38, 0.05);
+    }
+    
+    .answer-slot{
+      background: linear-gradient(135deg, #1a1a22, #14141a);
+      border:3px solid #2a2a31;
+      border-radius:12px;
+      padding:20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      cursor:pointer;
+      transition: all 0.3s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .answer-slot:hover:not(.revealed){
+      border-color:var(--brand-gold);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(251, 191, 36, 0.3);
+    }
+    
+    .answer-slot.revealed{
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange));
+      border-color:var(--brand-gold);
+      cursor:default;
+      animation: revealAnswer 0.5s ease-out;
+    }
+    
+    @keyframes revealAnswer {
+      0% { transform: scale(0.9) rotateX(90deg); opacity:0; }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1) rotateX(0deg); opacity:1; }
+    }
+    
+    .answer-rank{
+      font-size:2rem;
+      font-weight:900;
+      color:var(--brand-gold);
+      width:60px;
+      text-align:center;
+    }
+    
+    .answer-slot.revealed .answer-rank{
+      color:white;
+    }
+    
+    .answer-text{
+      flex:1;
+      font-size:1.5rem;
+      font-weight:700;
+      color:var(--muted);
+      text-align:left;
+      padding:0 20px;
+    }
+    
+    .answer-slot.revealed .answer-text{
+      color:white;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    
+    .answer-count{
+      font-size:2.5rem;
+      font-weight:900;
+      color:var(--muted);
+      background: #0c0c0f;
+      padding:8px 20px;
+      border-radius:8px;
+      min-width:80px;
+      text-align:center;
+    }
+    
+    .answer-slot.revealed .answer-count{
+      color:var(--brand-gold);
+      animation: countPulse 0.6s ease-out 0.3s;
+    }
+    
+    @keyframes countPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+    
+    .answer-hidden{
+      font-size:3rem;
+      color:#2a2a31;
+    }
+    
+    /* Footer Section */
+    .footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:20px;
+      background: linear-gradient(135deg, rgba(0,0,0,.85), rgba(0,0,0,.7));
+      border-radius:16px;
+      border:2px solid rgba(220, 38, 38, 0.4);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    /* Team Scores Section */
+    .teams-section{
+      display:flex;
+      gap:24px;
+      flex:1;
+    }
+    
+    .team-score{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:12px 20px;
+      background: rgba(255,255,255,0.05);
+      border:3px solid #2a2a31;
+      border-radius:12px;
+      cursor:pointer;
+      transition: all 0.3s ease;
+      min-width: 160px;
+    }
+    
+    .team-score:hover{
+      border-color:var(--brand-gold);
+      transform: translateY(-2px);
+    }
+    
+    .team-score.active{
+      border-color:var(--brand-gold);
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(249, 115, 22, 0.2));
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+    }
+    
+    .team-name{
+      font-size:0.9rem;
+      font-weight:700;
+      color:var(--muted);
+      margin-bottom:4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .team-score.active .team-name{
+      color:var(--brand-gold);
+    }
+    
+    .team-icon{
+      font-size:1.5rem;
+      margin-bottom:4px;
+    }
+    
+    .team-value{
+      font-size:2.5rem;
+      font-weight:900;
+      color:var(--fg);
+    }
+    
+    .team-score.active .team-value{
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .score-section{
+      display:flex;
+      align-items:center;
+      gap:20px;
+    }
+    
+    .score-label{
+      font-size:1.2rem;
+      font-weight:600;
+      color:var(--muted);
+    }
+    
+    .score-value{
+      font-size:3rem;
+      font-weight:900;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .strikes-section{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    
+    .strike{
+      font-size:3rem;
+      color:#2a2a31;
+      transition: all 0.3s ease;
+    }
+    
+    .strike.active{
+      color:var(--danger);
+      animation: strikeAppear 0.5s ease-out;
+    }
+    
+    @keyframes strikeAppear {
+      0% { transform: scale(0) rotate(-45deg); opacity:0; }
+      50% { transform: scale(1.3) rotate(5deg); }
+      100% { transform: scale(1) rotate(0deg); opacity:1; }
+    }
+    
+    .controls-section{
+      display:flex;
+      gap:12px;
+    }
+    
+    button{
+      background:#17171c;
+      color:var(--fg);
+      border:2px solid #2a2a31;
+      padding:12px 24px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:1rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+    
+    button:hover{
+      border-color:var(--brand-gold);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(251, 191, 36, 0.3);
+    }
+    
+    button.danger{
+      background:var(--danger);
+      border-color:var(--danger);
+      color:white;
+    }
+    
+    button.danger:hover{
+      background:#d42d5a;
+      border-color:#d42d5a;
+    }
+    
+    button.primary{
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange));
+      border-color:var(--brand-gold);
+      color:white;
+    }
+    
+    button.primary:hover{
+      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+    }
+    
+    button.success{
+      background: linear-gradient(135deg, #06d6a0, #118ab2);
+      border-color: #06d6a0;
+      color: white;
+      font-size: 1.1rem;
+      padding: 14px 28px;
+    }
+    
+    button.success:hover{
+      box-shadow: 0 6px 20px rgba(6, 214, 160, 0.5);
+      transform: translateY(-2px) scale(1.02);
+    }
+    
+    /* Loading State */
+    .loading-overlay{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(12,12,15,0.95);
+      z-index:100;
+      flex-direction:column;
+      gap:16px;
+    }
+    
+    .spinner{
+      width:50px;
+      height:50px;
+      border:4px solid #2a2a31;
+      border-top-color:var(--brand-red);
+      border-radius:50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+    
+    .loading-text{
+      color:var(--muted);
+      font-weight:600;
+      font-size:1.2rem;
+    }
+    
+    /* Logo */
+    .logo-frame{
+      position:absolute;
+      bottom:12px;
+      right:12px;
+      opacity:0.3;
+    }
+    
+    .logo-frame img{
+      height:28px;
+      width:auto;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+    }
+  </style>
+</head>
+<body>
+  <!-- Audio Enable Prompt -->
+  <div class="audio-prompt" id="audioPrompt">
+    <div class="audio-prompt-content">
+      <div class="audio-prompt-icon">🔊</div>
+      <h2>Click to Start</h2>
+      <p>Click anywhere to begin with sound</p>
+    </div>
+  </div>
+
+  <!-- Splash Screen -->
+  <div class="splash-screen" id="splashScreen">
+    <div class="splash-image-container">
+      <img src="../assets/img/dilwale-family-feud.png" alt="Dilwale Family Feud" class="splash-image" />
+      <div class="splash-timer" id="splashTimer">Starting in <span id="countdown">14</span>...</div>
+    </div>
+    <button class="skip-button" id="skipButton">Skip Intro →</button>
+  </div>
+
+  <!-- Round Transition -->
+  <div class="round-transition" id="roundTransition">
+    <div class="round-number" id="transitionRoundNumber">ROUND 1</div>
+    <div class="round-title" id="transitionRoundTitle">Houston Restaurants</div>
+    <div class="round-question" id="transitionRoundQuestion">What is your favorite Desi restaurant in Houston?</div>
+  </div>
+
+  <!-- Winner Screen -->
+  <div class="winner-screen" id="winnerScreen">
+    <div class="winner-trophy">🏆</div>
+    <div class="winner-title">TOURNAMENT WINNER!</div>
+    <div class="winner-team" id="winnerTeamName">Spades & Clubs ♠️♣️</div>
+    <div class="winner-score" id="winnerFinalScore">Final Score: 325 - 280</div>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading survey results...</div>
+  </div>
+
+  <div class="game-container" style="display: none;" id="gameContainer">
+    <div class="header">
+      <!-- Round selector buttons -->
+      <div class="round-selector" id="roundSelector">
+        <button class="round-btn active" data-round="0">1</button>
+        <button class="round-btn" data-round="1">2</button>
+        <button class="round-btn" data-round="2">3</button>
+        <button class="round-btn" data-round="3">4</button>
+        <button class="round-btn" data-round="4">5</button>
+      </div>
+      
+      <div class="round-indicator" id="roundIndicator">ROUND 1 of 5</div>
+      <h1 class="game-title">Dilwale Family Feud</h1>
+      <p class="question" id="roundQuestion">Your favorite Houston area desi restaurant is?</p>
+      <p class="survey-count">We surveyed <span id="surveyCount">0</span> people</p>
+    </div>
+
+    <div class="board" id="board">
+      <!-- Answer slots will be dynamically generated -->
+    </div>
+
+    <div class="footer">
+      <!-- Team Scores -->
+      <div class="teams-section">
+        <div class="team-score active" id="teamSpades" data-team="spades">
+          <div class="team-icon">♠️♣️</div>
+          <div class="team-name">Spades & Clubs</div>
+          <div class="team-value" id="teamSpadesScore">0</div>
+        </div>
+        <div class="team-score" id="teamHearts" data-team="hearts">
+          <div class="team-icon">♥️♦️</div>
+          <div class="team-name">Hearts & Diamonds</div>
+          <div class="team-value" id="teamHeartsScore">0</div>
+        </div>
+      </div>
+
+      <!-- Round Score -->
+      <div class="score-section">
+        <div class="score-label">ROUND:</div>
+        <div class="score-value" id="scoreValue">0</div>
+      </div>
+
+      <div class="strikes-section">
+        <div class="strike" id="strike1">✗</div>
+        <div class="strike" id="strike2">✗</div>
+        <div class="strike" id="strike3">✗</div>
+      </div>
+
+      <div class="controls-section">
+        <button class="danger" id="strikeBtn">Add Strike ✗</button>
+        <button id="revealAllBtn">Reveal All</button>
+        <button class="primary" id="resetBtn">Reset Round</button>
+        <button class="success" id="nextRoundBtn" style="display:none;">Next Round →</button>
+        <button class="success" id="finishTournamentBtn" style="display:none;">Finish Tournament 🏆</button>
+      </div>
+    </div>
+
+    <div class="logo-frame">
+      <img src="../assets/img/dilwale_logo.png" alt="Dilwale" />
+    </div>
+  </div>
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config/env.local.js"></script>
+
+  <script>
+    // ======== ROUNDS CONFIGURATION ========
+    const ROUNDS = [
+      {
+        id: 'restaurants',
+        title: 'Houston Restaurants',
+        question: 'Your favorite Houston area desi restaurant is?',
+        emoji: '🍽️',
+        dataField: 'food_desi_restaurant',
+        normalizer: normalizeRestaurantName,
+        topN: 8
+      },
+      {
+        id: 'nashta',
+        title: 'Nashta (Breakfast)',
+        question: 'My most desired nashta (breakfast) is?',
+        emoji: '☕',
+        dataField: 'breakfast_nashta',
+        normalizer: normalizeNashtaName,
+        topN: 8
+      },
+      {
+        id: 'travel',
+        title: 'Dream Destinations',
+        question: 'What is your dream travel destination?',
+        emoji: '✈️',
+        dataField: 'fav_city_travel',
+        normalizer: normalizeCityName,
+        topN: 8
+      },
+      {
+        id: 'tv',
+        title: 'TV Show Obsessions',
+        question: 'What TV show are you currently obsessed with?',
+        emoji: '📺',
+        dataField: 'tv_obsession',
+        normalizer: normalizeTVShow,
+        topN: 8
+      },
+      {
+        id: 'crush',
+        title: 'Celebrity Crushes',
+        question: 'When you were a teenager, who was your celebrity crush?',
+        emoji: '💖',
+        dataField: 'celebrity_crush_teen',
+        normalizer: normalizeCelebrityName,
+        topN: 8
+      }
+    ];
+    
+    // ======== CONFIG VERIFICATION ========
+    if (typeof CONFIG === 'undefined') {
+      console.error('❌ CONFIG not loaded!');
+      document.getElementById('loadingOverlay').innerHTML = `
+        <div style="color:var(--danger); font-weight:600;">Configuration Error</div>
+        <div style="color:var(--muted);">config/env.local.js not found</div>
+      `;
+      throw new Error('CONFIG is undefined');
+    }
+
+    // ======== SUPABASE SETUP ========
+    const { createClient } = supabase;
+    const supabaseClient = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    console.log('✅ Supabase client initialized');
+
+    // ======== SOUND EFFECTS ========
+    const sounds = {
+      intro: new Audio('../assets/sounds/feud-intro.mp3'),
+      ding: new Audio('../assets/sounds/feud-ding.mp3'),
+      buzzer: new Audio('../assets/sounds/feud-buzzer.mp3'),
+      music: new Audio('../assets/sounds/feud-intro.mp3')
+    };
+    
+    // Preload sounds
+    Object.values(sounds).forEach(sound => {
+      sound.preload = 'auto';
+      sound.volume = 0.7;
+    });
+    
+    function playSound(soundName) {
+      if (sounds[soundName]) {
+        sounds[soundName].currentTime = 0;
+        sounds[soundName].play().catch(err => {
+          console.error('❌ Sound play failed:', soundName, err);
+        });
+      }
+    }
+    
+    function playIntroMusic() {
+      sounds.music.currentTime = 0;
+      sounds.music.volume = 0.8;
+      sounds.music.play().catch(err => {
+        console.error('❌ Music play failed:', err);
+      });
+      
+      setTimeout(() => {
+        sounds.music.pause();
+        sounds.music.currentTime = 0;
+      }, 14000);
+    }
+
+    // ======== GAME STATE ========
+    let currentRoundIndex = 0;
+    let roundData = [];
+    let currentScore = 0;
+    let currentStrikes = 0;
+    let totalSurveyCount = 0;
+    let introPlayed = false;
+    let splashTimerInterval = null;
+    
+    // Team scores - persisted across rounds
+    let activeTeam = 'spades';
+    let teamScores = {
+      spades: 0,
+      hearts: 0
+    };
+    
+    // Track completed rounds
+    let completedRounds = [];
+
+    // ======== NORMALIZATION FUNCTIONS ========
+    
+    // Restaurant normalization
+    const restaurantNormalization = {
+      'agas': "Aga's", 'aga': "Aga's", "aga's": "Aga's",
+      'bismillah': 'Bismillah', 'lasbela': 'Lasbela',
+      'tempura': 'Tempura', 'himalaya': 'Himalaya',
+      'bundoo khan': 'Bundoo Khan', 'bundu khan': 'Bundoo Khan',
+    };
+    
+    function normalizeRestaurantName(rawName) {
+      if (!rawName) return '';
+      let cleaned = rawName.trim()
+        .replace(/[!?.,;]/g, '')
+        .replace(/\s+/g, ' ')
+        .replace(/restaurant$/i, '')
+        .trim();
+      
+      const lowerCleaned = cleaned.toLowerCase();
+      if (restaurantNormalization[lowerCleaned]) {
+        return restaurantNormalization[lowerCleaned];
+      }
+      
+      return cleaned.split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+    }
+    
+    // Nashta normalization
+    const nashtaNormalization = {
+      'paratha_chai': 'Paratha + Chai',
+      'halwa_puri': 'Halwa Puri',
+      'nihari_naan': 'Nihari + Naan',
+      'omelette': 'Omelette',
+      'anda_paratha': 'Anda Paratha',
+      'cereal': 'Cereal'
+    };
+    
+    function normalizeNashtaName(rawName) {
+      if (!rawName) return '';
+      let cleaned = rawName.trim();
+      
+      // Handle write-in
+      if (cleaned.startsWith('X:')) {
+        const parts = cleaned.split(':');
+        if (parts.length >= 3) {
+          cleaned = parts.slice(2).join(':').trim();
+        }
+      }
+      
+      const lowerCleaned = cleaned.toLowerCase().replace(/\s+/g, '_');
+      if (nashtaNormalization[lowerCleaned]) {
+        return nashtaNormalization[lowerCleaned];
+      }
+      
+      return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+    }
+    
+    // City/Travel normalization
+    function normalizeCityName(rawName) {
+      if (!rawName) return '';
+      return rawName.trim()
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+    }
+    
+    // TV Show normalization
+    function normalizeTVShow(rawName) {
+      if (!rawName) return '';
+      return rawName.trim();
+    }
+    
+    // Celebrity normalization
+    function normalizeCelebrityName(rawName) {
+      if (!rawName) return '';
+      return rawName.trim()
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+    }
+
+    // ======== SPLASH SCREEN ========
+    function startSplashScreen() {
+      const splashScreen = document.getElementById('splashScreen');
+      const countdown = document.getElementById('countdown');
+      const skipButton = document.getElementById('skipButton');
+      
+      let timeLeft = 14;
+      
+      splashTimerInterval = setInterval(() => {
+        timeLeft--;
+        countdown.textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+          clearInterval(splashTimerInterval);
+          endSplashScreen();
+        }
+      }, 1000);
+      
+      skipButton.addEventListener('click', () => {
+        clearInterval(splashTimerInterval);
+        endSplashScreen();
+      });
+      
+      setTimeout(() => {
+        playIntroMusic();
+        introPlayed = true;
+      }, 500);
+    }
+    
+    function endSplashScreen() {
+      const splashScreen = document.getElementById('splashScreen');
+      const gameContainer = document.getElementById('gameContainer');
+      
+      splashScreen.classList.add('fade-out');
+      
+      setTimeout(() => {
+        splashScreen.style.display = 'none';
+        gameContainer.style.display = 'flex';
+      }, 800);
+    }
+
+    // ======== LOAD DATA FROM SUPABASE ========
+    async function loadRoundData(roundIndex) {
+      try {
+        const PARTY_SLUG = 'friendsgiving2025-1ty7';
+        const round = ROUNDS[roundIndex];
+        
+        console.log(`🔍 Loading ${round.title} data...`);
+        
+        const { data: party, error: partyError } = await supabaseClient
+          .from('parties')
+          .select('id')
+          .eq('slug', PARTY_SLUG)
+          .single();
+        
+        if (partyError) throw partyError;
+        
+        const { data: profiles, error: profileError } = await supabaseClient
+          .from('party_profiles')
+          .select('user_id, display_name, extended_answers')
+          .eq('party_id', party.id);
+        
+        if (profileError) throw profileError;
+        
+        totalSurveyCount = profiles.length;
+        
+        const dataCount = {};
+        
+        profiles.forEach(profile => {
+          let value = profile.extended_answers?.[round.dataField];
+          
+          // Handle write-in custom entries
+          if (value && value.startsWith('X:')) {
+            const parts = value.split(':');
+            if (parts.length >= 3) {
+              value = parts.slice(2).join(':').trim();
+            }
+          }
+          
+          if (value && value.trim() && 
+              value.toLowerCase() !== 'not shared' && 
+              value.toLowerCase() !== 'other') {
+            
+            const normalizedValue = round.normalizer(value);
+            
+            if (!dataCount[normalizedValue]) {
+              dataCount[normalizedValue] = {
+                name: normalizedValue,
+                count: 0
+              };
+            }
+            dataCount[normalizedValue].count++;
+          }
+        });
+        
+        // Get top N answers sorted by count
+        roundData = Object.values(dataCount)
+          .sort((a, b) => b.count - a.count)
+          .slice(0, round.topN);
+        
+        console.log(`✅ Top ${round.topN} for ${round.title}:`, roundData);
+        
+        initializeGame();
+        
+      } catch (error) {
+        console.error('Error loading data:', error);
+        document.getElementById('loadingOverlay').innerHTML = `
+          <div style="color:var(--danger); font-weight:600;">Failed to load data</div>
+          <div style="color:var(--muted);">Check console for details</div>
+        `;
+      }
+    }
+
+    // ======== INITIALIZE GAME ========
+    function initializeGame() {
+      const round = ROUNDS[currentRoundIndex];
+      const board = document.getElementById('board');
+      board.innerHTML = '';
+      
+      // Update header
+      document.getElementById('roundIndicator').textContent = `ROUND ${currentRoundIndex + 1} of ${ROUNDS.length}`;
+      document.getElementById('roundQuestion').textContent = round.question;
+      
+      // Update round selector buttons
+      document.querySelectorAll('.round-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx === currentRoundIndex);
+      });
+      
+      // Reorder for column-first layout
+      const reorderedData = [];
+      const half = Math.ceil(roundData.length / 2);
+      
+      for (let i = 0; i < half; i++) {
+        reorderedData.push(roundData[i]);
+        if (i + half < roundData.length) {
+          reorderedData.push(roundData[i + half]);
+        }
+      }
+      
+      reorderedData.forEach((item, displayIndex) => {
+        const originalIndex = roundData.indexOf(item);
+        
+        const slot = document.createElement('div');
+        slot.className = 'answer-slot';
+        slot.dataset.index = originalIndex;
+        slot.dataset.count = item.count;
+        slot.dataset.name = item.name;
+        
+        slot.innerHTML = `
+          <div class="answer-rank">${originalIndex + 1}</div>
+          <div class="answer-text answer-hidden">▓▓▓▓▓▓▓▓▓▓</div>
+          <div class="answer-count answer-hidden">▓▓</div>
+        `;
+        
+        slot.addEventListener('click', () => revealAnswer(slot));
+        board.appendChild(slot);
+      });
+      
+      document.getElementById('surveyCount').textContent = totalSurveyCount;
+      document.getElementById('loadingOverlay').style.display = 'none';
+      
+      // Reset round state
+      currentScore = 0;
+      currentStrikes = 0;
+      document.getElementById('scoreValue').textContent = '0';
+      document.querySelectorAll('.strike').forEach(strike => {
+        strike.classList.remove('active');
+      });
+      document.getElementById('nextRoundBtn').style.display = 'none';
+      document.getElementById('finishTournamentBtn').style.display = 'none';
+      
+      // Setup control buttons
+      setupControls();
+      setupRoundSelector();
+    }
+    
+    // ======== SETUP CONTROLS ========
+    function setupControls() {
+      document.getElementById('strikeBtn').onclick = addStrike;
+      document.getElementById('revealAllBtn').onclick = revealAll;
+      document.getElementById('resetBtn').onclick = resetGame;
+      document.getElementById('nextRoundBtn').onclick = nextRound;
+      document.getElementById('finishTournamentBtn').onclick = finishTournament;
+      
+      document.getElementById('teamSpades').onclick = () => switchTeam('spades');
+      document.getElementById('teamHearts').onclick = () => switchTeam('hearts');
+    }
+    
+    // ======== SETUP ROUND SELECTOR ========
+    function setupRoundSelector() {
+      document.querySelectorAll('.round-btn').forEach(btn => {
+        btn.onclick = () => {
+          const roundIndex = parseInt(btn.dataset.round);
+          if (roundIndex !== currentRoundIndex) {
+            showRoundTransition(roundIndex);
+          }
+        };
+      });
+    }
+    
+    // ======== ROUND TRANSITION ========
+    function showRoundTransition(newRoundIndex) {
+      currentRoundIndex = newRoundIndex;
+      const round = ROUNDS[currentRoundIndex];
+      
+      const transition = document.getElementById('roundTransition');
+      document.getElementById('transitionRoundNumber').textContent = `ROUND ${currentRoundIndex + 1}`;
+      document.getElementById('transitionRoundTitle').textContent = `${round.emoji} ${round.title}`;
+      document.getElementById('transitionRoundQuestion').textContent = round.question;
+      
+      transition.classList.add('active');
+      
+      setTimeout(() => {
+        transition.classList.remove('active');
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        loadRoundData(currentRoundIndex);
+      }, 3000);
+    }
+    
+    // ======== SWITCH TEAM ========
+    function switchTeam(team) {
+      activeTeam = team;
+      document.getElementById('teamSpades').classList.toggle('active', team === 'spades');
+      document.getElementById('teamHearts').classList.toggle('active', team === 'hearts');
+      console.log(`🔄 Switched to ${team === 'spades' ? 'Spades & Clubs ♠️♣️' : 'Hearts & Diamonds ♥️♦️'}`);
+    }
+
+    // ======== REVEAL ANSWER ========
+    function revealAnswer(slot) {
+      if (slot.classList.contains('revealed')) return;
+      
+      const name = slot.dataset.name;
+      const count = parseInt(slot.dataset.count);
+      
+      slot.classList.add('revealed');
+      
+      slot.querySelector('.answer-text').textContent = name;
+      slot.querySelector('.answer-text').classList.remove('answer-hidden');
+      slot.querySelector('.answer-count').textContent = count;
+      slot.querySelector('.answer-count').classList.remove('answer-hidden');
+      
+      // Update round score
+      currentScore += count;
+      document.getElementById('scoreValue').textContent = currentScore;
+      
+      // Add to active team's tournament score
+      teamScores[activeTeam] += count;
+      const teamScoreElement = activeTeam === 'spades' ? 'teamSpadesScore' : 'teamHeartsScore';
+      document.getElementById(teamScoreElement).textContent = teamScores[activeTeam];
+      
+      playSound('ding');
+      
+      const teamName = activeTeam === 'spades' ? 'Spades & Clubs ♠️♣️' : 'Hearts & Diamonds ♥️♦️';
+      console.log(`✅ Revealed: ${name} (${count} points) → ${teamName} total: ${teamScores[activeTeam]}`);
+      
+      checkAllRevealed();
+    }
+    
+    // ======== CHECK ALL REVEALED ========
+    function checkAllRevealed() {
+      const totalSlots = document.querySelectorAll('.answer-slot').length;
+      const revealedSlots = document.querySelectorAll('.answer-slot.revealed').length;
+      
+      if (totalSlots > 0 && revealedSlots === totalSlots) {
+        // Mark round as completed
+        if (!completedRounds.includes(currentRoundIndex)) {
+          completedRounds.push(currentRoundIndex);
+        }
+        
+        // Show appropriate button
+        if (currentRoundIndex < ROUNDS.length - 1) {
+          document.getElementById('nextRoundBtn').style.display = 'inline-block';
+        } else {
+          document.getElementById('finishTournamentBtn').style.display = 'inline-block';
+        }
+        console.log('🎯 All answers revealed!');
+      }
+    }
+
+    // ======== ADD STRIKE ========
+    function addStrike() {
+      if (currentStrikes >= 3) return;
+      
+      currentStrikes++;
+      const strikeElement = document.getElementById(`strike${currentStrikes}`);
+      strikeElement.classList.add('active');
+      
+      playSound('buzzer');
+      console.log(`❌ Strike ${currentStrikes}/3`);
+      
+      if (currentStrikes === 3) {
+        setTimeout(() => alert('3 STRIKES! Game Over!'), 500);
+      }
+    }
+
+    // ======== REVEAL ALL ========
+    function revealAll() {
+      const slots = document.querySelectorAll('.answer-slot:not(.revealed)');
+      slots.forEach((slot, index) => {
+        setTimeout(() => revealAnswer(slot), index * 400);
+      });
+    }
+
+    // ======== RESET GAME ========
+    function resetGame() {
+      const resetRound = confirm('Reset this round?\n\nThis will clear the board but keep tournament scores.');
+      if (!resetRound) return;
+      
+      currentScore = 0;
+      currentStrikes = 0;
+      
+      document.getElementById('scoreValue').textContent = '0';
+      document.querySelectorAll('.strike').forEach(strike => {
+        strike.classList.remove('active');
+      });
+      
+      document.getElementById('nextRoundBtn').style.display = 'none';
+      document.getElementById('finishTournamentBtn').style.display = 'none';
+      
+      const slots = document.querySelectorAll('.answer-slot');
+      slots.forEach(slot => {
+        slot.classList.remove('revealed');
+        slot.querySelector('.answer-text').textContent = '▓▓▓▓▓▓▓▓▓▓';
+        slot.querySelector('.answer-text').classList.add('answer-hidden');
+        slot.querySelector('.answer-count').textContent = '▓▓';
+        slot.querySelector('.answer-count').classList.add('answer-hidden');
+      });
+      
+      playSound('intro');
+      console.log('🔄 Round reset (tournament scores preserved)');
+    }
+    
+    // ======== NEXT ROUND ========
+    function nextRound() {
+      if (currentRoundIndex < ROUNDS.length - 1) {
+        showRoundTransition(currentRoundIndex + 1);
+      }
+    }
+    
+    // ======== FINISH TOURNAMENT ========
+    function finishTournament() {
+      const winner = teamScores.spades > teamScores.hearts ? 'spades' : 'hearts';
+      const winnerName = winner === 'spades' ? 'Spades & Clubs ♠️♣️' : 'Hearts & Diamonds ♥️♦️';
+      const finalScore = `${teamScores.spades} - ${teamScores.hearts}`;
+      
+      document.getElementById('winnerTeamName').textContent = winnerName;
+      document.getElementById('winnerFinalScore').textContent = `Final Score: ${finalScore}`;
+      
+      document.getElementById('winnerScreen').classList.add('active');
+      
+      setTimeout(() => playSound('intro'), 500);
+      
+      console.log(`🏆 Tournament Winner: ${winnerName} (${finalScore})`);
+    }
+
+    // ======== START GAME ========
+    const audioPrompt = document.getElementById('audioPrompt');
+    audioPrompt.addEventListener('click', () => {
+      console.log('👆 User clicked to enable audio');
+      audioPrompt.classList.add('hidden');
+      
+      startSplashScreen();
+      loadRoundData(currentRoundIndex);
+    });
+    
+    document.addEventListener('keydown', (e) => {
+      if (!audioPrompt.classList.contains('hidden')) {
+        audioPrompt.click();
+      }
+    }, { once: true });
+  </script>
+</body>
+</html>
