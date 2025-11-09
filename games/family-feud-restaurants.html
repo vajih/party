@@ -181,6 +181,20 @@
       background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(249, 115, 22, 0.2));
       border-radius:16px;
       border:2px solid var(--brand-red);
+      position: relative;
+    }
+    
+    .round-indicator{
+      position: absolute;
+      top: 12px;
+      right: 20px;
+      background: rgba(0,0,0,0.5);
+      color: var(--brand-gold);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: 2px solid var(--brand-gold);
     }
     
     .game-title{
@@ -319,6 +333,70 @@
       background: linear-gradient(135deg, rgba(0,0,0,.85), rgba(0,0,0,.7));
       border-radius:16px;
       border:2px solid rgba(220, 38, 38, 0.4);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    /* Team Scores Section */
+    .teams-section{
+      display:flex;
+      gap:24px;
+      flex:1;
+    }
+    
+    .team-score{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:12px 20px;
+      background: rgba(255,255,255,0.05);
+      border:3px solid #2a2a31;
+      border-radius:12px;
+      cursor:pointer;
+      transition: all 0.3s ease;
+      min-width: 160px;
+    }
+    
+    .team-score:hover{
+      border-color:var(--brand-gold);
+      transform: translateY(-2px);
+    }
+    
+    .team-score.active{
+      border-color:var(--brand-gold);
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(249, 115, 22, 0.2));
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+    }
+    
+    .team-name{
+      font-size:0.9rem;
+      font-weight:700;
+      color:var(--muted);
+      margin-bottom:4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .team-score.active .team-name{
+      color:var(--brand-gold);
+    }
+    
+    .team-icon{
+      font-size:1.5rem;
+      margin-bottom:4px;
+    }
+    
+    .team-value{
+      font-size:2.5rem;
+      font-weight:900;
+      color:var(--fg);
+    }
+    
+    .team-score.active .team-value{
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
     .score-section{
@@ -410,6 +488,19 @@
       box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
     }
     
+    button.success{
+      background: linear-gradient(135deg, #06d6a0, #118ab2);
+      border-color: #06d6a0;
+      color: white;
+      font-size: 1.1rem;
+      padding: 14px 28px;
+    }
+    
+    button.success:hover{
+      box-shadow: 0 6px 20px rgba(6, 214, 160, 0.5);
+      transform: translateY(-2px) scale(1.02);
+    }
+    
     /* Loading State */
     .loading-overlay{
       position:fixed;
@@ -481,6 +572,7 @@
 
   <div class="game-container" style="display: none;" id="gameContainer">
     <div class="header">
+      <div class="round-indicator" id="roundIndicator">ROUND 1 of 5</div>
       <h1 class="game-title">Dilwale Family Feud</h1>
       <p class="question">Your favorite Houston area desi restaurant is?</p>
       <p class="survey-count">We surveyed <span id="surveyCount">0</span> people</p>
@@ -491,8 +583,23 @@
     </div>
 
     <div class="footer">
+      <!-- Team Scores -->
+      <div class="teams-section">
+        <div class="team-score active" id="teamSpades" data-team="spades">
+          <div class="team-icon">♠️♣️</div>
+          <div class="team-name">Spades & Clubs</div>
+          <div class="team-value" id="teamSpadesScore">0</div>
+        </div>
+        <div class="team-score" id="teamHearts" data-team="hearts">
+          <div class="team-icon">♥️♦️</div>
+          <div class="team-name">Hearts & Diamonds</div>
+          <div class="team-value" id="teamHeartsScore">0</div>
+        </div>
+      </div>
+
+      <!-- Round Score -->
       <div class="score-section">
-        <div class="score-label">TOTAL SCORE:</div>
+        <div class="score-label">ROUND:</div>
         <div class="score-value" id="scoreValue">0</div>
       </div>
 
@@ -505,7 +612,8 @@
       <div class="controls-section">
         <button class="danger" id="strikeBtn">Add Strike ✗</button>
         <button id="revealAllBtn">Reveal All</button>
-        <button class="primary" id="resetBtn">Reset Game</button>
+        <button class="primary" id="resetBtn">Reset Round</button>
+        <button class="success" id="nextRoundBtn" style="display:none;">Next Round →</button>
       </div>
     </div>
 
@@ -517,8 +625,14 @@
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../config/env.local.js"></script>
+  <script src="../js/tournament-scoring.js"></script>
 
   <script>
+    // ======== TOURNAMENT SETUP ========
+    const tournament = new TournamentScoring('restaurants');
+    const progress = tournament.getTournamentProgress();
+    document.getElementById('roundIndicator').textContent = `ROUND ${progress.current} of ${progress.total}`;
+    
     // ======== CONFIG VERIFICATION ========
     if (typeof CONFIG === 'undefined') {
       console.error('❌ CONFIG not loaded!');
@@ -595,6 +709,14 @@
     let totalSurveyCount = 0;
     let introPlayed = false;
     let splashTimerInterval = null;
+    
+    // Team scores - Initialize from tournament
+    let activeTeam = 'spades'; // 'spades' or 'hearts'
+    let teamScores = tournament.getTeamScores(); // Get scores from tournament
+    
+    // Update UI with tournament scores
+    document.getElementById('teamSpadesScore').textContent = teamScores.spades;
+    document.getElementById('teamHeartsScore').textContent = teamScores.hearts;
 
     // ======== SPLASH SCREEN ========
     function startSplashScreen() {
@@ -799,6 +921,22 @@
       document.getElementById('strikeBtn').addEventListener('click', addStrike);
       document.getElementById('revealAllBtn').addEventListener('click', revealAll);
       document.getElementById('resetBtn').addEventListener('click', resetGame);
+      document.getElementById('nextRoundBtn').addEventListener('click', nextRound);
+      
+      // Setup team switching
+      document.getElementById('teamSpades').addEventListener('click', () => switchTeam('spades'));
+      document.getElementById('teamHearts').addEventListener('click', () => switchTeam('hearts'));
+    }
+    
+    // ======== SWITCH TEAM ========
+    function switchTeam(team) {
+      activeTeam = team;
+      
+      // Update visual state
+      document.getElementById('teamSpades').classList.toggle('active', team === 'spades');
+      document.getElementById('teamHearts').classList.toggle('active', team === 'hearts');
+      
+      console.log(`🔄 Switched to ${team === 'spades' ? 'Spades & Clubs ♠️♣️' : 'Hearts & Diamonds ♥️♦️'}`);
     }
 
     // ======== REVEAL ANSWER ========
@@ -816,14 +954,35 @@
       slot.querySelector('.answer-count').textContent = count;
       slot.querySelector('.answer-count').classList.remove('answer-hidden');
       
-      // Update score
+      // Update round score
       currentScore += count;
       document.getElementById('scoreValue').textContent = currentScore;
+      
+      // Add to active team's score (both local and tournament)
+      teamScores[activeTeam] += count;
+      tournament.addRoundScore(activeTeam, count); // Save to tournament
+      const teamScoreElement = activeTeam === 'spades' ? 'teamSpadesScore' : 'teamHeartsScore';
+      document.getElementById(teamScoreElement).textContent = teamScores[activeTeam];
       
       // Play ding sound
       playSound('ding');
       
-      console.log(`✅ Revealed: ${name} (${count} points)`);
+      const teamName = activeTeam === 'spades' ? 'Spades & Clubs ♠️♣️' : 'Hearts & Diamonds ♥️♦️';
+      console.log(`✅ Revealed: ${name} (${count} points) → ${teamName} total: ${teamScores[activeTeam]}`);
+      
+      // Check if all answers revealed - show Next Round button
+      checkAllRevealed();
+    }
+    
+    // ======== CHECK ALL REVEALED ========
+    function checkAllRevealed() {
+      const totalSlots = document.querySelectorAll('.answer-slot').length;
+      const revealedSlots = document.querySelectorAll('.answer-slot.revealed').length;
+      
+      if (totalSlots > 0 && revealedSlots === totalSlots) {
+        document.getElementById('nextRoundBtn').style.display = 'inline-block';
+        console.log('🎯 All answers revealed! Next Round button shown.');
+      }
     }
 
     // ======== ADD STRIKE ========
@@ -856,6 +1015,12 @@
 
     // ======== RESET GAME ========
     function resetGame() {
+      // Only reset round, not tournament scores
+      const resetRound = confirm('Reset this round?\n\nThis will clear the board but keep tournament scores.');
+      
+      if (!resetRound) return;
+      
+      // Reset round score and strikes
       currentScore = 0;
       currentStrikes = 0;
       
@@ -864,6 +1029,10 @@
         strike.classList.remove('active');
       });
       
+      // Hide next round button
+      document.getElementById('nextRoundBtn').style.display = 'none';
+      
+      // Reset board
       const slots = document.querySelectorAll('.answer-slot');
       slots.forEach(slot => {
         slot.classList.remove('revealed');
@@ -876,7 +1045,12 @@
       // Play intro sound on reset
       playSound('intro');
       
-      console.log('🔄 Game reset');
+      console.log('🔄 Round reset (tournament scores preserved)');
+    }
+    
+    // ======== NEXT ROUND ========
+    function nextRound() {
+      tournament.navigateToNextRound();
     }
 
     // ======== START GAME ========
