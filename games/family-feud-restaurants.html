@@ -757,15 +757,31 @@
       const board = document.getElementById('board');
       board.innerHTML = '';
       
-      restaurantData.forEach((restaurant, index) => {
+      // Reorder for column-first layout (like real Family Feud)
+      // Original: 1,2,3,4,5,6,7,8
+      // New order: 1,5,2,6,3,7,4,8 (fills down columns)
+      const reorderedData = [];
+      const half = Math.ceil(restaurantData.length / 2);
+      
+      for (let i = 0; i < half; i++) {
+        reorderedData.push(restaurantData[i]); // Left column
+        if (i + half < restaurantData.length) {
+          reorderedData.push(restaurantData[i + half]); // Right column
+        }
+      }
+      
+      reorderedData.forEach((restaurant, displayIndex) => {
+        // Find original rank (1-8)
+        const originalIndex = restaurantData.indexOf(restaurant);
+        
         const slot = document.createElement('div');
         slot.className = 'answer-slot';
-        slot.dataset.index = index;
+        slot.dataset.index = originalIndex;
         slot.dataset.count = restaurant.count;
         slot.dataset.name = restaurant.name;
         
         slot.innerHTML = `
-          <div class="answer-rank">${index + 1}</div>
+          <div class="answer-rank">${originalIndex + 1}</div>
           <div class="answer-text answer-hidden">▓▓▓▓▓▓▓▓▓▓</div>
           <div class="answer-count answer-hidden">▓▓</div>
         `;
