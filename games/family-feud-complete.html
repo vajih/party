@@ -362,6 +362,8 @@
       flex:1;
       display:grid;
       grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      grid-auto-flow: column;
       gap:16px;
       padding:20px;
       background: radial-gradient(1200px 600px at 50% 30%, #16161b, #0e0e12 70%, #0b0b0e 90%);
@@ -457,6 +459,34 @@
     .answer-hidden{
       font-size:3rem;
       color:#2a2a31;
+    }
+    
+    /* Logo Slot (6th position) */
+    .logo-slot{
+      background: linear-gradient(135deg, #1a1a22, #14141a);
+      border:3px solid #2a2a31;
+      border-radius:12px;
+      padding:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:default;
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .logo-slot img{
+      max-width:90%;
+      max-height:100%;
+      object-fit:contain;
+      opacity:0.9;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+      transition: all 0.3s ease;
+    }
+    
+    .logo-slot:hover img{
+      opacity:1;
+      transform: scale(1.05);
     }
     
     /* Footer Section */
@@ -796,7 +826,7 @@
         emoji: '🍽️',
         dataField: 'food_desi_restaurant',
         normalizer: normalizeRestaurantName,
-        topN: 8
+        topN: 5
       },
       {
         id: 'nashta',
@@ -805,7 +835,7 @@
         emoji: '☕',
         dataField: 'breakfast_nashta',
         normalizer: normalizeNashtaName,
-        topN: 8
+        topN: 5
       },
       {
         id: 'travel',
@@ -814,7 +844,7 @@
         emoji: '✈️',
         dataField: 'fav_city_travel',
         normalizer: normalizeCityName,
-        topN: 8
+        topN: 5
       },
       {
         id: 'tv',
@@ -823,7 +853,7 @@
         emoji: '📺',
         dataField: 'tv_obsession',
         normalizer: normalizeTVShow,
-        topN: 8
+        topN: 5
       },
       {
         id: 'crush',
@@ -832,7 +862,7 @@
         emoji: '💖',
         dataField: 'celebrity_crush_teen',
         normalizer: normalizeCelebrityName,
-        topN: 8
+        topN: 5
       }
     ];
     
@@ -1116,28 +1146,16 @@
         btn.classList.toggle('active', idx === currentRoundIndex);
       });
       
-      // Reorder for column-first layout
-      const reorderedData = [];
-      const half = Math.ceil(roundData.length / 2);
-      
-      for (let i = 0; i < half; i++) {
-        reorderedData.push(roundData[i]);
-        if (i + half < roundData.length) {
-          reorderedData.push(roundData[i + half]);
-        }
-      }
-      
-      reorderedData.forEach((item, displayIndex) => {
-        const originalIndex = roundData.indexOf(item);
-        
+      // Create 5 answer slots in order (will display as 2 columns, 3 rows)
+      roundData.forEach((item, index) => {
         const slot = document.createElement('div');
         slot.className = 'answer-slot';
-        slot.dataset.index = originalIndex;
+        slot.dataset.index = index;
         slot.dataset.count = item.count;
         slot.dataset.name = item.name;
         
         slot.innerHTML = `
-          <div class="answer-rank">${originalIndex + 1}</div>
+          <div class="answer-rank">${index + 1}</div>
           <div class="answer-text answer-hidden">▓▓▓▓▓▓▓▓▓▓</div>
           <div class="answer-count answer-hidden">▓▓</div>
         `;
@@ -1145,6 +1163,12 @@
         slot.addEventListener('click', () => revealAnswer(slot));
         board.appendChild(slot);
       });
+      
+      // Add blank slot as 6th item (bottom-right position)
+      const logoSlot = document.createElement('div');
+      logoSlot.className = 'logo-slot';
+      logoSlot.innerHTML = '';
+      board.appendChild(logoSlot);
       
       document.getElementById('surveyCount').textContent = totalSurveyCount;
       document.getElementById('loadingOverlay').style.display = 'none';
