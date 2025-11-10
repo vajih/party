@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dilwale Party Games — Host Menu</title>
+  <link rel="icon" type="image/x-icon" href="./assets/img/dilwale-family-feud-favicon.ico" />
+  <style>
+    :root{
+      --bg:#0c0c0f;
+      --fg:#f4f4f7;
+      --muted:#9aa0a6;
+      --shadow: rgba(0,0,0,.35);
+      /* Dilwale brand colors */
+      --brand-red:#dc2626;
+      --brand-gold:#fbbf24;
+      --brand-orange:#f97316;
+    }
+    
+    * { box-sizing: border-box; }
+    
+    html,body{
+      height:100%;
+      margin:0;
+      background: radial-gradient(ellipse at center, #1a1a22 0%, #0c0c0f 70%);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    /* Main Container */
+    .container{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:40px 20px;
+      position:relative;
+    }
+    
+    /* Hero Logo */
+    .hero-logo{
+      margin-bottom:60px;
+      animation: fadeInScale 1s ease-out;
+    }
+    
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    .hero-logo img{
+      max-width:600px;
+      width:90vw;
+      height:auto;
+      filter: drop-shadow(0 20px 60px rgba(220, 38, 38, 0.4));
+      transition: all 0.3s ease;
+    }
+    
+    .hero-logo img:hover{
+      filter: drop-shadow(0 25px 70px rgba(220, 38, 38, 0.6));
+      transform: translateY(-5px);
+    }
+    
+    /* Host Menu Title */
+    .menu-title{
+      font-size:1.2rem;
+      font-weight:700;
+      color:var(--muted);
+      text-align:center;
+      margin:0 0 30px 0;
+      text-transform:uppercase;
+      letter-spacing:2px;
+      opacity:0.6;
+      animation: fadeIn 1.5s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 0.6; }
+    }
+    
+    /* Games Grid */
+    .games-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+      gap:30px;
+      max-width:1200px;
+      margin:0 auto;
+      animation: fadeInUp 1s ease-out 0.3s backwards;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Game Card */
+    .game-card{
+      background: linear-gradient(135deg, #1a1a22, #14141a);
+      border:3px solid #2a2a31;
+      border-radius:20px;
+      padding:30px;
+      text-align:center;
+      cursor:pointer;
+      transition: all 0.3s ease;
+      position:relative;
+      overflow:hidden;
+      text-decoration:none;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:20px;
+    }
+    
+    .game-card:hover{
+      border-color:var(--brand-gold);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 40px rgba(251, 191, 36, 0.3);
+    }
+    
+    .game-card.disabled{
+      opacity:0.5;
+      cursor:not-allowed;
+    }
+    
+    .game-card.disabled:hover{
+      border-color:#2a2a31;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .game-logo{
+      width:100%;
+      max-width:250px;
+      height:auto;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+      transition: all 0.3s ease;
+    }
+    
+    .game-card:hover:not(.disabled) .game-logo{
+      transform: scale(1.05);
+      filter: drop-shadow(0 6px 20px rgba(251, 191, 36, 0.5));
+    }
+    
+    .game-title{
+      font-size:1.5rem;
+      font-weight:900;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin:0;
+      text-transform:uppercase;
+      letter-spacing:1px;
+    }
+    
+    .game-status{
+      font-size:0.85rem;
+      color:var(--muted);
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      padding:6px 14px;
+      background: rgba(0,0,0,0.3);
+      border-radius:20px;
+      margin-top:-10px;
+    }
+    
+    .game-status.coming-soon{
+      color:#fbbf24;
+      border:1px solid rgba(251, 191, 36, 0.3);
+    }
+    
+    .game-status.live{
+      color:#06d6a0;
+      border:1px solid rgba(6, 214, 160, 0.3);
+    }
+    
+    /* Footer Note */
+    .footer-note{
+      position:fixed;
+      bottom:20px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:0.75rem;
+      color:rgba(154, 160, 166, 0.4);
+      text-align:center;
+      font-weight:500;
+      letter-spacing:1px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-logo img{
+        max-width:400px;
+      }
+      
+      .games-grid{
+        grid-template-columns: 1fr;
+        max-width:350px;
+      }
+      
+      .menu-title{
+        font-size:1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Hero Logo -->
+    <div class="hero-logo">
+      <img src="./assets/img/dilwale_logo.png" alt="Dilwale" />
+    </div>
+    
+    <!-- Menu Title (subtle) -->
+    <h2 class="menu-title">Host Menu — Select Game</h2>
+    
+    <!-- Games Grid -->
+    <div class="games-grid">
+      <!-- Scavenger Hunt (Coming Soon) -->
+      <div class="game-card disabled" onclick="handleGameClick('scavenger')">
+        <img src="./assets/img/dilwale_scavenger_logo.png" alt="Scavenger Hunt" class="game-logo" />
+        <h3 class="game-title">Scavenger Hunt</h3>
+        <span class="game-status coming-soon">Coming Soon</span>
+      </div>
+      
+      <!-- Baby Photo Game -->
+      <a href="./games/baby-guess-game.html" class="game-card">
+        <img src="./assets/img/dilwale_baby_game_logo.png" alt="Baby Photo Game" class="game-logo" />
+        <h3 class="game-title">Baby Photo Game</h3>
+        <span class="game-status live">● Live</span>
+      </a>
+      
+      <!-- Family Feud Tournament -->
+      <a href="./games/family-feud-complete.html" class="game-card">
+        <img src="./assets/img/dilwale-family-feud.png" alt="Family Feud" class="game-logo" />
+        <h3 class="game-title">Family Feud</h3>
+        <span class="game-status live">● Live</span>
+      </a>
+    </div>
+    
+    <!-- Footer Note -->
+    <div class="footer-note">
+      HOST CONTROL PANEL — DILWALE FRIENDSGIVING 2025
+      <br>
+      <a href="./waiting-screen.html" style="color: rgba(251, 191, 36, 0.5); text-decoration: none; font-size: 0.7rem; margin-top: 4px; display: inline-block;">
+        ← Waiting Screen
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function handleGameClick(gameType) {
+      if (gameType === 'scavenger') {
+        alert('🚧 Scavenger Hunt game is under development.\n\nCheck back soon for this exciting game!');
+      }
+    }
+    
+    // Keyboard shortcut for host: Press 'H' to return home from any game
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'h' || e.key === 'H') {
+        if (!window.location.pathname.endsWith('games-host-menu.html')) {
+          console.log('🏠 Navigating to host menu...');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
