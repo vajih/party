@@ -189,6 +189,7 @@ party/
 ## Quick Reference
 
 ### Host Workflow
+
 1. **Pre-Party:** Open `waiting-screen.html` → Display while guests arrive
 2. **Ready to Start:** Press `M` or `SPACE` → Go to games menu
 3. **Select Game:** Click game card → Launch game
@@ -197,16 +198,20 @@ party/
 6. **End of Night:** Close browser
 
 ### Keyboard Shortcuts
+
 **Waiting Screen:**
+
 - `M` → Games menu
 - `SPACE` or `ENTER` → Games menu
 - `2` → Launch Baby Game
 - `3` → Launch Family Feud
 
 **From Any Game:**
+
 - Click "← Menu" (top-left)
 
 ### URLs
+
 - Waiting: `http://127.0.0.1:5502/waiting-screen.html`
 - Menu: `http://127.0.0.1:5502/games-host-menu.html`
 - Baby Game: `http://127.0.0.1:5502/games/baby-guess-game.html`
