@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dilwale Scavenger Hunt — Conversations Over Checkmarks</title>
+  <link rel="icon" type="image/x-icon" href="../assets/img/dilwale-family-feud-favicon.ico" />
+  <style>
+    :root{
+      --bg:#0c0c0f;
+      --fg:#f4f4f7;
+      --muted:#9aa0a6;
+      --shadow: rgba(0,0,0,.35);
+      --brand-red:#dc2626;
+      --brand-gold:#fbbf24;
+      --brand-orange:#f97316;
+    }
+    
+    * { box-sizing: border-box; }
+    
+    html,body{
+      height:100%;
+      margin:0;
+      background: radial-gradient(ellipse at center, #1a1a22 0%, #0c0c0f 70%);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    /* Back to Menu Button */
+    .back-menu-btn{
+      position:fixed;
+      top:20px;
+      left:20px;
+      background:rgba(0,0,0,0.6);
+      color:var(--muted);
+      border:2px solid rgba(255,255,255,0.1);
+      padding:10px 18px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:0.85rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      z-index:2000;
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      opacity:0.4;
+    }
+    
+    .back-menu-btn:hover{
+      opacity:1;
+      background:rgba(0,0,0,0.8);
+      border-color:var(--brand-gold);
+      color:var(--brand-gold);
+      transform: translateX(-3px);
+    }
+    
+    /* ======== PHASE 1: INTRO SCREEN ======== */
+    .intro-screen{
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      z-index: 1000;
+      animation: fadeIn 0.6s ease-out;
+    }
+    
+    .intro-screen.hidden{
+      animation: fadeOut 0.5s ease-out forwards;
+      pointer-events: none;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    
+    .intro-container{
+      max-width: 1800px;
+      width: 100%;
+      background: linear-gradient(135deg, #1a1a22, #14141a);
+      border: 3px solid var(--brand-gold);
+      border-radius: 24px;
+      padding: 60px 50px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+      animation: slideUp 0.7s ease-out;
+      position: relative;
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .intro-logo{
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      width: 100px;
+      height: auto;
+      filter: drop-shadow(0 10px 30px rgba(220, 38, 38, 0.4));
+      z-index: 1;
+    }
+    
+    .intro-main-content{
+      width: 100%;
+    }
+    
+    .intro-title{
+      font-size: 3.5rem;
+      font-weight: 900;
+      margin: 0 0 16px 0;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.2;
+      text-align: center;
+    }
+    
+    .intro-subtitle{
+      font-size: 2.5rem;
+      color: var(--brand-gold);
+      font-weight: 600;
+      margin: 0 0 40px 0;
+      font-style: italic;
+      text-align: center;
+    }
+    
+    .intro-content{
+      text-align: left;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 50px;
+      margin-bottom: 40px;
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      width: 100%;
+    }
+    
+    .intro-heading{
+      font-size: 1.8rem;
+      color: var(--brand-gold);
+      margin: 0 0 30px 0;
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    
+    .intro-points{
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .intro-points li{
+      font-size: 2.3rem;
+      line-height: 1.6;
+      color: var(--fg);
+      padding: 30px 0 30px 70px;
+      position: relative;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .intro-points li:last-child{
+      border-bottom: none;
+    }
+    
+    .intro-points li::before{
+      content: '•';
+      position: absolute;
+      left: 20px;
+      color: var(--brand-gold);
+      font-weight: 900;
+      font-size: 3rem;
+      line-height: 1;
+    }
+    
+    .intro-points strong{
+      color: var(--brand-gold);
+      font-weight: 700;
+    }
+    
+    .begin-button{
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange));
+      border: 3px solid var(--brand-gold);
+      color: white;
+      padding: 20px 60px;
+      border-radius: 14px;
+      font-size: 1.4rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
+      display: block;
+      margin: 0 auto;
+    }
+    
+    .begin-button:hover{
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(220, 38, 38, 0.6);
+    }
+    
+    .begin-button:active{
+      transform: translateY(-1px) scale(0.98);
+    }
+    
+    /* ======== PHASE 2: GAME TABLE ======== */
+    .game-screen{
+      position: fixed;
+      inset: 0;
+      display: none;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .game-screen.active{
+      display: block;
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    .game-container{
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px 0;
+    }
+    
+    .game-header{
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 40px;
+      padding: 25px 40px;
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(249, 115, 22, 0.2));
+      border-radius: 20px;
+      border: 2px solid var(--brand-gold);
+    }
+    
+    .game-header-logo{
+      width: 120px;
+      height: auto;
+      flex-shrink: 0;
+      filter: drop-shadow(0 8px 20px rgba(220, 38, 38, 0.4));
+    }
+    
+    .game-header-text{
+      flex: 1;
+      text-align: left;
+    }
+    
+    .game-title{
+      font-size: 2.2rem;
+      font-weight: 900;
+      margin: 0 0 8px 0;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .game-subtitle{
+      font-size: 1.3rem;
+      color: var(--brand-gold);
+      font-weight: 600;
+      margin: 0;
+      font-style: italic;
+    }
+    
+    /* Main Table */
+    .scavenger-table{
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    
+    .scavenger-table td{
+      border: 3px solid #2a2a31;
+      padding: 20px 16px;
+      vertical-align: middle;
+      position: relative;
+      background: linear-gradient(135deg, #1a1a22, #14141a);
+      transition: all 0.2s ease;
+      width: 20%;
+      height: 150px;
+    }
+    
+    .scavenger-table td:hover{
+      background: linear-gradient(135deg, #2a2a31, #1f1f26);
+      transform: scale(1.02);
+      z-index: 10;
+      box-shadow: 0 8px 24px rgba(251, 191, 36, 0.3);
+      border-color: var(--brand-gold);
+    }
+    
+    .cell-number{
+      display: none;
+    }
+    
+    .cell-content{
+      font-size: 1.5rem;
+      color: var(--brand-gold);
+      line-height: 1.5;
+      min-height: 100px;
+      padding-top: 0;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    
+    .cell-content small{
+      font-size: 0.75em;
+      display: block;
+      margin-top: 8px;
+      font-weight: 500;
+      color: var(--brand-orange);
+    }
+    
+    /* Special cell - Golden Nugget */
+    .golden-nugget{
+      background: linear-gradient(135deg, #1a1a22, #14141a) !important;
+      border: 5px double var(--brand-gold) !important;
+      box-shadow: 0 0 40px rgba(251, 191, 36, 0.6), inset 0 0 30px rgba(251, 191, 36, 0.1) !important;
+      position: relative;
+    }
+    
+    .golden-nugget::before{
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border: 2px solid var(--brand-gold);
+      border-radius: inherit;
+      opacity: 0.5;
+      animation: pulse-border 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-border {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.02); }
+    }
+    
+    .golden-nugget .cell-content{
+      color: var(--brand-gold);
+      text-shadow: 0 2px 10px rgba(251, 191, 36, 0.5);
+    }
+    
+    .golden-nugget .cell-content strong{
+      color: var(--brand-gold);
+      font-size: 1.1em;
+      text-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+    }
+    
+    .golden-nugget .cell-content small{
+      color: var(--brand-orange);
+      opacity: 0.9;
+    }
+    
+    .golden-nugget::after{
+      content: '✨';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 2rem;
+      animation: sparkle 2s ease-in-out infinite;
+      z-index: 1;
+    }
+    
+    @keyframes sparkle {
+      0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+      50% { opacity: 0.7; transform: scale(1.15) rotate(10deg); }
+    }
+    
+    .golden-nugget:hover{
+      box-shadow: 0 0 60px rgba(251, 191, 36, 0.8), inset 0 0 40px rgba(251, 191, 36, 0.15) !important;
+      border-color: var(--brand-orange) !important;
+    }
+    
+    .golden-nugget:hover::before{
+      border-color: var(--brand-orange);
+      opacity: 0.8;
+    }
+    
+    /* Footer Info */
+    .game-footer{
+      max-width: 1200px;
+      margin: 40px auto 0;
+      padding: 40px 50px;
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(249, 115, 22, 0.15));
+      border-radius: 16px;
+      border: 2px solid rgba(251, 191, 36, 0.3);
+    }
+    
+    .footer-title{
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--brand-gold);
+      margin: 0 0 24px 0;
+      text-align: center;
+    }
+    
+    .footer-text{
+      font-size: 1.4rem;
+      color: var(--fg);
+      line-height: 1.8;
+      text-align: center;
+      margin: 16px 0;
+    }
+    
+    .footer-text strong{
+      color: var(--brand-gold);
+    }
+    
+    /* Back Button in Game Screen */
+    .back-to-intro{
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.6);
+      color: var(--muted);
+      border: 2px solid rgba(255,255,255,0.1);
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      opacity: 0.4;
+    }
+    
+    .back-to-intro:hover{
+      opacity: 1;
+      background: rgba(0,0,0,0.8);
+      border-color: var(--brand-gold);
+      color: var(--brand-gold);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .intro-container{
+        padding: 40px 30px;
+      }
+      
+      .intro-title{
+        font-size: 2.2rem;
+      }
+      
+      .intro-subtitle{
+        font-size: 1.4rem;
+      }
+      
+      .game-title{
+        font-size: 2rem;
+      }
+      
+      .game-subtitle{
+        font-size: 1.2rem;
+      }
+      
+      .game-header{
+        gap: 20px;
+        padding: 20px 30px;
+      }
+      
+      .game-header-logo{
+        width: 100px;
+      }
+      
+      .scavenger-table td{
+        padding: 20px 16px;
+        height: 130px;
+      }
+      
+      .cell-content{
+        font-size: 1.25rem;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .intro-container{
+        padding: 100px 20px 30px 20px;
+      }
+      
+      .intro-logo{
+        width: 80px;
+        top: 15px;
+        left: 15px;
+      }
+      
+      .intro-title{
+        font-size: 2rem;
+        text-align: center;
+      }
+      
+      .intro-subtitle{
+        font-size: 1.4rem;
+        margin-bottom: 30px;
+        text-align: center;
+      }
+      
+      .intro-content{
+        padding: 30px 25px;
+      }
+      
+      .intro-heading{
+        font-size: 1.2rem;
+        text-align: center;
+      }
+      
+      .intro-points li{
+        font-size: 1.3rem;
+        padding: 20px 0 20px 50px;
+      }
+      
+      .intro-points li::before{
+        font-size: 2rem;
+        left: 10px;
+      }
+      
+      .begin-button{
+        padding: 16px 40px;
+        font-size: 1.2rem;
+      }
+      
+      .scavenger-table{
+        font-size: 0.9rem;
+      }
+      
+      .scavenger-table td{
+        padding: 16px 12px;
+        height: 110px;
+      }
+      
+      .cell-content{
+        font-size: 1.1rem;
+        min-height: 80px;
+        padding-top: 0;
+      }
+      
+      .game-header{
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+        gap: 15px;
+      }
+      
+      .game-header-text{
+        text-align: center;
+      }
+      
+      .game-header-logo{
+        width: 90px;
+      }
+      
+      .game-title{
+        font-size: 1.6rem;
+      }
+      
+      .game-subtitle{
+        font-size: 1.1rem;
+      }
+      
+      .game-footer{
+        padding: 30px 25px;
+      }
+      
+      .footer-title{
+        font-size: 1.5rem;
+      }
+      
+      .footer-text{
+        font-size: 1.15rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Back to Menu Button -->
+  <a href="../games-host-menu.html" class="back-menu-btn" title="Back to Host Menu">
+    ← Menu
+  </a>
+
+  <!-- PHASE 1: INTRO SCREEN -->
+  <div class="intro-screen" id="introScreen">
+    <div class="intro-container">
+      <img src="../assets/img/dilwale_scavenger_logo.png" alt="Dilwale Scavenger Hunt" class="intro-logo" />
+      
+      <div class="intro-main-content">
+        <h1 class="intro-title">Dilwale Scavenger Hunt</h1>
+        <h2 class="intro-subtitle">Conversations Over Checkmarks</h2>
+        
+        <div class="intro-content">
+          <p class="intro-heading">Guidance</p>
+          
+          <ul class="intro-points">
+            <li>
+              <strong>Connect, don't compete:</strong> This activity is a catalyst for real conversations at your table.
+            </li>
+            <li>
+              <strong>How:</strong> At your table, pick prompts, ask & listen to 10–15 second stories; initials optional—quality over quantity.
+            </li>
+            <li>
+              <strong>Then share:</strong> After ~15 minutes, each of the 12 tables offers one standout story to the room.
+            </li>
+          </ul>
+        </div>
+        
+        <button class="begin-button" onclick="beginGame()">
+          ▶ Begin Conversations
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2: GAME TABLE -->
+  <div class="game-screen" id="gameScreen">
+    <button class="back-to-intro" onclick="showIntro()">
+      ↻ View Instructions
+    </button>
+    
+    <div class="game-container">
+      <div class="game-header">
+        <img src="../assets/img/dilwale_scavenger_logo.png" alt="Dilwale" class="game-header-logo" />
+        <div class="game-header-text">
+          <h2 class="game-title">Scavenger Hunt</h2>
+          <p class="game-subtitle">Conversations Over Checkmarks</p>
+        </div>
+      </div>
+
+      <table class="scavenger-table">
+        <tr>
+          <!-- Cell 1 -->
+          <td>
+            <div class="cell-number">1</div>
+            <div class="cell-content">
+              Collects something<br>
+              <small>(Records, stamps, pens)</small>
+            </div>
+          </td>
+          
+          <!-- Cell 2 -->
+          <td>
+            <div class="cell-number">2</div>
+            <div class="cell-content">
+              Lived in the<br>Far East
+            </div>
+          </td>
+          
+          <!-- Cell 3 -->
+          <td>
+            <div class="cell-number">3</div>
+            <div class="cell-content">
+              Has/had a milestone<br>celebration in 2025
+            </div>
+          </td>
+          
+          <!-- Cell 4 -->
+          <td>
+            <div class="cell-number">4</div>
+            <div class="cell-content">
+              Ran a race<br>
+              <small>(½ Marathon, 5K, Marathon)</small>
+            </div>
+          </td>
+          
+          <!-- Cell 5 -->
+          <td>
+            <div class="cell-number">5</div>
+            <div class="cell-content">
+              Is/was involved<br>in politics
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <!-- Cell 6 -->
+          <td>
+            <div class="cell-number">6</div>
+            <div class="cell-content">
+              Can hum a<br>Nusrat/Nazia Hassan/other tune or whistle
+            </div>
+          </td>
+          
+          <!-- Cell 7 -->
+          <td>
+            <div class="cell-number">7</div>
+            <div class="cell-content">
+              Has been on a<br>school sports team
+            </div>
+          </td>
+          
+          <!-- Cell 8 -->
+          <td>
+            <div class="cell-number">8</div>
+            <div class="cell-content">
+              Formally trained for a fine art<br>
+              <small>(dance, singing, painting)</small>
+            </div>
+          </td>
+          
+          <!-- Cell 9 -->
+          <td>
+            <div class="cell-number">9</div>
+            <div class="cell-content">
+              Grew up<br>in Europe
+            </div>
+          </td>
+          
+          <!-- Cell 10 -->
+          <td>
+            <div class="cell-number">10</div>
+            <div class="cell-content">
+              Has acted, directed,<br>or been on a show
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <!-- Cell 11 -->
+          <td>
+            <div class="cell-number">11</div>
+            <div class="cell-content">
+              Married their childhood/<br>school sweetheart
+            </div>
+          </td>
+          
+          <!-- Cell 12 -->
+          <td>
+            <div class="cell-number">12</div>
+            <div class="cell-content">
+              Can tell<br>a joke
+            </div>
+          </td>
+          
+          <!-- Cell 13 - Golden Nugget (Special) -->
+          <td class="golden-nugget">
+            <div class="cell-number">13</div>
+            <div class="cell-content">
+              <strong>Golden Nugget</strong><br>
+              <small>(unique thing discovered)</small>
+            </div>
+          </td>
+          
+          <!-- Cell 14 -->
+          <td>
+            <div class="cell-number">14</div>
+            <div class="cell-content">
+              Can fly<br>a plane
+            </div>
+          </td>
+          
+          <!-- Cell 15 -->
+          <td>
+            <div class="cell-number">15</div>
+            <div class="cell-content">
+              Is the<br>middle child
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <!-- Cell 16 -->
+          <td>
+            <div class="cell-number">16</div>
+            <div class="cell-content">
+              Can play a<br>musical instrument
+            </div>
+          </td>
+          
+          <!-- Cell 17 -->
+          <td>
+            <div class="cell-number">17</div>
+            <div class="cell-content">
+              Can whistle<br>a tune
+            </div>
+          </td>
+          
+          <!-- Cell 18 -->
+          <td>
+            <div class="cell-number">18</div>
+            <div class="cell-content">
+              Has a creative outlet/hobby<br>
+              <small>(Woodwork, knitting, painting)</small>
+            </div>
+          </td>
+          
+          <!-- Cell 19 -->
+          <td>
+            <div class="cell-number">19</div>
+            <div class="cell-content">
+              Sat next to a celebrity<br>on a trip
+            </div>
+          </td>
+          
+          <!-- Cell 20 -->
+          <td>
+            <div class="cell-number">20</div>
+            <div class="cell-content">
+              Has a<br>hidden talent
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <!-- Cell 21 -->
+          <td>
+            <div class="cell-number">21</div>
+            <div class="cell-content">
+              Can recite a full movie/<br>book dialogue or a poem
+            </div>
+          </td>
+          
+          <!-- Cell 22 -->
+          <td>
+            <div class="cell-number">22</div>
+            <div class="cell-content">
+              Can speak more than<br>three languages
+            </div>
+          </td>
+          
+          <!-- Cell 23 -->
+          <td>
+            <div class="cell-number">23</div>
+            <div class="cell-content">
+              Had a<br>supernatural encounter
+            </div>
+          </td>
+          
+          <!-- Cell 24 -->
+          <td>
+            <div class="cell-number">24</div>
+            <div class="cell-content">
+              Can do<br>the Moonwalk
+            </div>
+          </td>
+          
+          <!-- Cell 25 -->
+          <td>
+            <div class="cell-number">25</div>
+            <div class="cell-content">
+              Can do/teach<br>a party trick
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <div class="game-footer">
+        <h3 class="footer-title">✨ Remember</h3>
+        <p class="footer-text">
+          <strong>Quality over quantity.</strong> Listen to stories, make connections, and enjoy the conversations!
+        </p>
+        <p class="footer-text">
+          After ~15 minutes, your table will share <strong>one standout story</strong> with the room.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Phase Management
+    function beginGame() {
+      document.getElementById('introScreen').classList.add('hidden');
+      setTimeout(() => {
+        document.getElementById('introScreen').style.display = 'none';
+        document.getElementById('gameScreen').classList.add('active');
+      }, 500);
+    }
+
+    function showIntro() {
+      document.getElementById('gameScreen').classList.remove('active');
+      setTimeout(() => {
+        document.getElementById('gameScreen').style.display = 'none';
+        document.getElementById('introScreen').style.display = 'flex';
+        document.getElementById('introScreen').classList.remove('hidden');
+      }, 300);
+    }
+  </script>
+</body>
+</html>
