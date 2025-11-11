@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dilwale Scavenger Hunt — Party Game</title>
+  <link rel="icon" type="image/x-icon" href="../assets/img/dilwale-family-feud-favicon.ico" />
+  <style>
+    :root{
+      --bg:#0c0c0f;
+      --fg:#f4f4f7;
+      --muted:#9aa0a6;
+      --shadow: rgba(0,0,0,.35);
+      /* Dilwale brand colors */
+      --brand-red:#dc2626;
+      --brand-gold:#fbbf24;
+      --brand-orange:#f97316;
+    }
+    
+    * { box-sizing: border-box; }
+    
+    html,body{
+      height:100%;
+      margin:0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+    }
+    
+    /* Back to Menu Button */
+    .back-menu-btn{
+      position:fixed;
+      top:20px;
+      left:20px;
+      background:rgba(0,0,0,0.6);
+      color:var(--muted);
+      border:2px solid rgba(255,255,255,0.1);
+      padding:10px 18px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:0.85rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      z-index:1000;
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      opacity:0.4;
+    }
+    
+    .back-menu-btn:hover{
+      opacity:1;
+      background:rgba(0,0,0,0.8);
+      border-color:var(--brand-gold);
+      color:var(--brand-gold);
+      transform: translateX(-3px);
+    }
+    
+    /* Main Container */
+    .game-container{
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      padding:20px;
+      gap:20px;
+    }
+    
+    /* Header Section */
+    .header{
+      text-align:center;
+      padding:20px;
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(249, 115, 22, 0.2));
+      border-radius:16px;
+      border:2px solid var(--brand-red);
+      position: relative;
+    }
+    
+    .game-title{
+      font-size:2.5rem;
+      font-weight:900;
+      margin:0 0 12px 0;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .game-subtitle{
+      font-size:1.2rem;
+      color:var(--muted);
+      margin:0;
+    }
+    
+    /* Main Content Area */
+    .content-area{
+      flex:1;
+      display:flex;
+      gap:20px;
+      overflow:hidden;
+    }
+    
+    /* PDF Viewer Section */
+    .pdf-section{
+      flex:1;
+      background: linear-gradient(135deg, #1a1a22, #14141a);
+      border:3px solid #2a2a31;
+      border-radius:20px;
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      overflow:hidden;
+    }
+    
+    .pdf-controls{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    
+    .pdf-title{
+      font-size:1.1rem;
+      font-weight:700;
+      color:var(--fg);
+      margin:0;
+    }
+    
+    .pdf-viewer{
+      flex:1;
+      background: white;
+      border-radius:12px;
+      overflow:hidden;
+      position:relative;
+    }
+    
+    .pdf-viewer iframe{
+      width:100%;
+      height:100%;
+      border:none;
+      border-radius:12px;
+    }
+    
+    .pdf-placeholder{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      height:100%;
+      gap:20px;
+      color:var(--muted);
+    }
+    
+    .pdf-icon{
+      font-size:4rem;
+      opacity:0.5;
+    }
+    
+    /* Host Panel */
+    .host-panel{
+      width:320px;
+      background: linear-gradient(135deg, #1a1a22, #14141a);
+      border:3px solid #2a2a31;
+      border-radius:20px;
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+      overflow-y:auto;
+    }
+    
+    .panel-section{
+      background: rgba(255,255,255,0.02);
+      border-radius:12px;
+      padding:16px;
+      border:1px solid rgba(255,255,255,0.05);
+    }
+    
+    .panel-title{
+      font-size:0.85rem;
+      font-weight:700;
+      color:var(--brand-gold);
+      text-transform:uppercase;
+      letter-spacing:1px;
+      margin:0 0 12px 0;
+    }
+    
+    /* Timer */
+    .timer-display{
+      font-size:3rem;
+      font-weight:900;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align:center;
+      margin:12px 0;
+      font-variant-numeric: tabular-nums;
+    }
+    
+    .timer-controls{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    
+    /* Buttons */
+    button, .btn{
+      background:#17171c;
+      color:var(--fg);
+      border:2px solid #2a2a31;
+      padding:12px 20px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:0.95rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px var(--shadow);
+      flex:1;
+      min-width:fit-content;
+      text-decoration:none;
+      text-align:center;
+      display:inline-block;
+    }
+    
+    button:hover, .btn:hover{
+      border-color:var(--brand-gold);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(251, 191, 36, 0.3);
+    }
+    
+    button.primary, .btn.primary{
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange));
+      border-color:var(--brand-gold);
+      color:white;
+    }
+    
+    button.success, .btn.success{
+      background: linear-gradient(135deg, #06d6a0, #118ab2);
+      border-color: #06d6a0;
+      color: white;
+    }
+    
+    button.danger{
+      background:var(--danger);
+      border-color:var(--danger);
+      color:white;
+    }
+    
+    button:disabled{
+      opacity:0.5;
+      cursor:not-allowed;
+    }
+    
+    button:disabled:hover{
+      transform:none;
+      border-color:#2a2a31;
+    }
+    
+    /* Instructions */
+    .instructions{
+      color:var(--muted);
+      font-size:0.9rem;
+      line-height:1.6;
+    }
+    
+    .instructions ul{
+      margin:8px 0;
+      padding-left:20px;
+    }
+    
+    .instructions li{
+      margin:6px 0;
+    }
+    
+    /* Status indicator */
+    .status-badge{
+      display:inline-block;
+      padding:6px 14px;
+      background:rgba(0,0,0,0.3);
+      border-radius:20px;
+      font-size:0.8rem;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:1px;
+    }
+    
+    .status-badge.active{
+      background: linear-gradient(135deg, rgba(6, 214, 160, 0.3), rgba(17, 138, 178, 0.3));
+      color:#06d6a0;
+      border:1px solid rgba(6, 214, 160, 0.5);
+    }
+    
+    .status-badge.paused{
+      background: rgba(255, 193, 7, 0.2);
+      color:#ffc107;
+      border:1px solid rgba(255, 193, 7, 0.5);
+    }
+    
+    .status-badge.stopped{
+      background: rgba(239, 71, 111, 0.2);
+      color:#ef476f;
+      border:1px solid rgba(239, 71, 111, 0.5);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .content-area{
+        flex-direction:column;
+      }
+      
+      .host-panel{
+        width:100%;
+        max-height:400px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .game-title{
+        font-size:1.8rem;
+      }
+      
+      .timer-display{
+        font-size:2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Back to Menu Button -->
+  <a href="../games-host-menu.html" class="back-menu-btn" title="Back to Host Menu">
+    ← Menu
+  </a>
+
+  <div class="game-container">
+    <!-- Header -->
+    <div class="header">
+      <h1 class="game-title">🔍 Dilwale Scavenger Hunt</h1>
+      <p class="game-subtitle">Find all the items and complete the challenge!</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-area">
+      <!-- PDF Viewer Section -->
+      <div class="pdf-section">
+        <div class="pdf-controls">
+          <h2 class="pdf-title">📄 Scavenger Hunt Sheet</h2>
+          <a href="../assets/Friendsgiving_scavenger.pdf" download class="btn success">
+            ⬇ Download PDF
+          </a>
+        </div>
+        
+        <div class="pdf-viewer">
+          <iframe 
+            src="../assets/Friendsgiving_scavenger.pdf" 
+            type="application/pdf"
+            title="Scavenger Hunt PDF">
+          </iframe>
+          
+          <!-- Fallback for browsers that don't support PDF embedding -->
+          <div class="pdf-placeholder" style="display:none;" id="pdfFallback">
+            <div class="pdf-icon">📄</div>
+            <div>
+              <strong>PDF Preview Not Available</strong>
+              <p>Click the download button above to view the scavenger hunt sheet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Host Control Panel -->
+      <div class="host-panel">
+        <!-- Timer Section -->
+        <div class="panel-section">
+          <h3 class="panel-title">⏱ Timer</h3>
+          <div class="timer-display" id="timerDisplay">15:00</div>
+          <div style="text-align:center; margin-bottom:12px;">
+            <span class="status-badge stopped" id="timerStatus">Stopped</span>
+          </div>
+          <div class="timer-controls">
+            <button class="primary" onclick="startTimer()">▶ Start</button>
+            <button onclick="pauseTimer()">⏸ Pause</button>
+            <button onclick="resetTimer()">↻ Reset</button>
+          </div>
+          <div style="margin-top:12px;">
+            <label style="color:var(--muted); font-size:0.85rem; display:block; margin-bottom:6px;">
+              Set Duration (minutes):
+            </label>
+            <div style="display:flex; gap:8px;">
+              <button onclick="setTimerMinutes(10)">10</button>
+              <button onclick="setTimerMinutes(15)">15</button>
+              <button onclick="setTimerMinutes(20)">20</button>
+              <button onclick="setTimerMinutes(30)">30</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="panel-section">
+          <h3 class="panel-title">📋 Host Instructions</h3>
+          <div class="instructions">
+            <ul>
+              <li><strong>Display PDF:</strong> Show scavenger hunt sheet on main screen</li>
+              <li><strong>Distribute:</strong> Share PDF link or print copies for teams</li>
+              <li><strong>Set Timer:</strong> Choose duration (10-30 minutes)</li>
+              <li><strong>Start Hunt:</strong> Click "Start" to begin countdown</li>
+              <li><strong>Monitor:</strong> Teams search for items on the list</li>
+              <li><strong>Finish:</strong> First team to complete wins!</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="panel-section">
+          <h3 class="panel-title">⚡ Quick Actions</h3>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <a href="../assets/Friendsgiving_scavenger.pdf" download class="btn success">
+              📥 Download Hunt Sheet
+            </a>
+            <button onclick="printPDF()">🖨 Print Hunt Sheet</button>
+            <button onclick="fullscreenPDF()">⛶ Fullscreen PDF</button>
+          </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="panel-section">
+          <h3 class="panel-title">💡 Tips</h3>
+          <div class="instructions">
+            <ul>
+              <li>Divide guests into teams (3-5 people each)</li>
+              <li>Set clear boundaries for the hunt area</li>
+              <li>Award bonus points for creativity</li>
+              <li>Have prizes ready for winners!</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ======== TIMER FUNCTIONALITY ========
+    let timerDuration = 15 * 60; // 15 minutes in seconds
+    let timeRemaining = timerDuration;
+    let timerInterval = null;
+    let timerState = 'stopped'; // stopped, running, paused
+    
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerStatus = document.getElementById('timerStatus');
+    
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeRemaining / 60);
+      const seconds = timeRemaining % 60;
+      timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      
+      // Change color when time is low
+      if (timeRemaining <= 60 && timerState === 'running') {
+        timerDisplay.style.color = '#ef476f';
+      } else {
+        timerDisplay.style.background = 'linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold))';
+        timerDisplay.style.webkitBackgroundClip = 'text';
+        timerDisplay.style.webkitTextFillColor = 'transparent';
+      }
+    }
+    
+    function updateTimerStatus(status) {
+      timerState = status;
+      timerStatus.className = 'status-badge ' + status;
+      timerStatus.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+    }
+    
+    function startTimer() {
+      if (timerState === 'running') return;
+      
+      updateTimerStatus('running');
+      
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        
+        if (timeRemaining <= 0) {
+          pauseTimer();
+          alert('⏰ Time\'s up! Scavenger hunt has ended!');
+          playSound();
+        }
+      }, 1000);
+    }
+    
+    function pauseTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      updateTimerStatus(timeRemaining > 0 ? 'paused' : 'stopped');
+    }
+    
+    function resetTimer() {
+      pauseTimer();
+      timeRemaining = timerDuration;
+      updateTimerDisplay();
+      updateTimerStatus('stopped');
+    }
+    
+    function setTimerMinutes(minutes) {
+      pauseTimer();
+      timerDuration = minutes * 60;
+      timeRemaining = timerDuration;
+      updateTimerDisplay();
+      console.log(`⏱ Timer set to ${minutes} minutes`);
+    }
+    
+    function playSound() {
+      // Simple beep sound
+      const context = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, context.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
+      
+      oscillator.start(context.currentTime);
+      oscillator.stop(context.currentTime + 0.5);
+    }
+    
+    // ======== PDF CONTROLS ========
+    function printPDF() {
+      window.open('../assets/Friendsgiving_scavenger.pdf', '_blank');
+      setTimeout(() => {
+        window.print();
+      }, 500);
+    }
+    
+    function fullscreenPDF() {
+      const iframe = document.querySelector('.pdf-viewer iframe');
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+      } else if (iframe.webkitRequestFullscreen) {
+        iframe.webkitRequestFullscreen();
+      } else if (iframe.msRequestFullscreen) {
+        iframe.msRequestFullscreen();
+      }
+    }
+    
+    // ======== INITIALIZATION ========
+    updateTimerDisplay();
+    
+    // Check if PDF loaded successfully
+    const iframe = document.querySelector('.pdf-viewer iframe');
+    iframe.addEventListener('error', () => {
+      document.getElementById('pdfFallback').style.display = 'flex';
+      iframe.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
