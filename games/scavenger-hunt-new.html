@@ -324,17 +324,21 @@
       padding-top: 0;
       font-weight: 700;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      gap: 8px;
     }
     
     .cell-content small{
-      font-size: 0.75em;
+      font-size: 0.65em;
       display: block;
-      margin-top: 8px;
+      margin-top: 0;
       font-weight: 500;
       color: var(--brand-orange);
+      font-style: italic;
+      opacity: 0.85;
     }
     
     /* Special cell - Golden Nugget */
@@ -655,7 +659,7 @@
           <td>
             <div class="cell-number">1</div>
             <div class="cell-content">
-              Collects something<br>
+              <span>Collects something</span>
               <small>(Records, stamps, pens)</small>
             </div>
           </td>
@@ -664,7 +668,7 @@
           <td>
             <div class="cell-number">2</div>
             <div class="cell-content">
-              Lived in the<br>Far East
+              <span>Lived in the Far East</span>
             </div>
           </td>
           
@@ -672,7 +676,7 @@
           <td>
             <div class="cell-number">3</div>
             <div class="cell-content">
-              Has/had a milestone<br>celebration in 2025
+              <span>Has/had a milestone celebration in 2025</span>
             </div>
           </td>
           
@@ -680,7 +684,7 @@
           <td>
             <div class="cell-number">4</div>
             <div class="cell-content">
-              Ran a race<br>
+              <span>Ran a race</span>
               <small>(½ Marathon, 5K, Marathon)</small>
             </div>
           </td>
@@ -689,7 +693,7 @@
           <td>
             <div class="cell-number">5</div>
             <div class="cell-content">
-              Is/was involved<br>in politics
+              <span>Is/was involved in politics</span>
             </div>
           </td>
         </tr>
@@ -699,7 +703,7 @@
           <td>
             <div class="cell-number">6</div>
             <div class="cell-content">
-              Can hum a<br>Nusrat/Nazia Hassan/other tune or whistle
+              <span>Can hum a Nusrat/Nazia Hassan/other tune or whistle</span>
             </div>
           </td>
           
@@ -707,7 +711,7 @@
           <td>
             <div class="cell-number">7</div>
             <div class="cell-content">
-              Has been on a<br>school sports team
+              <span>Has been on a school sports team</span>
             </div>
           </td>
           
@@ -715,7 +719,7 @@
           <td>
             <div class="cell-number">8</div>
             <div class="cell-content">
-              Formally trained for a fine art<br>
+              <span>Formally trained for a fine art</span>
               <small>(dance, singing, painting)</small>
             </div>
           </td>
@@ -724,7 +728,7 @@
           <td>
             <div class="cell-number">9</div>
             <div class="cell-content">
-              Grew up<br>in Europe
+              <span>Grew up in Europe</span>
             </div>
           </td>
           
@@ -732,7 +736,7 @@
           <td>
             <div class="cell-number">10</div>
             <div class="cell-content">
-              Has acted, directed,<br>or been on a show
+              <span>Has acted, directed, or been on a show</span>
             </div>
           </td>
         </tr>
@@ -742,7 +746,7 @@
           <td>
             <div class="cell-number">11</div>
             <div class="cell-content">
-              Married their childhood/<br>school sweetheart
+              <span>Married their childhood/school sweetheart</span>
             </div>
           </td>
           
@@ -750,7 +754,7 @@
           <td>
             <div class="cell-number">12</div>
             <div class="cell-content">
-              Can tell<br>a joke
+              <span>Can tell a joke</span>
             </div>
           </td>
           
@@ -758,7 +762,7 @@
           <td class="golden-nugget">
             <div class="cell-number">13</div>
             <div class="cell-content">
-              <strong>Golden Nugget</strong><br>
+              <span><strong>Golden Nugget</strong></span>
               <small>(unique thing discovered)</small>
             </div>
           </td>
@@ -767,7 +771,7 @@
           <td>
             <div class="cell-number">14</div>
             <div class="cell-content">
-              Can fly<br>a plane
+              <span>Can fly a plane</span>
             </div>
           </td>
           
@@ -775,7 +779,7 @@
           <td>
             <div class="cell-number">15</div>
             <div class="cell-content">
-              Is the<br>middle child
+              <span>Is the middle child</span>
             </div>
           </td>
         </tr>
@@ -785,7 +789,7 @@
           <td>
             <div class="cell-number">16</div>
             <div class="cell-content">
-              Can play a<br>musical instrument
+              <span>Can play a musical instrument</span>
             </div>
           </td>
           
@@ -793,7 +797,7 @@
           <td>
             <div class="cell-number">17</div>
             <div class="cell-content">
-              Can whistle<br>a tune
+              <span>Can whistle a tune</span>
             </div>
           </td>
           
@@ -801,7 +805,7 @@
           <td>
             <div class="cell-number">18</div>
             <div class="cell-content">
-              Has a creative outlet/hobby<br>
+              <span>Has a creative outlet/hobby</span>
               <small>(Woodwork, knitting, painting)</small>
             </div>
           </td>
@@ -810,7 +814,7 @@
           <td>
             <div class="cell-number">19</div>
             <div class="cell-content">
-              Sat next to a celebrity<br>on a trip
+              <span>Sat next to a celebrity on a trip</span>
             </div>
           </td>
           
@@ -818,7 +822,7 @@
           <td>
             <div class="cell-number">20</div>
             <div class="cell-content">
-              Has a<br>hidden talent
+              <span>Has a hidden talent</span>
             </div>
           </td>
         </tr>
@@ -828,7 +832,7 @@
           <td>
             <div class="cell-number">21</div>
             <div class="cell-content">
-              Can recite a full movie/<br>book dialogue or a poem
+              <span>Can recite a full movie/book dialogue or a poem</span>
             </div>
           </td>
           
@@ -836,7 +840,7 @@
           <td>
             <div class="cell-number">22</div>
             <div class="cell-content">
-              Can speak more than<br>three languages
+              <span>Can speak more than three languages</span>
             </div>
           </td>
           
@@ -844,7 +848,7 @@
           <td>
             <div class="cell-number">23</div>
             <div class="cell-content">
-              Had a<br>supernatural encounter
+              <span>Had a supernatural encounter</span>
             </div>
           </td>
           
@@ -852,7 +856,7 @@
           <td>
             <div class="cell-number">24</div>
             <div class="cell-content">
-              Can do<br>the Moonwalk
+              <span>Can do the Moonwalk</span>
             </div>
           </td>
           
@@ -860,7 +864,7 @@
           <td>
             <div class="cell-number">25</div>
             <div class="cell-content">
-              Can do/teach<br>a party trick
+              <span>Can do/teach a party trick</span>
             </div>
           </td>
         </tr>
