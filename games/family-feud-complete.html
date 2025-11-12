@@ -410,7 +410,7 @@
     }
     
     .answer-rank{
-      font-size:2rem;
+      font-size:3rem;
       font-weight:900;
       color:var(--brand-gold);
       width:60px;
@@ -419,6 +419,7 @@
     
     .answer-slot.revealed .answer-rank{
       color:white;
+      font-size:3.5rem;
     }
     
     .answer-text{
@@ -432,6 +433,7 @@
     
     .answer-slot.revealed .answer-text{
       color:white;
+      font-size:5rem;
       text-shadow: 0 2px 8px rgba(0,0,0,0.5);
     }
     
@@ -448,6 +450,7 @@
     
     .answer-slot.revealed .answer-count{
       color:var(--brand-gold);
+      font-size:4rem;
       animation: countPulse 0.6s ease-out 0.3s;
     }
     
@@ -830,8 +833,6 @@
 
       <div class="strikes-section">
         <div class="strike" id="strike1">✗</div>
-        <div class="strike" id="strike2">✗</div>
-        <div class="strike" id="strike3">✗</div>
       </div>
 
       <div class="controls-section">
@@ -840,6 +841,7 @@
         <button class="primary" id="resetBtn">Reset Round</button>
         <button class="success" id="nextRoundBtn" style="display:none;">Next Round →</button>
         <button class="success" id="finishTournamentBtn" style="display:none;">Finish Tournament 🏆</button>
+        <button class="danger" id="resetScoresBtn" style="margin-top: 20px;">Reset All Scores</button>
       </div>
     </div>
 
@@ -1231,6 +1233,7 @@
       document.getElementById('resetBtn').onclick = resetGame;
       document.getElementById('nextRoundBtn').onclick = nextRound;
       document.getElementById('finishTournamentBtn').onclick = finishTournament;
+      document.getElementById('resetScoresBtn').onclick = resetAllScores;
       
       document.getElementById('teamSpades').onclick = () => switchTeam('spades');
       document.getElementById('teamHearts').onclick = () => switchTeam('hearts');
@@ -1329,17 +1332,17 @@
 
     // ======== ADD STRIKE ========
     function addStrike() {
-      if (currentStrikes >= 3) return;
+      if (currentStrikes >= 1) return;
       
       currentStrikes++;
       const strikeElement = document.getElementById(`strike${currentStrikes}`);
       strikeElement.classList.add('active');
       
       playSound('buzzer');
-      console.log(`❌ Strike ${currentStrikes}/3`);
+      console.log(`❌ Strike ${currentStrikes}/1`);
       
-      if (currentStrikes === 3) {
-        setTimeout(() => alert('3 STRIKES! Game Over!'), 500);
+      if (currentStrikes === 1) {
+        setTimeout(() => alert('Strike! Chance to steal.'), 500);
       }
     }
 
@@ -1378,6 +1381,25 @@
       
       playSound('intro');
       console.log('🔄 Round reset (tournament scores preserved)');
+    }
+    
+    // ======== RESET ALL SCORES ========
+    function resetAllScores() {
+      const confirmReset = confirm('Reset ALL scores?\n\nThis will reset both team scores to 0 and clear the current round.');
+      if (!confirmReset) return;
+      
+      // Reset team scores
+      teamScores.spades = 0;
+      teamScores.hearts = 0;
+      
+      // Update team score displays
+      document.getElementById('teamSpadesScore').textContent = '0';
+      document.getElementById('teamHeartsScore').textContent = '0';
+      
+      // Reset current round
+      resetGame();
+      
+      console.log('🔄 All scores reset to 0');
     }
     
     // ======== NEXT ROUND ========
