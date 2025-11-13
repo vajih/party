@@ -297,6 +297,22 @@
       border: 2px solid var(--brand-gold);
     }
     
+    .game-title{
+      position: absolute;
+      top: 52px;
+      right: 20px;
+      margin: 0;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    
+    .game-title img{
+      max-height: 60px;
+      width: auto;
+      display: block;
+    }
+    
     .round-selector{
       position: absolute;
       top: 12px;
@@ -332,20 +348,8 @@
       color: white;
     }
     
-    .game-title{
-      font-size:2.5rem;
-      font-weight:900;
-      margin:0 0 12px 0;
-      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-    
     .question{
-      font-size:1.5rem;
+      font-size:3rem;
       font-weight:600;
       color:var(--fg);
       margin:0;
@@ -365,21 +369,30 @@
       grid-template-rows: auto auto auto;
       grid-auto-flow: column;
       gap:16px;
-      padding:20px;
-      background: radial-gradient(1200px 600px at 50% 30%, #16161b, #0e0e12 70%, #0b0b0e 90%);
-      border:4px solid transparent;
-      border-image: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold)) 1;
-      border-radius:20px;
+      padding:30px;
+      background: linear-gradient(135deg, #1a5490 0%, #0d3a6e 50%, #1a5490 100%);
+      border:8px solid #d4a017;
+      border-radius:24px;
       box-shadow: 
-        0 24px 60px var(--shadow),
-        0 0 0 1px rgba(220, 38, 38, 0.3),
-        inset 0 0 40px rgba(220, 38, 38, 0.05);
+        0 24px 60px rgba(0, 0, 0, 0.6),
+        inset 0 4px 20px rgba(255, 255, 255, 0.1),
+        inset 0 -4px 20px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+    
+    .board::before{
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 3px solid #f4d03f;
+      border-radius: 16px;
+      pointer-events: none;
     }
     
     .answer-slot{
-      background: linear-gradient(135deg, #1a1a22, #14141a);
-      border:3px solid #2a2a31;
-      border-radius:12px;
+      background: linear-gradient(180deg, #1a5490 0%, #0d3a6e 50%, #1a5490 100%);
+      border: 4px solid #1a5490;
+      border-radius:8px;
       padding:20px;
       display:flex;
       align-items:center;
@@ -388,19 +401,30 @@
       transition: all 0.3s ease;
       position:relative;
       overflow:hidden;
+      box-shadow: 
+        inset 0 2px 8px rgba(255, 255, 255, 0.2),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.4),
+        0 4px 12px rgba(0, 0, 0, 0.3);
     }
     
     .answer-slot:hover:not(.revealed){
-      border-color:var(--brand-gold);
+      border-color:#ffd700;
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(251, 191, 36, 0.3);
+      box-shadow: 
+        inset 0 2px 8px rgba(255, 255, 255, 0.3),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.3),
+        0 8px 20px rgba(255, 215, 0, 0.4);
     }
     
     .answer-slot.revealed{
-      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange));
-      border-color:var(--brand-gold);
+      background: linear-gradient(180deg, #2a5a9e 0%, #1e4578 50%, #2a5a9e 100%);
+      border-color:#ffd700;
       cursor:default;
       animation: revealAnswer 0.5s ease-out;
+      box-shadow: 
+        inset 0 2px 12px rgba(255, 255, 255, 0.3),
+        inset 0 -2px 12px rgba(0, 0, 0, 0.4),
+        0 8px 24px rgba(255, 215, 0, 0.5);
     }
     
     @keyframes revealAnswer {
@@ -412,46 +436,51 @@
     .answer-rank{
       font-size:3rem;
       font-weight:900;
-      color:var(--brand-gold);
+      color:#ffd700;
       width:60px;
       text-align:center;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
     
     .answer-slot.revealed .answer-rank{
-      color:white;
+      color:#ffd700;
       font-size:3.5rem;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.5);
     }
     
     .answer-text{
       flex:1;
       font-size:1.5rem;
       font-weight:700;
-      color:var(--muted);
+      color:#ffffff;
       text-align:left;
       padding:0 20px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
     
     .answer-slot.revealed .answer-text{
-      color:white;
+      color:#ffffff;
       font-size:5rem;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 255, 255, 0.3);
     }
     
     .answer-count{
       font-size:2.5rem;
       font-weight:900;
-      color:var(--muted);
-      background: #0c0c0f;
+      color:#ffffff;
+      background: rgba(0, 0, 0, 0.3);
       padding:8px 20px;
       border-radius:8px;
       min-width:80px;
       text-align:center;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
     
     .answer-slot.revealed .answer-count{
-      color:var(--brand-gold);
+      color:#ffd700;
       font-size:4rem;
       animation: countPulse 0.6s ease-out 0.3s;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.5);
     }
     
     @keyframes countPulse {
@@ -466,9 +495,9 @@
     
     /* Logo Slot (6th position) */
     .logo-slot{
-      background: linear-gradient(135deg, #1a1a22, #14141a);
-      border:3px solid #2a2a31;
-      border-radius:12px;
+      background: linear-gradient(180deg, #1a5490 0%, #0d3a6e 50%, #1a5490 100%);
+      border: 4px solid #1a5490;
+      border-radius:8px;
       padding:20px;
       display:flex;
       align-items:center;
@@ -476,6 +505,10 @@
       cursor:default;
       position:relative;
       overflow:hidden;
+      box-shadow: 
+        inset 0 2px 8px rgba(255, 255, 255, 0.2),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.4),
+        0 4px 12px rgba(0, 0, 0, 0.3);
     }
     
     .logo-slot img{
@@ -801,7 +834,9 @@
       </div>
       
       <div class="round-indicator" id="roundIndicator">ROUND 1 of 5</div>
-      <h1 class="game-title">Dilwale Family Feud</h1>
+      <h1 class="game-title">
+        <img src="../assets/img/dilwale-family-feud.png" alt="Dilwale Family Feud" />
+      </h1>
       <p class="question" id="roundQuestion">Your favorite Houston area desi restaurant is?</p>
       <p class="survey-count">We surveyed <span id="surveyCount">0</span> people</p>
     </div>
