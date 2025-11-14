@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dosti — Aftab's Performance</title>
+  <link rel="icon" type="image/x-icon" href="assets/img/dilwale-family-feud-favicon.ico" />
+  <style>
+    :root{
+      --bg:#0c0c0f;
+      --fg:#f4f4f7;
+      --muted:#9aa0a6;
+      --brand-red:#dc2626;
+      --brand-gold:#fbbf24;
+      --brand-orange:#f97316;
+    }
+    
+    * { box-sizing: border-box; }
+    
+    html,body{
+      height:100%;
+      margin:0;
+      background: radial-gradient(ellipse at center, #1a1a22 0%, #0c0c0f 70%);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    .container{
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 5px 10px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .header{
+      text-align: center;
+      margin-bottom: 5px;
+    }
+    
+    .song-title{
+      font-size: 2.5rem;
+      font-weight: 900;
+      margin: 0 0 8px 0;
+      background: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 1px;
+    }
+    
+    .performer{
+      font-size: 1.1rem;
+      color: var(--brand-gold);
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .subtitle{
+      font-size: 1rem;
+      color: var(--muted);
+      margin: 10px 0 0 0;
+      font-style: italic;
+      display: none;
+    }
+    
+    .lyrics-container{
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(249, 115, 22, 0.1));
+      border: 3px solid var(--brand-gold);
+      border-radius: 20px;
+      padding: 5px 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      width: 100%;
+    }
+    
+    .lyrics{
+      font-size: 2.1rem;
+      line-height: 1;
+      text-align: center;
+      color: var(--fg);
+      white-space: pre-line;
+    }
+    
+    .verse{
+      margin-bottom: 0;
+    }
+    
+    .verse:last-child{
+      margin-bottom: 0;
+    }
+    
+    .repeat{
+      color: var(--brand-gold);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-top: 0;
+      display: block;
+    }
+    
+    .back-menu-btn{
+      position:fixed;
+      top:20px;
+      left:20px;
+      background:rgba(0,0,0,0.6);
+      color:var(--muted);
+      border:2px solid rgba(255,255,255,0.1);
+      padding: 5px 8px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:0.85rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      z-index:2000;
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      gap:4px;
+      opacity:0.4;
+    }
+    
+    .back-menu-btn:hover{
+      opacity:1;
+      background:rgba(0,0,0,0.8);
+      border-color:var(--brand-gold);
+      color:var(--brand-gold);
+      transform: translateX(-3px);
+    }
+    
+    @media (max-width: 768px) {
+      .song-title{
+        font-size: 2.5rem;
+      }
+      
+      .performer{
+        font-size: 1.2rem;
+      }
+      
+      .lyrics{
+        font-size: 2.5rem;
+        line-height: 1.9;
+      }
+      
+      .lyrics-container{
+        padding: 5px 5px;
+      }
+      
+      .container{
+        padding: 5px 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-menu-btn">
+    ← Back to Menu
+  </a>
+
+  <div class="container">
+    <div class="header">
+      <h1 class="song-title">Dosti</h1>
+      <p class="performer">Led by Aftab all to join</p>
+
+    </div>
+    
+    <div class="lyrics-container">
+      <div class="lyrics">
+        <div class="verse">
+Yaaron yeh hi dosti hai
+Kismat se jo mili hai
+Sab sang chalen
+Sab rang chalen
+Chaltey rahen hum sada
+<span class="repeat">X2</span>
+
+Chalte rahe hum tum
+Yun hi bandhte rahe hum tum
+Khusiyun ke sang
+Hum tum sada
+<span class="repeat">X2</span>
+
+Yaaron yeh hi dosti hai
+Kismat se jo mili hai
+Sab sang chalen
+Sab rang chalen
+Chaltey rahen hum sada
+
+Tootey na kabhi saath yeh
+Chhutey na kabhi haath yeh
+Apni to hai yehi dua...<span class="repeat">X2</span>
+
+Yaaron yeh hi dosti hai
+Kismat se jo mili hai
+Sab sang chalen
+Sab rang chalen
+Chaltey rahen hum sada
+<span class="repeat">X2</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
