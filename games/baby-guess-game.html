@@ -105,7 +105,7 @@
       opacity: 0;
     }
     .watermark{
-      position:absolute; inset:auto 16px 16px auto; opacity:.25; font-weight:700; font-size:.9rem;
+      position:absolute; inset:auto 16px 21px auto; opacity:.3; font-weight:700; font-size:1.5rem;
       pointer-events:none; color:#fff;
     }
     .nameOverlay{
@@ -121,7 +121,7 @@
       transition: width .1s linear;
     }
     .hint{
-      position:absolute; left:50%; bottom:5px; transform: translateX(-50%);
+      position:absolute; top:20px; right:20px;
       font-size:1.7rem; color:var(--fg);
       background: linear-gradient(135deg, rgba(0,0,0,.85), rgba(0,0,0,.9));
       backdrop-filter: blur(12px);
@@ -164,9 +164,16 @@
     footer{
       display:flex; align-items:center; justify-content:space-between; gap:8px;
       color:var(--muted); font-size:.95rem;
+      padding-bottom: 5px;
     }
     .grow{ flex:1; }
-    .right{ text-align:right; }
+    .right{ 
+      text-align:right; 
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--fg);
+      display: none;
+    }
     .hidden{ display:none !important; }
     .loading-overlay{
       position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
@@ -259,7 +266,7 @@
 
     <footer>
       <div class="grow">Shortcuts: SPACE (reveal), ← → (prev/next), A (auto), S (shuffle), R (restart), T/Y (−/+ seconds)</div>
-      <div class="right" id="progress">1 / 1</div>
+      <div class="right" id="progress">1/1</div>
     </footer>
   </div>
 
@@ -598,6 +605,10 @@
       
       const item = photosData[order[idx]];
       
+      // Hide hint box immediately to prevent flash
+      hintBox.style.display = "none";
+      hintBox.classList.remove('show-box');
+      
       // Fade in the new image
       imgEl.classList.remove('fade-out');
       imgEl.src = item.src;
@@ -616,11 +627,10 @@
         return `<span class="${className}" id="hint-${i}">${hint}</span>`;
       }).join('');
       hintBox.innerHTML = hintsHTML;
-      hintBox.style.display = "block";
-      hintBox.classList.remove('show-box'); // Reset box visibility
       
       // Show the hint box after 6 seconds
       const boxTimeout = setTimeout(() => {
+        hintBox.style.display = "block";
         hintBox.classList.add('show-box');
       }, 6000);
       hintTimeouts.push(boxTimeout);
@@ -653,8 +663,8 @@
       });
       
       revealed = false;
-      progress.textContent = `${idx+1} / ${photosData.length}`;
-      wm.textContent = `#${idx+1}`;
+      progress.textContent = `${idx+1}/${photosData.length}`;
+      wm.textContent = `${idx+1}/${photosData.length}`;
       resetTimer();
     }
 
@@ -679,8 +689,10 @@
         photosData[order[idx]].seen = true;
       }
       
-      // Fade out current image
+      // Fade out current image and hint box
       imgEl.classList.add('fade-out');
+      hintBox.classList.remove('show-box');
+      hintBox.style.display = 'none';
       
       // Wait for fade out, then load next photo
       setTimeout(() => {
