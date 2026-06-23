@@ -1,0 +1,41 @@
+round_id,rank,answer,count
+restaurants,1,Aga's,11
+restaurants,2,Bismillah,8
+restaurants,3,Himalaya,6
+restaurants,4,Lasbela,5
+restaurants,5,Bundoo Khan,4
+restaurants,6,Tempura,3
+restaurants,7,Savoy,2
+restaurants,8,BBQ Tonight,1
+nashta,1,Halwa Puri,12
+nashta,2,Paratha + Chai,9
+nashta,3,Nihari + Naan,7
+nashta,4,Anda Paratha,5
+nashta,5,Aloo Poori,4
+nashta,6,Omelette,2
+nashta,7,Cereal,2
+nashta,8,Chana Chaat,1
+travel,1,Paris,9
+travel,2,Istanbul,8
+travel,3,Dubai,6
+travel,4,Tokyo,5
+travel,5,Maldives,4
+travel,6,London,4
+travel,7,Rome,3
+travel,8,New York,2
+tv,1,The Bear,8
+tv,2,Succession,6
+tv,3,Severance,6
+tv,4,Squid Game,5
+tv,5,Ted Lasso,4
+tv,6,Game of Thrones,4
+tv,7,Friends,3
+tv,8,Breaking Bad,2
+crush,1,Shah Rukh Khan,10
+crush,2,Fawad Khan,7
+crush,3,Zendaya,5
+crush,4,Brad Pitt,4
+crush,5,Aishwarya Rai,4
+crush,6,Leonardo DiCaprio,3
+crush,7,Imran Khan,3
+crush,8,Hrithik Roshan,2

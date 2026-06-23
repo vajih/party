@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Dilwale Family Feud — Survey Says!</title>
+  <meta name="description" content="A desi twist on Family Feud. Survey says! Auto-demo, host mode, and Google Sheets powered." />
+  <meta name="theme-color" content="#0c0c0f" />
+  <link rel="icon" type="image/x-icon" href="./assets/img/dilwale-family-feud-favicon.ico" />
+  <!-- Social preview -->
+  <meta property="og:title" content="Dilwale Family Feud — Survey Says!" />
+  <meta property="og:description" content="Open it and watch it play itself. A desi Family Feud for game nights." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="./assets/img/dilwale-family-feud.png" />
+  <style>
+    :root{
+      --bg:#0a0a0d; --panel:#121218; --panel-2:#17171f;
+      --fg:#f6f6fb; --muted:#9aa0a6; --line:#2a2a33;
+      --accent:#ffd166; --danger:#ef476f; --success:#06d6a0;
+      --brand-red:#dc2626; --brand-gold:#fbbf24; --brand-orange:#f97316;
+      --brand-grad: linear-gradient(135deg, var(--brand-red), var(--brand-orange), var(--brand-gold));
+      --shadow: rgba(0,0,0,.45);
+      --font: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; background:
+        radial-gradient(1400px 700px at 50% -10%, #1b1b26 0%, var(--bg) 60%);
+      color:var(--fg); font-family:var(--font); overflow:hidden; -webkit-font-smoothing:antialiased; }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
+    button{ font-family:inherit; }
+
+    /* ===================== HOME SCREEN ===================== */
+    .home{
+      position:fixed; inset:0; z-index:200; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:28px; padding:28px;
+      background: radial-gradient(1200px 600px at 50% 20%, #1c1c28, #0a0a0d 70%);
+      animation: fade .5s ease;
+    }
+    .home.hidden{ display:none; }
+    .home-logo{ width:min(440px,82vw); filter: drop-shadow(0 24px 60px rgba(220,38,38,.45)); animation: pop .8s ease; }
+    .home-tag{ color:var(--muted); font-size:1.05rem; letter-spacing:.5px; margin-top:-8px; text-align:center; }
+    .home-tag b{ color:var(--brand-gold); font-weight:700; }
+    .home-actions{ display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+    .cta{
+      border:none; border-radius:16px; padding:18px 26px; min-width:210px; cursor:pointer;
+      font-weight:800; font-size:1.05rem; color:#fff; letter-spacing:.3px;
+      display:flex; flex-direction:column; align-items:center; gap:4px; transition:.25s;
+      box-shadow:0 10px 30px var(--shadow);
+    }
+    .cta small{ font-weight:600; opacity:.85; font-size:.74rem; letter-spacing:.2px; }
+    .cta:hover{ transform:translateY(-3px); }
+    .cta.demo{ background:var(--brand-grad); }
+    .cta.host{ background:linear-gradient(135deg,#06d6a0,#118ab2); }
+    .cta.admin{ background:linear-gradient(135deg,#3a3a46,#23232c); border:1px solid var(--line); }
+    .home-meta{ color:#6b7177; font-size:.82rem; text-align:center; }
+    .home-meta .dot{ color:var(--success); }
+
+    /* ===================== TRANSITIONS / WINNER ===================== */
+    .overlay{ position:fixed; inset:0; z-index:150; display:none; flex-direction:column;
+      align-items:center; justify-content:center; text-align:center; padding:24px;
+      background: radial-gradient(ellipse at center, #1a1a22 0%, #0a0a0d 70%); animation: fade .5s ease; }
+    .overlay.active{ display:flex; }
+    .round-number{ font-size: clamp(2.4rem,7vw,4.5rem); font-weight:900; background:var(--brand-grad);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+    .round-title{ font-size: clamp(1.8rem,6vw,3.4rem); font-weight:900; margin:10px 0 18px; }
+    .round-question{ font-size: clamp(1.05rem,3.4vw,1.8rem); color:var(--muted); max-width:820px; }
+    .winner-trophy{ font-size: clamp(5rem,16vw,8rem); animation: bounce 1.1s ease infinite; }
+    .winner-title{ font-size: clamp(2rem,7vw,4rem); font-weight:900; background:var(--brand-grad);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; margin:6px 0 14px;}
+    .winner-team{ font-size: clamp(1.6rem,6vw,3rem); font-weight:900; }
+    .winner-score{ font-size: clamp(1.1rem,3.5vw,2rem); color:var(--muted); margin-top:10px;}
+    .winner-actions{ margin-top:28px; display:flex; gap:12px; flex-wrap:wrap; justify-content:center;}
+
+    /* ===================== GAME ===================== */
+    .game{ height:100vh; height:100dvh; display:none; flex-direction:column; padding:16px; gap:14px; }
+    .game.active{ display:flex; }
+
+    .header{ position:relative; text-align:center; padding:16px 18px;
+      background: linear-gradient(135deg, rgba(220,38,38,.18), rgba(249,115,22,.14));
+      border:2px solid rgba(220,38,38,.55); border-radius:18px; }
+    .round-selector{ position:absolute; top:50%; left:16px; transform:translateY(-50%); display:flex; gap:8px; }
+    .round-btn{ width:34px; height:34px; border-radius:50%; border:2px solid var(--line);
+      background:#15151c; color:var(--muted); font-weight:800; cursor:pointer; transition:.2s; }
+    .round-btn:hover{ border-color:var(--brand-gold); transform:scale(1.08); }
+    .round-btn.active{ background:var(--brand-grad); border-color:var(--brand-gold); color:#fff; }
+    .round-indicator{ position:absolute; top:50%; right:16px; transform:translateY(-50%);
+      background:rgba(0,0,0,.45); color:var(--brand-gold); padding:6px 14px; border-radius:20px;
+      font-size:.8rem; font-weight:800; border:2px solid var(--brand-gold); }
+    .game-title{ margin:0; font-size: clamp(1.5rem,4vw,2.4rem); font-weight:900; letter-spacing:2px;
+      text-transform:uppercase; background:var(--brand-grad); -webkit-background-clip:text; background-clip:text;
+      -webkit-text-fill-color:transparent; }
+    .question{ margin:6px 0 0; font-size: clamp(1.05rem,2.8vw,1.5rem); font-weight:700; }
+    .survey-count{ margin:6px 0 0; color:var(--muted); font-size:.92rem; }
+    .survey-count b{ color:var(--brand-gold); }
+
+    .board{ flex:1; display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:16px;
+      background: radial-gradient(1200px 600px at 50% 30%, #16161d, #0d0d12 75%);
+      border:4px solid transparent; border-image:var(--brand-grad) 1; border-radius:20px;
+      box-shadow: 0 24px 60px var(--shadow), inset 0 0 40px rgba(220,38,38,.05); min-height:0; }
+    .slot{ background:linear-gradient(135deg,#1a1a22,#131319); border:3px solid var(--line);
+      border-radius:12px; padding:0 18px; display:flex; align-items:center; gap:14px; cursor:pointer;
+      transition:.3s; overflow:hidden; min-height:0; }
+    .slot:hover:not(.revealed){ border-color:var(--brand-gold); transform:translateY(-2px);
+      box-shadow:0 8px 24px rgba(251,191,36,.25); }
+    .slot.revealed{ background:var(--brand-grad); border-color:var(--brand-gold); cursor:default;
+      animation: reveal .55s cubic-bezier(.2,.9,.25,1.2); }
+    .rank{ font-size: clamp(1.3rem,3.5vw,2rem); font-weight:900; color:var(--brand-gold); width:42px; text-align:center; }
+    .slot.revealed .rank{ color:#fff; }
+    .atext{ flex:1; font-size: clamp(1rem,2.6vw,1.5rem); font-weight:700; color:var(--muted); }
+    .slot.revealed .atext{ color:#fff; text-shadow:0 2px 8px rgba(0,0,0,.5); }
+    .acount{ font-size: clamp(1.3rem,3.6vw,2.3rem); font-weight:900; color:var(--muted);
+      background:#0c0c0f; padding:6px 16px; border-radius:8px; min-width:64px; text-align:center; }
+    .slot.revealed .acount{ color:var(--brand-gold); animation: pulse .6s ease .25s; }
+    .hidden-fill{ color:var(--line); letter-spacing:2px; }
+
+    .footer{ display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;
+      padding:14px 16px; background:linear-gradient(135deg, rgba(0,0,0,.85), rgba(0,0,0,.7));
+      border:2px solid rgba(220,38,38,.4); border-radius:16px; }
+    .teams{ display:flex; gap:16px; }
+    .team{ display:flex; flex-direction:column; align-items:center; padding:10px 18px; min-width:148px;
+      background:rgba(255,255,255,.05); border:3px solid var(--line); border-radius:12px; cursor:pointer; transition:.3s; }
+    .team:hover{ border-color:var(--brand-gold); transform:translateY(-2px); }
+    .team.active{ border-color:var(--brand-gold);
+      background:linear-gradient(135deg, rgba(220,38,38,.2), rgba(249,115,22,.2)); box-shadow:0 0 20px rgba(251,191,36,.3); }
+    .team .ic{ font-size:1.3rem; }
+    .team .nm{ font-size:.72rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin:2px 0; }
+    .team.active .nm{ color:var(--brand-gold); }
+    .team .vl{ font-size: clamp(1.5rem,4vw,2.3rem); font-weight:900; }
+    .team.active .vl{ background:var(--brand-grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+    .score-section{ display:flex; align-items:center; gap:14px; }
+    .score-label{ font-weight:700; color:var(--muted); }
+    .score-value{ font-size: clamp(1.8rem,5vw,3rem); font-weight:900; background:var(--brand-grad);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+    .strikes{ display:flex; gap:10px; }
+    .strike{ font-size: clamp(1.8rem,5vw,3rem); color:var(--line); transition:.3s; }
+    .strike.on{ color:var(--danger); animation: strike .5s ease; }
+    .controls{ display:flex; gap:10px; flex-wrap:wrap; }
+    .controls button{ background:#16161c; color:var(--fg); border:2px solid var(--line);
+      padding:11px 18px; border-radius:10px; cursor:pointer; font-weight:700; transition:.2s; }
+    .controls button:hover{ border-color:var(--brand-gold); transform:translateY(-2px); }
+    .controls .danger{ background:var(--danger); border-color:var(--danger); color:#fff; }
+    .controls .primary{ background:linear-gradient(135deg,var(--brand-red),var(--brand-orange)); border-color:var(--brand-gold); color:#fff; }
+    .controls .success{ background:linear-gradient(135deg,#06d6a0,#118ab2); border-color:#06d6a0; color:#fff; }
+
+    /* top-right utility chips */
+    .topbar{ position:fixed; top:14px; right:16px; z-index:120; display:flex; gap:8px; }
+    .chip{ background:rgba(0,0,0,.5); border:1px solid var(--line); color:var(--fg); border-radius:999px;
+      padding:7px 14px; font-size:.8rem; font-weight:700; cursor:pointer; backdrop-filter:blur(8px); transition:.2s; }
+    .chip:hover{ border-color:var(--brand-gold); }
+    .chip.live{ color:var(--brand-gold); border-color:var(--brand-gold); display:none; }
+    .chip.live.show{ display:inline-flex; align-items:center; gap:7px; }
+    .chip.live .blink{ width:8px; height:8px; border-radius:50%; background:var(--brand-gold); animation: blink 1s infinite; }
+
+    /* loading + toast */
+    .loading{ position:fixed; inset:0; z-index:180; display:flex; flex-direction:column; gap:14px;
+      align-items:center; justify-content:center; background:rgba(10,10,13,.96); }
+    .spinner{ width:48px; height:48px; border:4px solid var(--line); border-top-color:var(--brand-red);
+      border-radius:50%; animation: spin 1s linear infinite; }
+    .loading-text{ color:var(--muted); font-weight:700; }
+    .logo-frame{ position:fixed; bottom:10px; right:12px; opacity:.28; z-index:5; }
+    .logo-frame img{ height:26px; }
+
+    /* confetti */
+    .confetti{ position:fixed; inset:0; pointer-events:none; z-index:160; overflow:hidden; }
+    .confetti i{ position:absolute; top:-12px; width:9px; height:14px; opacity:.9; animation: fall linear forwards; }
+
+    @keyframes fade{ from{opacity:0} to{opacity:1} }
+    @keyframes pop{ from{transform:scale(.85); opacity:0} to{transform:scale(1); opacity:1} }
+    @keyframes reveal{ 0%{transform:scale(.92) rotateX(80deg); opacity:0} 60%{transform:scale(1.04)} 100%{transform:scale(1) rotateX(0); opacity:1} }
+    @keyframes pulse{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+    @keyframes strike{ 0%{transform:scale(0) rotate(-45deg); opacity:0} 50%{transform:scale(1.3)} 100%{transform:scale(1) rotate(0); opacity:1} }
+    @keyframes bounce{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-26px)} }
+    @keyframes spin{ to{ transform:rotate(360deg) } }
+    @keyframes blink{ 0%,100%{opacity:1} 50%{opacity:.25} }
+    @keyframes fall{ to{ transform: translateY(105vh) rotate(720deg); } }
+    @media (max-width:760px){
+      .footer{ justify-content:center; } .teams{ width:100%; justify-content:center; }
+      .round-selector{ display:none; } .board{ gap:8px; padding:10px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== HOME ===== -->
+  <div class="home" id="home">
+    <img class="home-logo" src="./assets/img/dilwale-family-feud.png" alt="Dilwale Family Feud"
+         onerror="this.style.display='none'; document.getElementById('homeTextTitle').style.display='block';" />
+    <h1 id="homeTextTitle" style="display:none; font-size:clamp(2rem,7vw,3.6rem); font-weight:900; margin:0; text-align:center; background:var(--brand-grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:2px; text-transform:uppercase;">Dilwale Family Feud</h1>
+    <div class="home-tag">Survey says…! A <b>desi</b> twist on Family Feud for your game night.</div>
+    <div class="home-actions">
+      <button class="cta demo" id="btnDemo">🎬 Watch Auto-Demo<small>Plays itself — no setup</small></button>
+      <button class="cta host" id="btnHost">▶ Host a Game<small>You run the board</small></button>
+      <button class="cta admin" id="btnAdmin">⚙️ Edit Answers<small>Admin / Google Sheets</small></button>
+    </div>
+    <div class="home-meta" id="homeMeta"><span class="dot">●</span> loading data…</div>
+  </div>
+
+  <!-- ===== TOP UTILITY ===== -->
+  <div class="topbar" id="topbar" style="display:none;">
+    <div class="chip live" id="liveChip"><span class="blink"></span> AUTO-DEMO</div>
+    <button class="chip" id="soundChip">🔊 Sound</button>
+    <button class="chip" id="homeChip">⏏ Menu</button>
+  </div>
+
+  <!-- ===== ROUND TRANSITION ===== -->
+  <div class="overlay" id="roundTransition">
+    <div class="round-number" id="trNum">ROUND 1</div>
+    <div class="round-title" id="trTitle">Houston Restaurants</div>
+    <div class="round-question" id="trQ">Your favorite Houston area desi restaurant is?</div>
+  </div>
+
+  <!-- ===== WINNER ===== -->
+  <div class="overlay" id="winner">
+    <div class="winner-trophy">🏆</div>
+    <div class="winner-title">TOURNAMENT WINNER!</div>
+    <div class="winner-team" id="winTeam">Spades & Clubs ♠️♣️</div>
+    <div class="winner-score" id="winScore">Final Score: 0 – 0</div>
+    <div class="winner-actions">
+      <button class="cta host" id="winHost" style="min-width:auto;padding:14px 22px;">▶ Host a Game</button>
+      <button class="cta admin" id="winMenu" style="min-width:auto;padding:14px 22px;">⏏ Main Menu</button>
+    </div>
+  </div>
+
+  <!-- ===== LOADING ===== -->
+  <div class="loading" id="loading" style="display:none;">
+    <div class="spinner"></div><div class="loading-text">Loading survey results…</div>
+  </div>
+
+  <!-- ===== GAME ===== -->
+  <div class="game" id="game">
+    <div class="header">
+      <div class="round-selector" id="roundSelector"></div>
+      <div class="round-indicator" id="roundIndicator">ROUND 1 of 5</div>
+      <h1 class="game-title" id="gameTitle">Dilwale Family Feud</h1>
+      <p class="question" id="roundQuestion">—</p>
+      <p class="survey-count">We surveyed <b id="surveyCount">0</b> people</p>
+    </div>
+
+    <div class="board" id="board"></div>
+
+    <div class="footer">
+      <div class="teams">
+        <div class="team active" id="teamSpades" data-team="spades">
+          <div class="ic" id="spadesIc">♠️♣️</div><div class="nm" id="spadesNm">Spades & Clubs</div><div class="vl" id="spadesScore">0</div>
+        </div>
+        <div class="team" id="teamHearts" data-team="hearts">
+          <div class="ic" id="heartsIc">♥️♦️</div><div class="nm" id="heartsNm">Hearts & Diamonds</div><div class="vl" id="heartsScore">0</div>
+        </div>
+      </div>
+      <div class="score-section">
+        <div class="score-label">ROUND</div><div class="score-value" id="scoreValue">0</div>
+      </div>
+      <div class="strikes">
+        <div class="strike" id="strike1">✗</div><div class="strike" id="strike2">✗</div><div class="strike" id="strike3">✗</div>
+      </div>
+      <div class="controls">
+        <button class="danger" id="strikeBtn">Strike ✗</button>
+        <button id="revealAllBtn">Reveal All</button>
+        <button class="primary" id="resetBtn">Reset</button>
+        <button class="success" id="nextRoundBtn" style="display:none;">Next →</button>
+        <button class="success" id="finishBtn" style="display:none;">Finish 🏆</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="logo-frame"><img src="./assets/img/dilwale_logo.png" alt="Dilwale" onerror="this.parentNode.style.display='none'" /></div>
+  <div class="confetti" id="confetti"></div>
+
+  <script src="./config.js"></script>
+  <script src="./feud-data.js"></script>
+  <script>
+  (function(){
+    'use strict';
+    const CFG = window.FEUD_CONFIG;
+    const $ = id => document.getElementById(id);
+
+    // ---------- sound ----------
+    const sounds = {
+      ding:  new Audio('./assets/sounds/feud-ding.mp3'),
+      buzzer:new Audio('./assets/sounds/feud-buzzer.mp3'),
+      intro: new Audio('./assets/sounds/feud-intro.mp3'),
+    };
+    Object.values(sounds).forEach(s => { s.preload='auto'; s.volume=.7; });
+    let soundOn = true;
+    function play(n){ if(!soundOn||!sounds[n]) return; try{ sounds[n].currentTime=0; sounds[n].play().catch(()=>{});}catch(e){} }
+
+    // ---------- state ----------
+    let MODEL = null;             // {rounds, answersByRound}
+    let ROUNDS = [];
+    let cur = 0;                  // current round index
+    let roundAnswers = [];        // active round's answers (display order kept)
+    let roundScore = 0, strikes = 0;
+    let activeTeam = 'spades';
+    const teamScores = { spades:0, hearts:0 };
+    let demo = false;             // auto-demo running
+    let demoTimers = [];
+    const completed = new Set();
+
+    function teamMeta(t){ return CFG.TEAMS[t]; }
+    function teamLabel(t){ const m=teamMeta(t); return m.name+' '+m.icon; }
+
+    // ---------- load ----------
+    async function boot(){
+      try{
+        MODEL = await FeudData.loadGameData();
+        ROUNDS = MODEL.rounds;
+        $('gameTitle').textContent = CFG.GAME_TITLE;
+        // teams labels
+        $('spadesIc').textContent = teamMeta('spades').icon; $('spadesNm').textContent = teamMeta('spades').name;
+        $('heartsIc').textContent = teamMeta('hearts').icon; $('heartsNm').textContent = teamMeta('hearts').name;
+        // round selector buttons
+        const rs = $('roundSelector'); rs.innerHTML='';
+        ROUNDS.forEach((r,i)=>{ const b=document.createElement('button');
+          b.className='round-btn'+(i===0?' active':''); b.textContent=i+1; b.dataset.round=i;
+          b.onclick=()=>{ if(demo) return; if(i!==cur) transitionTo(i); }; rs.appendChild(b); });
+        const total = ROUNDS[0] ? ROUNDS[0].survey_count : 0;
+        $('homeMeta').innerHTML = '<span class="dot">●</span> Ready · '+ROUNDS.length+' rounds · '+
+          MODEL.source + (total? ' · ~'+total+' surveyed':'');
+      }catch(err){
+        console.error(err);
+        $('homeMeta').innerHTML = '⚠️ Could not load data. Check config.js / data files.';
+      }
+    }
+
+    // ---------- render a round ----------
+    function renderRound(i){
+      cur = i;
+      const r = ROUNDS[i];
+      roundAnswers = (MODEL.answersByRound[r.id]||[]).slice();
+      $('roundIndicator').textContent = 'ROUND '+(i+1)+' of '+ROUNDS.length;
+      $('roundQuestion').textContent = r.question;
+      $('surveyCount').textContent = r.survey_count || '';
+      document.querySelectorAll('.round-btn').forEach((b,idx)=> b.classList.toggle('active', idx===i));
+
+      // column-first ordering across two columns
+      const board = $('board'); board.innerHTML='';
+      const n = roundAnswers.length, half = Math.ceil(n/2), order=[];
+      for(let k=0;k<half;k++){ order.push(k); if(k+half<n) order.push(k+half); }
+      order.forEach(origIndex=>{
+        const item = roundAnswers[origIndex];
+        const slot = document.createElement('div');
+        slot.className='slot'; slot.dataset.index=origIndex;
+        slot.dataset.count=item.count; slot.dataset.name=item.name;
+        slot.innerHTML = '<div class="rank">'+(origIndex+1)+'</div>'+
+          '<div class="atext hidden-fill">▓▓▓▓▓▓▓▓</div>'+
+          '<div class="acount hidden-fill">▓▓</div>';
+        slot.onclick = ()=>{ if(!demo) reveal(slot); };
+        board.appendChild(slot);
+      });
+
+      // reset round state
+      roundScore=0; strikes=0;
+      $('scoreValue').textContent='0';
+      document.querySelectorAll('.strike').forEach(s=>s.classList.remove('on'));
+      $('nextRoundBtn').style.display='none';
+      $('finishBtn').style.display='none';
+    }
+
+    function reveal(slot){
+      if(slot.classList.contains('revealed')) return false;
+      slot.classList.add('revealed');
+      const name=slot.dataset.name, count=parseInt(slot.dataset.count,10);
+      const at=slot.querySelector('.atext'), ac=slot.querySelector('.acount');
+      at.textContent=name; at.classList.remove('hidden-fill');
+      ac.textContent=count; ac.classList.remove('hidden-fill');
+      roundScore += count; $('scoreValue').textContent=roundScore;
+      teamScores[activeTeam]+=count;
+      $(activeTeam==='spades'?'spadesScore':'heartsScore').textContent=teamScores[activeTeam];
+      play('ding');
+      checkAllRevealed();
+      return true;
+    }
+
+    function checkAllRevealed(){
+      const slots=document.querySelectorAll('.slot');
+      const done=document.querySelectorAll('.slot.revealed');
+      if(slots.length && slots.length===done.length){
+        completed.add(cur);
+        if(cur<ROUNDS.length-1) $('nextRoundBtn').style.display='inline-block';
+        else $('finishBtn').style.display='inline-block';
+        return true;
+      }
+      return false;
+    }
+
+    function switchTeam(t){
+      activeTeam=t;
+      $('teamSpades').classList.toggle('active', t==='spades');
+      $('teamHearts').classList.toggle('active', t==='hearts');
+    }
+    function addStrike(){
+      if(strikes>=3) return; strikes++;
+      $('strike'+strikes).classList.add('on'); play('buzzer');
+    }
+    function revealAll(){
+      document.querySelectorAll('.slot:not(.revealed)').forEach((s,i)=> setTimeout(()=>reveal(s), i*350));
+    }
+    function resetRound(){
+      renderRound(cur);
+    }
+
+    // ---------- transitions ----------
+    function transitionTo(i, after){
+      const r=ROUNDS[i];
+      $('trNum').textContent='ROUND '+(i+1);
+      $('trTitle').textContent=r.emoji+' '+r.title;
+      $('trQ').textContent=r.question;
+      const t=$('roundTransition'); t.classList.add('active');
+      const wait = demo ? 1700 : 2600;
+      const tm=setTimeout(()=>{ t.classList.remove('active'); renderRound(i); if(after) after(); }, wait);
+      if(demo) demoTimers.push(tm);
+    }
+
+    function finishTournament(){
+      const win = teamScores.spades>=teamScores.hearts ? 'spades':'hearts';
+      $('winTeam').textContent = teamLabel(win);
+      $('winScore').textContent = 'Final Score: '+teamScores.spades+' – '+teamScores.hearts;
+      $('winner').classList.add('active'); play('intro'); burstConfetti();
+    }
+
+    // ---------- confetti ----------
+    function burstConfetti(){
+      const wrap=$('confetti'); const colors=['#dc2626','#f97316','#fbbf24','#06d6a0','#f6f6fb'];
+      for(let i=0;i<120;i++){ const s=document.createElement('i');
+        s.style.left=Math.random()*100+'vw';
+        s.style.background=colors[i%colors.length];
+        s.style.animationDuration=(2.5+Math.random()*2.5)+'s';
+        s.style.animationDelay=(Math.random()*0.8)+'s';
+        s.style.transform='rotate('+Math.random()*360+'deg)';
+        wrap.appendChild(s); setTimeout(()=>s.remove(),6000); }
+    }
+
+    // ---------- MODES ----------
+    function showGame(){
+      $('home').classList.add('hidden');
+      $('topbar').style.display='flex';
+      $('game').classList.add('active');
+    }
+    function startHost(){
+      stopDemo();
+      // fresh tournament
+      teamScores.spades=0; teamScores.hearts=0;
+      $('spadesScore').textContent='0'; $('heartsScore').textContent='0';
+      switchTeam('spades'); completed.clear();
+      $('liveChip').classList.remove('show');
+      showGame(); renderRound(0);
+    }
+
+    function startDemo(){
+      demo=true; $('liveChip').classList.add('show');
+      teamScores.spades=0; teamScores.hearts=0;
+      $('spadesScore').textContent='0'; $('heartsScore').textContent='0';
+      switchTeam('spades'); completed.clear();
+      showGame();
+      demoRound(0);
+    }
+    function stopDemo(){
+      demo=false; demoTimers.forEach(clearTimeout); demoTimers=[];
+      $('liveChip').classList.remove('show'); $('winner').classList.remove('active');
+      $('roundTransition').classList.remove('active');
+    }
+    function dTimer(fn,ms){ const t=setTimeout(fn,ms); demoTimers.push(t); return t; }
+
+    function demoRound(i){
+      if(!demo) return;
+      transitionTo(i, ()=>{
+        if(!demo) return;
+        // reveal answers one-by-one, alternating active team for visual variety
+        const slots=[...document.querySelectorAll('.slot')]
+          .sort((a,b)=> (+a.dataset.index)-(+b.dataset.index));
+        let k=0;
+        (function step(){
+          if(!demo) return;
+          if(k>=slots.length){
+            // small pause then advance / finish
+            dTimer(()=>{
+              if(!demo) return;
+              if(i<ROUNDS.length-1) demoRound(i+1);
+              else { finishTournament(); dTimer(()=>{ if(demo) restartDemo(); }, 5200); }
+            }, 1500);
+            return;
+          }
+          switchTeam(k%2===0 ? 'spades':'hearts');
+          reveal(slots[k]); k++;
+          dTimer(step, 1250);
+        })();
+      });
+    }
+    function restartDemo(){
+      $('winner').classList.remove('active');
+      teamScores.spades=0; teamScores.hearts=0;
+      $('spadesScore').textContent='0'; $('heartsScore').textContent='0';
+      demoRound(0);
+    }
+
+    function backToMenu(){
+      stopDemo();
+      $('game').classList.remove('active'); $('topbar').style.display='none';
+      $('winner').classList.remove('active'); $('roundTransition').classList.remove('active');
+      $('home').classList.remove('hidden');
+    }
+
+    // ---------- wire up ----------
+    $('btnDemo').onclick = startDemo;
+    $('btnHost').onclick = startHost;
+    $('btnAdmin').onclick = ()=> location.href='./admin.html';
+    $('homeChip').onclick = backToMenu;
+    $('winHost').onclick = startHost;
+    $('winMenu').onclick = backToMenu;
+    $('soundChip').onclick = ()=>{ soundOn=!soundOn; $('soundChip').textContent = soundOn?'🔊 Sound':'🔇 Muted'; };
+
+    $('strikeBtn').onclick=addStrike;
+    $('revealAllBtn').onclick=revealAll;
+    $('resetBtn').onclick=resetRound;
+    $('nextRoundBtn').onclick=()=>{ if(cur<ROUNDS.length-1) transitionTo(cur+1); };
+    $('finishBtn').onclick=finishTournament;
+    $('teamSpades').onclick=()=>{ if(!demo) switchTeam('spades'); };
+    $('teamHearts').onclick=()=>{ if(!demo) switchTeam('hearts'); };
+
+    // keyboard for hosts: 1-8 reveal, s=strike, r=reset, n=next, arrow keys teams
+    document.addEventListener('keydown', e=>{
+      if(demo || !$('game').classList.contains('active')) return;
+      if(e.key>='1' && e.key<='8'){ const idx=+e.key-1;
+        const s=document.querySelector('.slot[data-index="'+idx+'"]'); if(s) reveal(s); }
+      else if(e.key==='s'||e.key==='S') addStrike();
+      else if(e.key==='r'||e.key==='R') resetRound();
+      else if(e.key==='n'||e.key==='N'){ if(cur<ROUNDS.length-1) transitionTo(cur+1); }
+      else if(e.key==='ArrowLeft') switchTeam('spades');
+      else if(e.key==='ArrowRight') switchTeam('hearts');
+    });
+
+    boot();
+  })();
+  </script>
+</body>
+</html>

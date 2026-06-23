@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Family Feud — Admin / Editor</title>
+  <link rel="icon" type="image/x-icon" href="./assets/img/dilwale-family-feud-favicon.ico" />
+  <style>
+    :root{
+      --bg:#0a0a0d; --panel:#14141b; --panel-2:#1b1b24; --fg:#f6f6fb; --muted:#9aa0a6; --line:#2a2a33;
+      --brand-red:#dc2626; --brand-gold:#fbbf24; --brand-orange:#f97316; --success:#06d6a0; --danger:#ef476f;
+      --grad: linear-gradient(135deg,var(--brand-red),var(--brand-orange),var(--brand-gold));
+      --font: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,"Apple Color Emoji";
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; background: radial-gradient(1200px 600px at 50% -10%, #1a1a24, var(--bg) 60%);
+      color:var(--fg); font-family:var(--font); }
+    header{ position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:14px;
+      padding:14px 22px; background:rgba(10,10,13,.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+    header img{ height:34px; }
+    header h1{ font-size:1.1rem; margin:0; font-weight:800; letter-spacing:.5px; }
+    header h1 span{ background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+    .grow{ flex:1; }
+    .btn{ border:2px solid var(--line); background:#16161c; color:var(--fg); border-radius:10px;
+      padding:9px 16px; font-weight:700; cursor:pointer; transition:.2s; font-family:inherit; }
+    .btn:hover{ border-color:var(--brand-gold); transform:translateY(-1px); }
+    .btn.primary{ background:var(--grad); border-color:var(--brand-gold); color:#fff; }
+    .btn.success{ background:linear-gradient(135deg,#06d6a0,#118ab2); border-color:#06d6a0; color:#fff; }
+    .btn.ghost{ background:transparent; }
+    .btn.sm{ padding:5px 10px; font-size:.82rem; }
+    .wrap{ max-width:1100px; margin:0 auto; padding:22px; }
+    .hint{ color:var(--muted); font-size:.9rem; line-height:1.6; }
+    .hint code{ background:#000; padding:2px 6px; border-radius:5px; color:var(--brand-gold); }
+
+    .rounds{ display:flex; flex-direction:column; gap:16px; margin-top:18px; }
+    .round-card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+    .round-head{ display:flex; align-items:center; gap:10px; padding:14px 16px; background:var(--panel-2); flex-wrap:wrap; }
+    .round-head .emoji{ font-size:1.4rem; width:40px; text-align:center; }
+    .round-head input{ background:#0d0d12; border:1px solid var(--line); color:var(--fg);
+      border-radius:8px; padding:8px 10px; font-family:inherit; font-size:.92rem; }
+    .in-emoji{ width:54px; text-align:center; } .in-id{ width:120px; } .in-title{ width:200px; }
+    .in-q{ flex:1; min-width:220px; } .in-num{ width:80px; }
+    .round-body{ padding:8px 16px 16px; }
+    table{ width:100%; border-collapse:collapse; }
+    th{ text-align:left; color:var(--muted); font-size:.78rem; text-transform:uppercase; letter-spacing:.5px; padding:6px 8px; }
+    td{ padding:4px 8px; }
+    td input{ width:100%; background:#0d0d12; border:1px solid var(--line); color:var(--fg);
+      border-radius:7px; padding:7px 9px; font-family:inherit; }
+    td.cnt{ width:90px; } td.rk{ width:46px; color:var(--muted); text-align:center; } td.act{ width:40px; }
+    .delrow{ background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:1.1rem; }
+    .row-add{ margin-top:8px; }
+    .preview{ margin-top:8px; padding:10px 12px; background:#0d0d12; border:1px dashed var(--line); border-radius:10px;
+      color:var(--muted); font-size:.85rem; }
+    .preview b{ color:var(--brand-gold); }
+
+    .toolbar{ display:flex; gap:10px; flex-wrap:wrap; margin:20px 0; align-items:center; }
+    .toast{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(120px);
+      background:var(--success); color:#04211a; font-weight:800; padding:12px 22px; border-radius:12px;
+      transition:.35s; z-index:50; box-shadow:0 12px 30px rgba(0,0,0,.4); }
+    .toast.show{ transform:translateX(-50%) translateY(0); }
+    .toast.err{ background:var(--danger); color:#fff; }
+
+    /* export modal */
+    .modal{ position:fixed; inset:0; z-index:60; display:none; align-items:center; justify-content:center;
+      background:rgba(0,0,0,.7); padding:20px; }
+    .modal.open{ display:flex; }
+    .modal-card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; width:min(760px,96vw);
+      max-height:90vh; overflow:auto; padding:22px; }
+    .modal-card h2{ margin:0 0 6px; }
+    .tab-cols{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:14px; }
+    @media(max-width:680px){ .tab-cols{ grid-template-columns:1fr; } }
+    .tab-cols h3{ font-size:.9rem; margin:0 0 6px; color:var(--brand-gold); }
+    textarea{ width:100%; height:200px; background:#0d0d12; border:1px solid var(--line); color:var(--fg);
+      border-radius:10px; padding:10px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.8rem; resize:vertical; }
+    .steps{ font-size:.88rem; color:var(--muted); line-height:1.7; margin-top:14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="./assets/img/dilwale_logo.png" alt="" onerror="this.style.display='none'" />
+    <h1><span>Family Feud</span> · Admin / Answer Editor</h1>
+    <div class="grow"></div>
+    <a class="btn ghost" href="./index.html">← Back to game</a>
+    <button class="btn" id="addRound">+ Round</button>
+    <button class="btn success" id="saveBtn">💾 Save & Play</button>
+    <button class="btn primary" id="exportBtn">⬆ Export to Sheets</button>
+  </header>
+
+  <div class="wrap">
+    <p class="hint">
+      Edit rounds and the curated answers + counts the game shows. <b>Save &amp; Play</b> stores it in this
+      browser so the game uses it instantly (no internet needed) — perfect for a live game night. <b>Export to Sheets</b>
+      gives you two CSV blocks to paste into your Google Sheet so anyone opening the public URL sees the same data.
+      Counts are how many people gave that answer; the board auto-sorts highest first.
+    </p>
+
+    <div class="rounds" id="rounds"></div>
+
+    <div class="toolbar">
+      <button class="btn" id="addRound2">+ Add Round</button>
+      <button class="btn ghost" id="loadCurrent">↺ Reload from data source</button>
+      <button class="btn ghost" id="resetSeed">⟲ Restore sample data</button>
+      <div class="grow"></div>
+      <button class="btn success" id="saveBtn2">💾 Save &amp; Play</button>
+      <button class="btn primary" id="exportBtn2">⬆ Export to Sheets</button>
+    </div>
+  </div>
+
+  <!-- Export modal -->
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <h2>Publish to Google Sheets</h2>
+      <p class="hint">Copy each block into the matching tab of your Google Sheet (replace existing contents), then
+        <b>File → Share → Publish to web</b> each tab as CSV. Paste those two CSV links into <code>config.js</code>
+        and set <code>SOURCE: 'sheets'</code>.</p>
+      <div class="tab-cols">
+        <div>
+          <h3>Tab: “Rounds”</h3>
+          <textarea id="roundsCSV" readonly></textarea>
+          <button class="btn sm" data-copy="roundsCSV">Copy Rounds CSV</button>
+        </div>
+        <div>
+          <h3>Tab: “Answers”</h3>
+          <textarea id="answersCSV" readonly></textarea>
+          <button class="btn sm" data-copy="answersCSV">Copy Answers CSV</button>
+        </div>
+      </div>
+      <div class="steps">
+        Tip: you can also just keep using <b>Save &amp; Play</b> if you only run the game on this one computer —
+        no Google Sheets required.
+      </div>
+      <div style="margin-top:16px; text-align:right;">
+        <button class="btn" id="closeModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Saved!</div>
+
+  <script src="./config.js"></script>
+  <script src="./feud-data.js"></script>
+  <script>
+  (function(){
+    'use strict';
+    const $ = id=>document.getElementById(id);
+    let model = { rounds:[], answersByRound:{} };
+
+    function toast(msg, err){ const t=$('toast'); t.textContent=msg; t.classList.toggle('err',!!err);
+      t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1900); }
+
+    function blankRound(){
+      const id = 'round'+(model.rounds.length+1);
+      return { order: model.rounds.length+1, id, title:'New Round', question:'Your answer is…', emoji:'🎯', survey_count:0 };
+    }
+
+    function render(){
+      const root=$('rounds'); root.innerHTML='';
+      model.rounds.forEach((r,ri)=>{
+        const card=document.createElement('div'); card.className='round-card';
+        const ans=(model.answersByRound[r.id]||[]);
+        card.innerHTML = `
+          <div class="round-head">
+            <input class="in-emoji" value="${esc(r.emoji)}" data-f="emoji" data-r="${ri}" maxlength="4"/>
+            <input class="in-id" value="${esc(r.id)}" data-f="id" data-r="${ri}" placeholder="id"/>
+            <input class="in-title" value="${esc(r.title)}" data-f="title" data-r="${ri}" placeholder="Title"/>
+            <input class="in-q" value="${esc(r.question)}" data-f="question" data-r="${ri}" placeholder="Question shown on board"/>
+            <input class="in-num" type="number" value="${r.survey_count||0}" data-f="survey_count" data-r="${ri}" title="# surveyed"/>
+            <button class="btn sm" data-mv="up" data-r="${ri}">↑</button>
+            <button class="btn sm" data-mv="down" data-r="${ri}">↓</button>
+            <button class="btn sm" data-delr="${ri}" style="border-color:var(--danger);color:var(--danger)">Delete</button>
+          </div>
+          <div class="round-body">
+            <table>
+              <thead><tr><th class="rk">#</th><th>Answer</th><th class="cnt">Count</th><th class="act"></th></tr></thead>
+              <tbody>
+                ${ans.map((a,ai)=>`
+                  <tr>
+                    <td class="rk">${ai+1}</td>
+                    <td><input value="${esc(a.name)}" data-an="name" data-r="${ri}" data-a="${ai}" placeholder="Answer text"/></td>
+                    <td class="cnt"><input type="number" value="${a.count}" data-an="count" data-r="${ri}" data-a="${ai}"/></td>
+                    <td class="act"><button class="delrow" data-dela="${ri}:${ai}" title="Remove">✕</button></td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+            <button class="btn sm row-add" data-adda="${ri}">+ Add answer</button>
+            <div class="preview" id="prev-${ri}"></div>
+          </div>`;
+        root.appendChild(card);
+        updatePreview(ri);
+      });
+      wire();
+    }
+
+    function updatePreview(ri){
+      const r=model.rounds[ri]; const el=$('prev-'+ri); if(!el) return;
+      const ans=(model.answersByRound[r.id]||[]).slice()
+        .sort((a,b)=> b.count-a.count).slice(0, (window.FEUD_CONFIG.TOP_N||8));
+      el.innerHTML = 'Board order: '+(ans.length? ans.map((a,i)=>`<b>${i+1}.</b> ${esc(a.name)} (${a.count})`).join(' &nbsp;·&nbsp; ') : '—');
+    }
+
+    function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+    function wire(){
+      // round field edits
+      document.querySelectorAll('[data-f]').forEach(inp=>{
+        inp.oninput=()=>{ const ri=+inp.dataset.r, f=inp.dataset.f;
+          if(f==='id'){ // keep answers mapped to id
+            const oldId=model.rounds[ri].id, newId=inp.value.trim()||oldId;
+            if(newId!==oldId){ model.answersByRound[newId]=model.answersByRound[oldId]||[]; delete model.answersByRound[oldId]; }
+            model.rounds[ri].id=newId;
+          } else if(f==='survey_count'){ model.rounds[ri][f]=parseInt(inp.value,10)||0; }
+          else { model.rounds[ri][f]=inp.value; }
+        };
+      });
+      // answer edits
+      document.querySelectorAll('[data-an]').forEach(inp=>{
+        inp.oninput=()=>{ const ri=+inp.dataset.r, ai=+inp.dataset.a, f=inp.dataset.an;
+          const id=model.rounds[ri].id; const arr=model.answersByRound[id]||(model.answersByRound[id]=[]);
+          if(f==='count') arr[ai].count=parseInt(inp.value,10)||0; else arr[ai].name=inp.value;
+          updatePreview(ri);
+        };
+      });
+      document.querySelectorAll('[data-adda]').forEach(b=> b.onclick=()=>{
+        const ri=+b.dataset.adda, id=model.rounds[ri].id;
+        (model.answersByRound[id]||(model.answersByRound[id]=[])).push({name:'',count:0,rank:null}); render();
+      });
+      document.querySelectorAll('[data-dela]').forEach(b=> b.onclick=()=>{
+        const [ri,ai]=b.dataset.dela.split(':').map(Number); const id=model.rounds[ri].id;
+        model.answersByRound[id].splice(ai,1); render();
+      });
+      document.querySelectorAll('[data-delr]').forEach(b=> b.onclick=()=>{
+        const ri=+b.dataset.delr; const id=model.rounds[ri].id;
+        delete model.answersByRound[id]; model.rounds.splice(ri,1); render();
+      });
+      document.querySelectorAll('[data-mv]').forEach(b=> b.onclick=()=>{
+        const ri=+b.dataset.r, dir=b.dataset.mv==='up'?-1:1, ni=ri+dir;
+        if(ni<0||ni>=model.rounds.length) return;
+        const tmp=model.rounds[ri]; model.rounds[ri]=model.rounds[ni]; model.rounds[ni]=tmp;
+        model.rounds.forEach((r,i)=> r.order=i+1); render();
+      });
+    }
+
+    function addRound(){ const r=blankRound(); model.rounds.push(r); model.answersByRound[r.id]=[{name:'',count:0,rank:null}]; render(); }
+
+    function save(){
+      model.rounds.forEach((r,i)=> r.order=i+1);
+      FeudData.saveLocalOverride(model);
+      toast('Saved! The game will use this now.');
+    }
+
+    async function loadCurrent(){
+      try{ const m=await FeudData.loadGameData(); model={ rounds:m.rounds, answersByRound:m.answersByRound }; render(); toast('Loaded from '+m.source+'.'); }
+      catch(e){ toast('Load failed: '+e.message, true); }
+    }
+    async function resetSeed(){
+      try{
+        const [rr,ar]=await Promise.all([
+          FeudData.fetchCSV(window.FEUD_CONFIG.LOCAL.ROUNDS_CSV_URL),
+          FeudData.fetchCSV(window.FEUD_CONFIG.LOCAL.ANSWERS_CSV_URL)
+        ]);
+        const m=FeudData.buildModel(rr,ar); model={rounds:m.rounds, answersByRound:m.answersByRound};
+        FeudData.clearLocalOverride(); render(); toast('Sample data restored.');
+      }catch(e){ toast('Could not load sample data (run via a server).', true); }
+    }
+
+    function openExport(){
+      model.rounds.forEach((r,i)=> r.order=i+1);
+      $('roundsCSV').value = FeudData.modelToRoundsCSV(model);
+      $('answersCSV').value = FeudData.modelToAnswersCSV(model);
+      $('modal').classList.add('open');
+    }
+
+    // copy buttons
+    document.addEventListener('click', e=>{
+      const id=e.target.getAttribute && e.target.getAttribute('data-copy');
+      if(id){ const ta=$(id); ta.select(); document.execCommand('copy');
+        try{ navigator.clipboard.writeText(ta.value); }catch(_){} toast('Copied '+id.replace('CSV','')+' CSV'); }
+    });
+
+    $('addRound').onclick=$('addRound2').onclick=addRound;
+    $('saveBtn').onclick=$('saveBtn2').onclick=save;
+    $('exportBtn').onclick=$('exportBtn2').onclick=openExport;
+    $('loadCurrent').onclick=loadCurrent;
+    $('resetSeed').onclick=resetSeed;
+    $('closeModal').onclick=()=>$('modal').classList.remove('open');
+
+    loadCurrent();
+  })();
+  </script>
+</body>
+</html>
