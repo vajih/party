@@ -283,6 +283,16 @@
     let soundOn = true;
     function play(n){ if(!soundOn||!sounds[n]) return; try{ sounds[n].currentTime=0; sounds[n].play().catch(()=>{});}catch(e){} }
 
+    // ---------- looping background theme ----------
+    // Browsers block autoplay-with-sound until the user interacts, so the theme
+    // starts on the first click/keypress and then loops quietly in the background.
+    const bgm = new Audio('./assets/sounds/feud-intro.mp3');
+    bgm.loop = true; bgm.volume = 0.3; bgm.preload = 'auto';
+    let bgmStarted = false;
+    function startBgm(){ if(!soundOn || bgmStarted) return; bgm.play().then(()=>{ bgmStarted = true; }).catch(()=>{}); }
+    document.addEventListener('pointerdown', startBgm);
+    document.addEventListener('keydown', startBgm);
+
     // ---------- state ----------
     let MODEL = null;             // {rounds, answersByRound}
     let ROUNDS = [];
@@ -506,7 +516,8 @@
     $('homeChip').onclick = backToMenu;
     $('winHost').onclick = startHost;
     $('winMenu').onclick = backToMenu;
-    $('soundChip').onclick = ()=>{ soundOn=!soundOn; $('soundChip').textContent = soundOn?'🔊 Sound':'🔇 Muted'; };
+    $('soundChip').onclick = ()=>{ soundOn=!soundOn; $('soundChip').textContent = soundOn?'🔊 Sound':'🔇 Muted';
+      if(soundOn){ bgm.play().then(()=>{ bgmStarted=true; }).catch(()=>{}); } else { bgm.pause(); } };
 
     $('strikeBtn').onclick=addStrike;
     $('revealAllBtn').onclick=revealAll;
